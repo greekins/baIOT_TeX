@@ -1,0 +1,29 @@
+\input{config/configuration}
+\input{config/commands}
+\input{config/standardtexts}
+ 
+\begin{document}
+
+\include{start/titlepage}
+
+\include{start/abstract}
+\include{start/managementsummary}
+
+%Selbststaendigkeitserklaerung
+%\includepdf[pages=-, pagecommand={},
+%scale=0.73, trim=80 210 80 80]{start/erklaerung}
+
+\addcontentsline{toc}{chapter}{Table of Contents}
+\tableofcontents
+
+%\include{mainpart/analysis/index}
+
+\nocite{*}
+\bibliographystyle{IEEEtran}
+\bibliography{Templator}
+
+%\input{appendix/abbreviations}
+
+\include{appendix/index}
+
+\end{document}
