@@ -107,7 +107,7 @@ Wöchentliche Besprechungen: \\
 	\textbf{Bezeichnung}	& \textbf{Ziel} & \textbf{Wochentag} & \textbf{Uhrzeit} & \textbf{Ort}\\
 	\hline
 	Teambesprechung			& Projektarbeiten im Plenum erledigen	& Donnerstag & 08:10-08:40	& HSR (Labor) \\ \hline
-	Fortschrittsbesprechung	& Fortschritte / Probleme besprechen		& Mittwoch & 10:10-10:50	& HSR (6.010) \\ \hline
+	Fortschrittsbesprechung	& Fortschritte/Probleme besprechen		& Mittwoch & 10:10-10:50	& HSR (6.010) \\ \hline
 \end{tabularx}
 \pagebreak
 
@@ -116,7 +116,7 @@ Wöchentliche Besprechungen: \\
 Unser projektbezogenes Risikomanagement wird in einem separaten Excel-Sheet aufgeführt. Nachstehend ist ein Snapshot dieses Sheets zu sehen. Das Dokument wird laufend angepasst und aktualisiert, falls notwendig. \tbd
 
 \subsection*{Umgang mit Risiken}
-\subsubsection*{Reserven / Rückstellungen}
+\subsubsection*{Reserven/Rückstellungen}
 Das grösste Risiko stellt R3 (ungeplante Machbarkeiten) \tbd dar. Aus diesem Grund werden in diesem Projekt Rückstellungen von 20 Stunden eingeplant.
 
 \subsubsection*{Überprüfung von Risiken}
@@ -133,28 +133,52 @@ Eine Übersicht mit allen Arbeitspaketen und dem zeitlichen Ablauf nach Iteratio
 \subsection*{Software}
 Wie in jedem Projekt kommt verschiedene Software zum Einsatz. \\
 
-\begin{tabularx}{\textwidth}{lXlll}
-	\textbf{Bezeichnung}	& \textbf{Ziel} & \textbf{Wochentag} & \textbf{Uhrzeit} & \textbf{Ort}\\
-	\hline
-	Teambesprechung			& Projektarbeiten im Plenum erledigen	& Donnerstag & 08:10-08:40	& HSR (Labor) \\ \hline
-	Fortschrittsbesprechung	& Fortschritte / Probleme besprechen		& Mittwoch & 10:10-10:50	& HSR (6.010) \\ \hline
+\begin{tabularx}{\textwidth}{llX}
+	\textbf{Software}	& \textbf{Version (Major)} & \textbf{Beschreibung/Einsatzbereich} \\ \hline
+	GitHub	& v3 & Source Code Verwaltung inkl. Branchmanagement, Web Interface für Git-Verwaltung. \\ \hline
+	Atlassian: Jira & 6.4 & Projektmanagement \\ \hline
+	Windows Server	& 2012 R2 (64Bit) & Virtueller Server für Jira \\ \hline
+	\tbd & \tbd & \tbd \\ \hline
 \end{tabularx}
+\pagebreak
 
 \section*{Qualitätsmassnahmen}
-\tbd
+
+\begin{tabularx}{\textwidth}{XXX}
+	\textbf{Massnahme}	& \textbf{Zeitraum} & \textbf{Ziel} \\ \hline
+	Einsetzen eines Projekt-Management-Tools & ganzes Projekt & Alle auf dem aktuellsten Stand halten \\ \hline
+	Versionierungssystem (git) ganzes Projekt & Sicherung des Codes/Doku, keine Blockaden \\ \hline
+	Koordinationsmeetings & ganzes Projekt & Ressourcen optimal zuteilen: Wer benötigt wo Hilfe, wer ist schon fertig? \\ \hline
+	Vier-Augen-Prinzip & ganzes Projekt & Dokumentation/Programm-code wird jeweils von beiden Partnern kontrolliert. Bei einem Ausfall einer Person, ist das andere Mitglied informiert. \\ \hline
+\end{tabularx}
 
 \subsection*{Dokumentation}
 \subsubsection*{Ablage}
-\tbd
+Alle Dokumente können auf dem GitHub Repository gefunden werden. Die Vorgänge werden mit Jira auf einem virtuellen Server der HSR verwaltet.
+\begin{itemize}
+	\item Dokumentation: \url{https://github.com/greekins/baIOT_TeX} 
+	\item Vorgänge: \url{http://sinv-56046.edu.hsr.ch:8080}
+\end{itemize}
+Der Source-Code wird mit Git verwaltet: \tbd
 
 \subsubsection*{Qualität}
-\tbd
+\begin{itemize}
+	\item Commits verlangen eine Beschreibung
+	\item Benutzerfreundliche Commit-Übersicht dank Github
+	\item Für die Qualität des Codes wird in jeder Iteration (ab Elaboration E2) Codereviews durchgeführt (siehe Managementabläufe)
+\end{itemize}
 
 \subsection*{Projektmanagement}
-\tbd
+Es wird die von Atlassian zur Verfügung gestellte Umgebung eingesetzt: \\
+\url{http://sinv-56046.edu.hsr.ch:8080}
+\textbf{Gast Login:} hhuser
+
 
 \subsection*{Entwicklung}
 \subsubsection*{Code Reviews}
-\tbd
+Die Commits sind für alle Projektmitglieder ersichtlich und werden in einem Activity Stream auf dem Repository unter «Graph» angezeigt. Diese werden sporadisch von den anderen Mitgliedern geöffnet und kurz überprüft. \\
+\\
+Bei einem wöchentlichen Meeting werden getätigte Implementierungen im Plenum angeschaut und besprochen. Auch lautet usere Regel, dass bei Unsicherheiten bei laufender Entwicklung Rat vom anderen Teammitglied eingeholt wird.
 
 \subsubsection*{Code Style Guidelines}
+Es wird sich an die gängigen Style Guidelines gehalten, die im Laufe des Studiums eingeführt wurden.
