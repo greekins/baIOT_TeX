@@ -4,6 +4,20 @@
 	ngerman] % english, hyphenation etc.
 	{scrreprt} % Report (KOMA-Script)
 
+\usepackage{titlesec}
+% spacing: how to read {12pt plus 4pt minus 2pt}
+%           12pt is what we would like the spacing to be
+%           plus 4pt means that TeX can stretch it by at most 4pt
+%           minus 2pt means that TeX can shrink it by at most 2pt
+%       This is one example of the concept of, 'glue', in TeX
+
+\titlespacing*{\section}
+{0pt}{8pt plus 0pt minus 4pt}{0pt plus 0pt minus 4pt}
+\titlespacing*{\subsection}
+{0pt}{8pt plus 0pt minus 4pt}{0pt plus 0pt minus 4pt}
+\titlespacing*{\subsubsection}
+{0pt}{8pt plus 0pt minus 4pt}{0pt plus 0pt minus 4pt}
+
 \usepackage[T1]{fontenc} % Font family encoding: 8 Bit
 \usepackage[utf8]{inputenc} % Encoding in the created document: UTF-8
 \usepackage{lmodern} % Font family
@@ -24,6 +38,7 @@
 
 \usepackage{booktabs} % Professional looking tables (\toprule,% \midrule,
 	% \bottomrule)
+\usepackage{tabularx}
 \usepackage{threeparttable} % table with notes (\tnote, \begin{tablenotes})
 \usepackage{longtable}
 
