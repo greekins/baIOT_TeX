@@ -1,0 +1,54 @@
+\section{Problembeschreibung}
+
+\subsection{Motivation}
+Als Smart-Home Beispielszenario soll ein System aufgesetzt werden, das einen grossen Bezug zur Realität hat. Es soll für aussenstehende Personen attraktiv und nachvollziehbar sein und einen Mehrwert mit sich bringen.
+
+\subsection{Funktionale Anforderungen}
+\subsubsection{Basisszenario}
+Während der Analyse für das Basisszenario hat sich der Einsatz des openHAB Smart-Home Framework ergeben. Dieses Framework bietet eine Basis für das versenden von Events, definieren von Regeln, und anschliessen (über Bindings) von Aktoren bzw. Sensoren.
+
+\textbf{F01: Sensoren Status} \\
+Der Status eines Sensors kann abgefrag werden und aufgrund dessen sollen bestimmte Aktionen ausgeführt werden.
+
+\textbf{F02: Steuern von Aktoren} \\
+Von einem Client wird ein Command gesendet, der an einen Aktor weitergeleitet wird. Beim Empfang eines Commands ändert der Aktor seinen Status. Der Status wird im openHAB aktualisiert.
+
+\textbf{F03: Persistieren der Events in Cloud} \\
+Alle Events/Commands, die von Aktoren, Sensoren und Client gesendet werden, werden in der MS Azure Cloud persistiert. Sie werden in einer optimierten Form abgelegt, damit später Statistiken erstellt werden können (nicht Teil der Arbeit).
+
+\textbf{F04: Regeln} \\
+Aufgrund von Statusänderungen sollen vordefinierte Aktionen ausgelöst werden. Das betrifft einerseits das Ändern eines Zustandes eines Aktors, andererseits das propagieren von Notifikationen an einen Client.
+
+\subsubsection{Lösungsteil (Demo-System)}
+\textbf{L01: Sicherheits-Status abfragen} \\
+Der Client soll den Status des Einbrecherschutzes abgefragt werden können. \\
+Status «OK»:
+\begin{itemize}
+	\item Fenster ist geschlossen
+	\item Türe ist geschlossen
+	\item keine Bewegung detektiert
+\end{itemize}
+Status «NOK»:
+\begin{itemize}
+	\item Fenster ist offen
+	\item Türe ist offen
+	\item Bewegung detektiert
+\end{itemize}
+
+\textbf{L02: Überwachungskamera} \\
+Der Client kann die Überwachungskamera ein- bzw. ausschalten und Livebilder anfordern.
+
+\textbf{L03: Event Kontaktsensor} \\
+Der Kontaktsensor hat permanent einen Status. Der Status ist entweder «offen» oder «geschlossen».
+
+\textbf{L04: Event Bewegungsmelder} \\
+Sobald der Bewegungsmelder eine Bewegung registriert, sendet dieser einen Event. Dieser wird nach interner Logik verarbeitet.
+
+\textbf{L05: Aktor: Philips Hue} \\
+Der Aktor wird via Command angesteuert. Das Licht kann durch eine Regel (Zeit-Mechanismus zur Prävention) oder durch eine Aktion des Clients ein bzw. abgeschaltet werden.
+
+\textbf{L06: Aktor: NFC Sticker} \\
+Die NFC Stickers können sehr vielfältig eingesetzt werden. Generell wird durch Auflegen eines NFC-fähigen Smartphones eine Aktion ausgeführt. Was diese Aktion genau beinhaltet ist offen. Beispielsweise könnte das Sicherheitssystem «scharfgestellt» werden.
+
+\textbf{L07: Aktor: Funksteckdose} \\
+Die Funksteckdose kann ebenfalls vielseitig eingesetzt werden. Etwas abstrahiert betrachtet, kann jedes Gerät per Remote ein- bzw. ausgeschaltet werden. An dieser Funktsteckdose kann zum Beispiel eine Musikanlage oder ein Fernsehgerät eingeschaltet werden.
