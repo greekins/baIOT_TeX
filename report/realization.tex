@@ -1,1 +1,50 @@
 \section{Umsetzung}
+\subsection{Technologie und Plattform}
+Für unser Projekt werden verschiedene Technologien bzw. Platformen eingesetzt. Auf der Clientseite, im SmartHome, wird openHAB mit verschiedenen Bindings eingesetzt. Cloudseitig wird MS Azure Cloud zur Persistierung von Events verwendet.
+
+\subsection{openHAB}
+Das System openHAB wird eingesetzt, um verschiedene Home-Automatisierungssysteme unter einen Hut zu bringen. Um dies zu realisieren bietet openHAB eine grosse Anzahl von Bindings mit, mit denen die verschiedenen Systeme angesprochen werden können.
+
+\subsubsection*{Module}
+OpenHAB ist durch OSGi-Bundles modular aufgebaut und binhaltet folgende Komponenten:
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=0.45]{report/img/openHAB_architecture}
+	\caption{openHAB Architektur}
+	\label{fig:ohArch}
+\end{figure}
+
+
+\subsubsection*{Kommunikation}
+Der Basisservice von openHAB stellt der Event Bus (nicht in der Abbildung \ref{fig:ohArch} zu sehen). Über diesen Bus werden Events zwischen den verschiedenen Bundles gesendet. Die Events sind entweder Commands, welche eine Aktion ausführen, oder Status-Updates, welche Statusänderungen der Devices beinhaltet. \\
+Durch den Einsatz dieses EventBus wird die Kopplung reduziert und können somit einfach ausgetauscht werden. \\
+Für die Verwaltung der verschiedenen Status ist das Item Repository zuständig, welches permanent den Event Hub auf Status-Updates abhört und die Änderungen ins Repository schreibt. Falls auf einem GUI ein Status eines Devices angezeigt werden soll, kann dazu das Item Repository abgefragt werden.\\
+Das Repository persistiert die Status und ist somit auch nach einem Neustart verfügbar.
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=0.4]{report/img/communicationOH}
+	\caption{Kommunikation openHAB}
+	\label{fig:ohComm}
+\end{figure}
+
+\subsection{Bindings}
+
+\subsubsection*{HomeMatic}
+
+\subsubsection*{EDIMAX Netzwerk-Kamera}
+
+\subsubsection*{Philips Hue}
+
+\subsubsection*{MS Azure Cloud}
+
+
+\subsection{Deploymentübersicht}
+\subsubsection*{Binding Azure}
+\begin{figure}[h!]
+	\centering
+		\includegraphics[scale=0.5]{report/img/deployment_binding_azure}
+	\caption{Binding Azure Cloud}
+	\label{fig:deploymentAzure}
+\end{figure}
