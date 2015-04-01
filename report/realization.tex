@@ -5,7 +5,7 @@ Für unser Projekt werden verschiedene Technologien bzw. Platformen eingesetzt. 
 \subsection{openHAB}
 Das System openHAB wird eingesetzt, um verschiedene Home-Automatisierungssysteme unter einen Hut zu bringen. Um dies zu realisieren bietet openHAB eine grosse Anzahl von Bindings mit, mit denen die verschiedenen Systeme angesprochen werden können.
 
-\subsubsection*{Module}
+\subsubsection{Module}
 OpenHAB ist durch OSGi-Bundles modular aufgebaut und binhaltet folgende Komponenten:
 
 \begin{figure}[H]
@@ -16,7 +16,7 @@ OpenHAB ist durch OSGi-Bundles modular aufgebaut und binhaltet folgende Komponen
 \end{figure}
 
 
-\subsubsection*{Kommunikation}
+\subsubsection{Kommunikation}
 Der Basisservice von openHAB stellt der Event Bus. Über diesen Bus werden Events zwischen den verschiedenen Bundles gesendet. Die Events sind entweder Commands, welche eine Aktion ausführen, oder Status-Updates, welche Statusänderungen der Devices beinhaltet. \\
 Durch den Einsatz dieses EventBus wird die Kopplung reduziert und können somit einfach ausgetauscht werden. \\
 Für die Verwaltung der verschiedenen Status ist das Item Repository zuständig, welches permanent den Event Bus auf Status-Updates abhört und die Änderungen ins Repository schreibt. Falls auf einem GUI ein Status eines Devices angezeigt werden soll, kann dazu das Item Repository abgefragt werden.\\
@@ -29,7 +29,7 @@ Das Repository persistiert die Status und ist somit auch nach einem Neustart ver
 	\label{fig:ohComm}
 \end{figure}
 
-\subsubsection*{Bindings}
+\subsubsection{Bindings}
 Ein Binding ist eine Verbindung zwischen dem Event Bus und den externen Systemen. Diese Verbindungen sind aufgrund der verschiedenen Technologien verschieden. Dadurch muss für jede Technologie ein eigenes Binding geschrieben werden. Für einige Systeme sind Bindings vorhanden, die einzeln heruntergeladen und als «Add-on» installiert werden können.
 Die Bindings stellen nur sicher, dass Events zwischen Event Bus und den jeweiligen Devices ausgetauscht werden können. Sie müssen sich also nicht um Statusänderungen oder ähnliches kümmern, da dies durch das Item Repository übernommen wird. \\
 Alle momentan verfügbare Bindings sind unter folgendem Link zu finden: \url{https://github.com/openhab/openhab/wiki/Bindings}
@@ -37,7 +37,8 @@ Alle momentan verfügbare Bindings sind unter folgendem Link zu finden: \url{htt
 
 \pagebreak
 \subsection{Deploymentübersicht}
-\subsubsection*{Binding Azure}
+
+\subsubsection{Binding Azure}
 \begin{figure}[h!]
 	\centering
 		\includegraphics[scale=0.5]{report/img/deployment_binding_azure}
