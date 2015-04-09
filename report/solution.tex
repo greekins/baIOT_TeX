@@ -1,5 +1,54 @@
 \section{Lösungskonzept}
-Dieses Kapitel beinhaltet die Beschreibung der Architektur und wichtiger Komponenten. Die eingesetzten Technologien und genauen Implementationsdetails stehen im Hintergrund und werden im Kapitel 4 aufgegriffen. Neben der Architektur beinhaltet das Lösungskonzept auch eine allgemeine Schnittstellenbeschreibung. Informationen zur technischen Anbindung an die Schnittstellen können im Abschnitt 7 \tbd im Anhang entnommen werden.
+Dieses Kapitel beinhaltet die Beschreibung der Architektur und wichtiger Komponenten. Die eingesetzten Technologien und genauen Implementationsdetails stehen im Hintergrund und werden im Kapitel 4 aufgegriffen. Ausserdem wird erklärt, welches Plattform verwendet wird und warum sie ausgewählt wurde.
+
+\subsection{Evaluation der Plattform}
+Anhand der Marktsituation und den funkionalen Anforderungen haben wir die Vor- und Nachteile der jeweiligen Plattformen miteinander verglichen und dabei darauf geachtet, welche Kriterien für unsere Lösung von Bedeutung sind.
+
+Wichtige Kriterien:
+\begin{itemize}
+	\item Nachträgliche Installation möglich
+	\item Beliebige Szenarien realisierbar
+	\item Herstellerunabhängige Komponenten
+	\item Erfüllung der Anforderungen F01 - F05
+\end{itemize}
+
+Vernachlässigbare Kriterien:
+\begin{itemize}
+	\item Optisch ansprechende Integration
+	\item Installation ohne Fachkenntnisse
+\end{itemize}
+
+\subsubsection{Ergebnis: openHAB} 
+Mit openHAB haben wir eine Plattform gefunden, die allen wichtigen Kriterien entspricht und zudem kostenlos ist. Da wir openHAB sofort auf unseren Notebooks installieren konnten, war es sehr einfach zu beurteilen, ob die Plattform auch in der Praxis unsere Anforderungen erfüllt. Die mitgelieferte Demo-Konfiguration beinhaltete bereits viele anschauliche Beispiele, die später als Vorlage für unsere eigenen Anwendungsfälle dienen können. 
+
+\textbf{Erfüllung der funktionalen Anforderungen} \\
+\textit{F01 - F02:} Über sogenannte Items können Sensoren und Aktoren virtuell und genügend abstrakt definiert werden. Der OSGi EventBus von openHAB ermöglicht den Transport von Events und Commands zwischen Items und der Zentrale (OpenHAB Runtime). Bindings mappen die Items auf tatsächliche Sensoren und Aktoren.
+
+\textit{F03:} OpenHAB kann den Verkehr auf dem EventBus über verschiedene Wege auf externen Systemen protokollieren. Zu unserem Zweck eignet sich das MQTT Persistence Modul.
+
+\textit{F04:} Über die Rule Engine von openHAB können Regeln mit Hilfe einer Java-ähnlichen DSL beschrieben werden. Regeln werden bei gewissen Events auf dem EventBus ausgeführt. Die DLS erlaubt den Zugriff auf den Zustand von Items und kann auch Commands an Items und somit an Aktoren senden.
+
+\textit{F05:} Ein RESTful API bietet umfassenden Zugriff auf die openHAB Runtime. Über sogenannte Sitemaps können deskriptive User Interfaces automatisch generiert werden.
+
+
+
+\textbf{Nachteile} \\
+Ein Nachteil an openHAB ist, dass die Dokumentation grosse Lücken aufweist. Zwar sind die Konzepte leichte verständlich, jedoch fehlen Detailangaben zur DSL und genauen Konfigurationssyntax. Aus diesem Grund müssen oft Beispiele analysiert oder Benutzerforen zu Rate gezogen werden.
+
+\subsection{Evaluation der Hardware}
+Nachdem wir openHAB als Plattform bestimmt haben konnten wir die Hardware für die Sensoren und Aktoren aussuchen. Dafür haben wir uns an den Vorgaben L02 - L06 aus Abschnitt 2.2.2 orientiert. Durch die Vielzahl an Protokollen, die durch openHAB unterstützt werden, hatten wir genügend Auswahl an Hardware von unterschiedlichen Herstellern. OpenHAB selbst läuft auf einem Raspberry Pi B+.
+
+\textit{L02:} Als Überwachungskamera haben wir die Edimax IC-3115W Netzwerkkamera ausgesucht. Sie ist mit einem Preis von weniger als 50 Euro relativ günstig und über das HTTP Binding von openHAB kompatibel.
+
+\textit{L03:} Beim Fensterkontaktsensor war uns ein kabelloses Modell wichtig, das unkompliziert montiert werden kann. Aus diesem Grund haben wir uns für den optischen Fensterkontakt HM-Sec-Sco von eQ-3 HomeMatic entschieden. Der Fensterkontakt erfordert jedoch eine Zentrale, die separat bestellt werden musste. Für HomeMatic existiert ein Binding seitens openHAB.
+
+\textit{L04:} Der Funk Bewegungsmelder HM-Sec-MDIR-2, ebenfalls von eQ-3 HomeMatic, benutzt die gleiche Zentrale wie der Fensterkontaktsensor und ist für den Indoorgebrauch ausgelegt.
+
+\textit{L05:} Das Philips Hue Lux Starterkit beinhaltet zwei dimmbare LED-Birnen und eine Zentrale, die ans lokale Netzwerk angeschlossen werden muss. Ein openHAB Binding für Philips Hue ist vorhanden.
+
+\textit{L06:} Da wir durch den Fensterkontakt und den Bewegungsmelder schon eine HomeMatic Zentrale besitzen, liegt es nahe auch die Funksteckdose von diesem Hersteller zu verwenden.
+
+
 
 \subsection{Allgemeine Systemsicht}
 Anhand der Problembeschreibung wurde ein Plan erarbeitet, der das ganze System verständlich beschreibt. Abbildung \ref{fig:systemView} stellt die wichtigsten Komponenten und Entitäten aus der Problemdomäne in gegenseitiger Beziehung dar.
@@ -10,3 +59,5 @@ Anhand der Problembeschreibung wurde ein Plan erarbeitet, der das ganze System v
 	\caption{Systemübersicht}
 	\label{fig:systemView}
 \end{figure}
+
+\pagebreak
