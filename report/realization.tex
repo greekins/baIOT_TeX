@@ -53,30 +53,23 @@ Alle momentan verfügbare Bindings sind unter folgendem Link zu finden: \url{htt
 
 \subsubsection{MQTT Client}
 
-\begin{lstlisting}[style=csharp]
-class MQTTClient
-{
-	static void Main(string[] args)
-	{
-		var stream = Assembly.GetExecutingAssembly()
-					.GetManifestResourceStream("ConsoleApplication1.m2mqtt_ca.cer");
-		var bytes = new byte[stream.Length];
-		stream.Read(bytes, 0, bytes.Length);
-		var cert = new X509Certificate2(bytes, "certPassword");
+\begin{lstlisting}[style=csharp, caption=MQTT Client in Worker Role]
+	var stream = Assembly.GetExecutingAssembly()
+					.GetManifestResourceStream("m2mqtt_ca.cer");
+	var bytes = new byte[stream.Length];
+	stream.Read(bytes, 0, bytes.Length);
+	var cert = new X509Certificate2(bytes, "certPassword");
 
-		MqttClient client = new MqttClient("greekinsWIN",
-		   8883,
-		   true,
-		   new X509Certificate(cert));
+	MqttClient client = new MqttClient("greekinsWIN",
+									8883,
+									true,
+									new X509Certificate(cert));
+	client.Connect(Guid.NewGuid().ToString());
 
-		client.Connect(Guid.NewGuid().ToString());
-
-		for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 10; i++)
 		client.Publish(
 			"sensor/temp", Encoding.UTF8.GetBytes("27"),
 			MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, true
 		);
-		Console.Read();
-	}
-}
+	Console.Read();
 \end{lstlisting}

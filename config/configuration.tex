@@ -69,7 +69,7 @@
 \usepackage{color}
 \definecolor{bluekeywords}{rgb}{0.13,0.13,1}
 \definecolor{greencomments}{rgb}{0,0.5,0}
-\definecolor{redstrings}{rgb}{0.9,0,0}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
 
 % colors for syntax highlighting
 \definecolor{strings}{RGB}{42,0,255}
@@ -125,7 +125,7 @@
 \usepackage{chngcntr}
 \counterwithout{figure}{section}
 
-\lstset{language=[Sharp]C,frame=lines}
+\lstset{language=[Sharp]C,frame=single}
 \lstdefinestyle{csharp}{
 	language=[Sharp]C,
 	showspaces=false,
@@ -136,6 +136,8 @@
 	escapeinside={(*@}{@*)},
 	commentstyle=\color{greencomments},
 	keywordstyle=\color{bluekeywords}\bfseries,
-	stringstyle=\color{redstrings},
-	basicstyle=\small
+	stringstyle=\color{mauve},
+	captionpos=b,
+	keepspaces=true,
+	basicstyle=\ttfamily
 }
