@@ -18,7 +18,7 @@ OpenHAB ist durch OSGi-Bundles modular aufgebaut und binhaltet folgende Komponen
 
 
 \subsubsection{Kommunikation}
-Der Basisservice von openHAB stellt der Event Bus. Über diesen Bus werden Events zwischen den verschiedenen Bundles gesendet. Die Events sind entweder Commands, welche eine Aktion ausführen, oder Status-Updates, welche Statusänderungen der Devices beinhaltet. \\
+Der Basisservice von openHAB stellt der Event Bus dar. Über diesen Bus werden Events zwischen den verschiedenen Bundles gesendet. Die Events sind entweder Commands, welche eine Aktion ausführen, oder Status-Updates, welche Statusänderungen der Devices beinhaltet. \\
 Durch den Einsatz dieses EventBus wird die Kopplung reduziert und können somit einfach ausgetauscht werden. \\
 Für die Verwaltung der verschiedenen Status ist das Item Repository zuständig, welches permanent den Event Bus auf Status-Updates abhört und die Änderungen ins Repository schreibt. Falls auf einem GUI ein Status eines Devices angezeigt werden soll, kann dazu das Item Repository abgefragt werden.\\
 Das Repository persistiert die Status und ist somit auch nach einem Neustart verfügbar.
@@ -51,25 +51,57 @@ Alle momentan verfügbare Bindings sind unter folgendem Link zu finden: \url{htt
 	\label{fig:deploymentAzure}
 \end{figure}
 
-\subsubsection{MQTT Client}
+\subsubsection{MQTT Binding}
 
-\begin{lstlisting}[style=csharp, caption=MQTT Client in Worker Role]
-	var stream = Assembly.GetExecutingAssembly()
-					.GetManifestResourceStream("m2mqtt_ca.cer");
-	var bytes = new byte[stream.Length];
-	stream.Read(bytes, 0, bytes.Length);
-	var cert = new X509Certificate2(bytes, "certPassword");
+\subsection{MQTT}
+MQTT steht für «Message Queue Telemetry Transport» und ist ein Nachrichten-Protokoll, das speziell für IOT-Anwendungen konzipiert wurde. Es setzt auf dem TCP/IP Stack auf und wird für den Nachrichtenaustausch zwischen verschiedenen, verteilten Maschinen verwendet. \\
+Das Protokoll wurde speziell für Systeme designt, die über wenig Speicherplatz und kleiner Netzwerk-Bandbreite verfügen, was bei IOT-Anwendungen meist der Fall ist.
 
-	MqttClient client = new MqttClient("greekinsWIN",
-									8883,
-									true,
-									new X509Certificate(cert));
-	client.Connect(Guid.NewGuid().ToString());
+\subsubsection{Funktionsweise}
+MQTT folgt dem Prinzip «Publish/Subscribe», sprich Clients können bestimmte Topics abonnieren. Wenn Messages auf dieses Topic gesendet werden, leitet der Broker diese an alle interessierten Clients weiter. \\
+In Bezug auf erstellen von Topics agiert der Broker passiv. Das bedeutet, Clients können sich auf beliebigen, selber defnierte, Topics registrieren. Wenn aber niemand auf dieses Topic publiziert, wird der Client nie eine Message erhalten.
 
-	for (int i = 0; i < 10; i++)
-		client.Publish(
-			"sensor/temp", Encoding.UTF8.GetBytes("27"),
-			MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, true
-		);
-	Console.Read();
-\end{lstlisting}
+\begin{figure}[h!]
+	\centering
+		\includegraphics[scale=0.6]{report/img/mqttFunktionsweise}
+	\caption{Funktionsweise MQTT}
+	\label{fig:deploymentAzure}
+\end{figure}
+
+\subsubsection{MQTT Broker Evaluation}
+Für die Evaluation des Brokers haben wir eine List mit unseren Anforderungen erstellt: 
+
+\begin{enumerate}
+	\item Open Source/Freeware
+	\item SSL TLS Verschlüsselung
+	\item Benutzername \& Passwort Authentifizierung
+	\item High throughput, Low latency
+	\item Cloud Ready
+	\item Einfache Installation
+	\item Qualit of Service Level: Exactly once
+	\item Last Will unterstützung (Message, die gesendet wird, wenn der Client die Verbindung schliesst)
+\end{enumerate}
+
+\textbf{HiveMQ (\url{http://www.hivemq.com})} \\
+HiveMQ ist ein proprietärer MQTT-Broker und erfüllt alle unsere Kriterien bis auf das erste Kriterium. Jeder Gebrauch des Brokers muss bezahlt werden, siehe: \url{http://www.hivemq.com/pricing/}.
+
+\textbf{Mosquitto (\url{http://eclipse.org/mosquitto/})}\\
+Mosquitto ist ein Open Source Broker, dessen Projekt von Roger Light im Jahr 2010 auf die Beine gestellt wurde. Seit der Version 1.4 läuft das Projekt unter der Eclipse Foundation. \\
+Die aktuelle Implementation benötigt lediglich 120kB Speicherplatz und 3MB RAM bei 1000 verbundenen Clients. Ein Belastungstest von 100'000 Clients erzielte erfolgreiche und zufriedenstellende Resultate.
+Alle anderen Kriterien werden ebenfalls erfüllt.
+
+\textbf{CloudMQTT} \\
+CloudMQTT unterscheidet sich von den anderen Brokern, da dieser nicht selbst betrieben werden kann. Das bedeutet, man erstellt bei CloudMQTT eine Instanz und kann denn neu erstellten Broke über verschiedene APIs ansteuern. \\
+Der Anbieter stellt verschiedene Preispläne zur Verfügung (\url{http://www.cloudmqtt.com/plans.html}). Ab 10 Verbindungen bzw. 10Kbit/s Bandbreite muss für die Leistung bezahlt werden. \\
+Ob TLS SSL Verschlüsselung unterstützt wird, ist in der spärlichen Dokumentation nicht ersichtlich.
+
+\textbf{Fazit} \\
+Aufgrund der gesammelten Daten der drei Produkte wurde entschieden, Mosquitto einzusetzen. Es ist das einzige Produkt, welches alle unsere Kriterien erfüllt. Da dieses Projekt durch die Eclipse Foundation unterstützt wird, besteht die Hoffung, dass die Zusammenarbeit mit openHAB unterstützt bzw. miteinbezogen wurde.
+
+\subsubsection{MQTT Client-Library}
+In unserem Systemaufbau wird es zwei MQTT-Clients geben. Einerseits durch das openHAB-Binding, da die Events auf dem EventBus über MQTT in die Azure Cloud gesendet werden soll. Andererseits wird in der Cloud eine Worker Role diese Events konsumieren und persistieren. \\
+Das Binding von openHAB besteht bereits, daher muss nur noch eine Client-Implementation für C\# gesuchtwerden. Nach kurzer Rechereche scheint die «M2Mqtt» Library sehr verbreitet zu sein. \\
+Durch aufsetzen eines Prototyps konnte die benötigte Funktionalität erfasst werden. Sie erfüllt alle Kriterien, die auch an den Broker gestellt wurden.
+
+
+
