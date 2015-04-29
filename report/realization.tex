@@ -68,7 +68,7 @@ In Bezug auf erstellen von Topics agiert der Broker passiv. Das bedeutet, Client
 
 \subsubsection{Broker}
 
-\textbf{Zertifikate} \\
+\textbf{Zertifizierungsstelle/Server-Zertifikat} \\
 Da die MQTT-Verbindung verschlüsselt werden soll, müssen verschiedene Zertifikate erstellt werden. Das erstellte Server-Zertifikat muss von einer CA (Certification Authority) signiert werden. Da ein gültiges Zertifikat nicht entgeltlich erworben werden möchte, wird eine eigene Zertifizierungsstelle erstellt. OpenSSl bringt da alle nötigen Mittel für die Erzeugung eines CAs mit. Dies bringt den Nachteil mit, dass Computersysteme diesem Zertifikat nicht automatisch trauen, daher muss dann das Zertifkat von Hand dem Certificate Storea als «Trusted Root Certification Authority» hinzugefügt werden. \\
 
 Nachdem die Zertifizierungsstelle erfolgreich generiert wurde, kann das Server Zertifikat erstellt werden. Anschliessend muss dieses Server Zertifikat von der eben erstellten Zertifizierungsstelle signiert werden.
@@ -105,6 +105,13 @@ Nach der Standard-Installation muss der Broker Konfiguriert werden. Dazu wird da
 \end{tabularx}
 
 \subsubsection{Client (Azure Worker Role)}
+Wie die Abbildung \ref{fig:deploymentAzure} zeigt, is eine Azure Worker Role ein MQTT-Client. Die Aufgabe dieser Worker Role ist die Persistierung der versendeten Events im Azure Storage.
+
+
+
+
+
+
 
 
 
