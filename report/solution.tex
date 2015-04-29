@@ -48,20 +48,6 @@ Nachdem wir openHAB als Plattform bestimmt haben konnten wir die Hardware für d
 
 \textit{L06:} Da wir durch den Fensterkontakt und den Bewegungsmelder schon eine HomeMatic Zentrale besitzen, liegt es nahe auch die Funksteckdose von diesem Hersteller zu verwenden.
 
-
-
-\subsection{Allgemeine Systemsicht}
-Anhand der Problembeschreibung wurde ein Plan erarbeitet, der das ganze System verständlich beschreibt. Abbildung \ref{fig:systemView} stellt die wichtigsten Komponenten und Entitäten aus der Problemdomäne in gegenseitiger Beziehung dar.
-
-\begin{figure}[h!]
-	\centering
-		\includegraphics[scale=0.55]{report/img/systemuebersicht}
-	\caption{Systemübersicht}
-	\label{fig:systemView}
-\end{figure}
-
-\pagebreak
-
 \subsection{MQTT}
 \subsubsection{Broker Evaluation}
 Für die Evaluation des Brokers haben wir eine List mit unseren Anforderungen erstellt: 
@@ -97,3 +83,15 @@ Aufgrund der gesammelten Daten der drei Produkte wurde entschieden, Mosquitto ei
 In unserem Systemaufbau wird es zwei MQTT-Clients geben. Einerseits durch das openHAB-Binding, da die Events auf dem EventBus über MQTT in die Azure Cloud gesendet werden soll. Andererseits wird in der Cloud eine Worker Role diese Events konsumieren und persistieren. \\
 Das Binding von openHAB besteht bereits, daher muss nur noch eine Client-Implementation für C\# gesuchtwerden. Nach kurzer Rechereche scheint die «M2Mqtt» Library sehr verbreitet zu sein. \\
 Durch aufsetzen eines Prototyps konnte die benötigte Funktionalität erfasst werden. Sie erfüllt alle Kriterien, die auch an den Broker gestellt wurden.
+
+\subsection{Allgemeine Systemsicht}
+Anhand der Problembeschreibung wurde ein Plan erarbeitet, der das ganze System verständlich beschreibt. Abbildung \ref{fig:systemView} stellt die wichtigsten Komponenten und Entitäten aus der Problemdomäne in gegenseitiger Beziehung dar.
+
+\begin{figure}[h!]
+	\centering
+		\includegraphics[scale=0.55]{report/img/systemuebersicht}
+	\caption{Systemübersicht}
+	\label{fig:systemView}
+\end{figure}
+
+\pagebreak
