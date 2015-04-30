@@ -48,7 +48,41 @@ Nachdem wir openHAB als Plattform bestimmt haben konnten wir die Hardware für d
 
 \textit{L06:} Da wir durch den Fensterkontakt und den Bewegungsmelder schon eine HomeMatic Zentrale besitzen, liegt es nahe auch die Funksteckdose von diesem Hersteller zu verwenden.
 
+\subsection{MQTT}
+\subsubsection{Broker Evaluation}
+Für die Evaluation des Brokers haben wir eine List mit unseren Anforderungen erstellt: 
 
+\begin{enumerate}
+	\item Open Source/Freeware
+	\item SSL TLS Verschlüsselung
+	\item Benutzername \& Passwort Authentifizierung
+	\item High throughput, Low latency
+	\item Cloud Ready
+	\item Einfache Installation
+	\item Qualit of Service Level: Exactly once
+	\item Last Will unterstützung (Message, die gesendet wird, wenn der Client die Verbindung schliesst)
+\end{enumerate}
+
+\textbf{HiveMQ (\url{http://www.hivemq.com})} \\
+HiveMQ ist ein proprietärer MQTT-Broker und erfüllt alle unsere Kriterien bis auf das erste Kriterium. Jeder Gebrauch des Brokers muss bezahlt werden, siehe: \url{http://www.hivemq.com/pricing/}.
+
+\textbf{Mosquitto (\url{http://eclipse.org/mosquitto/})}\\
+Mosquitto ist ein Open Source Broker, dessen Projekt von Roger Light im Jahr 2010 auf die Beine gestellt wurde. Seit der Version 1.4 läuft das Projekt unter der Eclipse Foundation. \\
+Die aktuelle Implementation benötigt lediglich 120kB Speicherplatz und 3MB RAM bei 1000 verbundenen Clients. Ein Belastungstest von 100'000 Clients erzielte erfolgreiche und zufriedenstellende Resultate.
+Alle anderen Kriterien werden ebenfalls erfüllt.
+
+\textbf{CloudMQTT} \\
+CloudMQTT unterscheidet sich von den anderen Brokern, da dieser nicht selbst betrieben werden kann. Das bedeutet, man erstellt bei CloudMQTT eine Instanz und kann denn neu erstellten Broke über verschiedene APIs ansteuern. \\
+Der Anbieter stellt verschiedene Preispläne zur Verfügung (\url{http://www.cloudmqtt.com/plans.html}). Ab 10 Verbindungen bzw. 10Kbit/s Bandbreite muss für die Leistung bezahlt werden. \\
+Ob TLS SSL Verschlüsselung unterstützt wird, ist in der spärlichen Dokumentation nicht ersichtlich.
+
+\textbf{Fazit} \\
+Aufgrund der gesammelten Daten der drei Produkte wurde entschieden, Mosquitto einzusetzen. Es ist das einzige Produkt, welches alle unsere Kriterien erfüllt. Da dieses Projekt durch die Eclipse Foundation unterstützt wird, besteht die Hoffung, dass die Zusammenarbeit mit openHAB unterstützt bzw. miteinbezogen wurde.
+
+\subsubsection{Client-Library}
+In unserem Systemaufbau wird es zwei MQTT-Clients geben. Einerseits durch das openHAB-Binding, da die Events auf dem EventBus über MQTT in die Azure Cloud gesendet werden soll. Andererseits wird in der Cloud eine Worker Role diese Events konsumieren und persistieren. \\
+Das Binding von openHAB besteht bereits, daher muss nur noch eine Client-Implementation für C\# gesuchtwerden. Nach kurzer Rechereche scheint die «M2Mqtt» Library sehr verbreitet zu sein. \\
+Durch aufsetzen eines Prototyps konnte die benötigte Funktionalität erfasst werden. Sie erfüllt alle Kriterien, die auch an den Broker gestellt wurden.
 
 \subsection{Allgemeine Systemsicht}
 Anhand der Problembeschreibung wurde ein Plan erarbeitet, der das ganze System verständlich beschreibt. Abbildung \ref{fig:systemView} stellt die wichtigsten Komponenten und Entitäten aus der Problemdomäne in gegenseitiger Beziehung dar.
