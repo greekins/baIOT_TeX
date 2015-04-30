@@ -105,7 +105,34 @@ Nach der Standard-Installation muss der Broker Konfiguriert werden. Dazu wird da
 \end{tabularx}
 
 \subsubsection{Client (Azure Worker Role)}
-Wie die Abbildung \ref{fig:deploymentAzure} zeigt, is eine Azure Worker Role ein MQTT-Client. Die Aufgabe dieser Worker Role ist die Persistierung der versendeten Events im Azure Storage.
+Wie die Abbildung \ref{fig:systemView} (Systemübersicht) zeigt, befindet sich nebst dem Broker auch ein Client, in form einer Worker Role, in der Cloud. Die Worker Role abonniert alle Topics und persistiert die Messages im Table bzw. Blob-Storage.
+
+In der \lstinline!OnStart()!-Methode der Worke Role werden zu erst die Referenzen zum Table- und Blob-Storage erzeugt. \\
+Danach wird die Verbindung zum MQTT-Broker hergestellt, die Topics definiert, die er abonnieren möchte und der QoS-Level gesetzt. \\
+Damit der Client benachrichtigt wird, wenn eine Message eintrifft, wird der Eventhandler \lstinline!client_MqttMsgPublishReceived()! definiert. Die Methode muss die gleichen Parameter entgegennehmen, wie die Delegate-Methode. Das ist einerseits der Sender (Object) und die Event-Argumente. Damit der Eventhandler beim Eintreffen einer Message aufgerufen wird, muss dieser auf dem Event registriert werden: \\ \lstinline!client.MqttMsgPublishReceived += client_MqttMsgPublishReceived;! 
+
+\begin{lstlisting}[style=csharp]
+public override bool OnStart()
+{
+  setupStorageConnections();
+  MqttClient client = new MqttClient(
+            				"mqttbrokerba.cloudapp.net",
+               				8883, true, null
+               			  );
+  client.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
+  client.Connect(Guid.NewGuid().ToString(),
+  				 "mosquitto",
+  				 "baIOT_mq++"
+  				 );
+  string[] topics = { "openhab/+" };
+  byte[] qos = { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE };
+  client.Subscribe(topics, qos);
+
+  return result;
+}
+\end{lstlisting}
+
+Im Eventhandler wird dann schlussendlich die Logik zur Persistierung eingefügt. 
 
 
 
