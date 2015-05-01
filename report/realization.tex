@@ -74,13 +74,57 @@ Sitemaps sind Konfigurationsfiles zur deklarativen Definition von User Interface
 Die verschiedenen Elemente, die in Sitemaps verfügbar sind, können Items direkt über deren Name referenzieren. Einige Elemente sind dynamisch und erlauben eine werteabhängige Darstellung.
 
 
+\subsection{openHAB Konfiguration}
+Items, Rules, Sitemaps und Persitence Strategies werden in openHAB in einer eigens dafür entwickelten DSL beschrieben. Für alle diese Bereiche werden Konfigurationsdateien im entsprechenden Unterverzeichnis des openHAB Konfigurationsordner abgelegt. Änderungen an den Konfigurationsdateien werden von openHAB zur Laufzeit sofort erkannt und berücksichtigt. Nebst den genannten Bereichen existiert noch eine globale Konfigurationsdatei um beispielsweise IP-Adressen für Bindings einzutragen. Folgende Dateien sind für diese Arbeit relevant:
+
+\begin{itemize}
+	\item /configurations/*.cfg
+	\item /configurations/items/*.items
+	\item /configurations/rules/*.rules
+	\item /configurations/sitemaps/*.sitemap
+	\item /configurations/persistence/*.persist
+	\item /configurations/transform/*.map
+\end{itemize}
+
+Anhand diesen Konfigurationen werden die User Cases modelliert.
+
+\subsubsection{Konfiguration Überwachungskamera} 
+Für die Überwachungskamera existiert kein entsprechendes Item. Stattdessen wird in der Sitemap ein Image-Element angezeigt, dessen URL auf das HTTP Snapshot Interface der Netzwerkkamera verweist.\\ \\
+Das Bild wird dank dem Attribut \lstinline!visibility!  immer dann angezeigt, wenn das Item \lstinline!Alarm_activated! den Wert \lstinline!ON! hat. Das \lstinline!refresh! Interval bewirkt einen Reload des Bildes alle 200 Millisekunden.
+
+\begin{lstlisting}[style=csharp, caption=demo.sitemap - Webcam Bild]
+[...]
+Image url="http://192.168.1.15/snapshot.jpg" refresh=200
+visibility=[Alarm_activated==ON]
+[...]
+\end{lstlisting}
+
+
+
+
+\subsubsection{Konfiguration Kontaktsensor} 
+Der Kontaktsensor ist ein Use Case der in openHAB sehr oft vorkommt. Deshalb existiert ein Item Type «Contact» mit den beiden möglichen Werten OPEN und CLOSED. Das Homematic Binding liefert aber die Werte \lstinline!true! oder \lstinline!false! und kann deshalb nicht an ein Contact Item gebunden werden. Als Alternative haben wir ein String Item verwendet und mit Hilfe einer Transformation-Map \lstinline!false! mit «geschlossen» und \lstinline!true! mit «offen» übersetzt. Das Icon <contact> kann trotzdem noch verwendet werden. Allerdings wird nun nicht mehr automatisch das Icon für das offene bzw. geschlossene Fenster angezeigt, da openHAB den Basisnamen des Icons mit dem State konkateniert. Wir haben dementsprechend die Icons kopiert und ein File contact-false.png und contact-true.png im Ressourcen-Ordner hinterlegt.\\ \\
+Auf der letzten Zeile werden die Bindingparameter für Homematic angegeben.\\ \lstinline!address=LEQ1469091! bezieht sich auf die Seriennummer des Kontaktsensors und\\ \lstinline!parameter=STATE! gibt an, welche Eigenschaft gebunden werden soll. \lstinline!channel=1! ist ein Defaultwert.
+
+\begin{lstlisting}[style=csharp, caption=demo.items - Kontaktsensor]
+[...]
+String Window_Bedroom "Schlafzimmerfenster [MAP(window.map):%s]"
+<contact> (OV_Windows, Windows)
+{homematic="address=LEQ1469091,channel=1,parameter=STATE"}
+[...]
+\end{lstlisting}
+
+In der Sitemap wird das Item in einem Text-Element referenziert. Weitere Attribute sind nicht notwendig.
+
+\begin{lstlisting}[style=csharp, caption=demo.sitemap - Kontaktsensor]
+[...]
+Text item=Window_Bedroom
+[...]
+\end{lstlisting}
+
 
 
 \pagebreak
-
-\subsection{Konfiguration openHAB}
-
-
 
 
 \subsection{Deploymentübersicht}
@@ -147,8 +191,59 @@ Nach der Standard-Installation muss der Broker Konfiguriert werden. Dazu wird da
 \end{tabularx}
 
 \subsubsection{Client (Azure Worker Role)}
-Wie die Abbildung \ref{fig:deploymentAzure} zeigt, is eine Azure Worker Role ein MQTT-Client. Die Aufgabe dieser Worker Role ist die Persistierung der versendeten Events im Azure Storage.
+Wie die Abbildung \ref{fig:systemView} (Systemübersicht) zeigt, befindet sich nebst dem Broker auch ein Client, in form einer Worker Role, in der Cloud. Die Worker Role abonniert alle Topics und persistiert die Messages im Table bzw. Blob-Storage.
 
+In der \lstinline!OnStart()!-Methode der Worke Role werden zu erst die Referenzen zum Table- und Blob-Storage erzeugt. \\
+Danach wird die Verbindung zum MQTT-Broker hergestellt, die Topics definiert, die er abonnieren möchte und der QoS-Level gesetzt. \\
+Damit der Client benachrichtigt wird, wenn eine Message eintrifft, wird der Eventhandler \lstinline!client_MqttMsgPublishReceived()! definiert. Die Methode muss die gleichen Parameter entgegennehmen, wie die Delegate-Methode. Das ist einerseits der Sender (Object) und die Event-Argumente. Damit der Eventhandler beim Eintreffen einer Message aufgerufen wird, muss dieser auf dem Event registriert werden: \\ \lstinline!client.MqttMsgPublishReceived += client_MqttMsgPublishReceived;! 
+
+\begin{lstlisting}[style=csharp]
+public override bool OnStart()
+{
+  setupStorageConnections();
+  MqttClient client = new MqttClient(
+            				"mqttbrokerba.cloudapp.net",
+               				8883, true, null
+               			  );
+  client.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
+  client.Connect(Guid.NewGuid().ToString(),
+  				 "mosquitto",
+  				 "baIOT_mq++"
+  				 );
+  string[] topics = { "openhab/+" };
+  byte[] qos = { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE };
+  client.Subscribe(topics, qos);
+
+  return result;
+}
+\end{lstlisting}
+
+Im Eventhandler wird dann schlussendlich die Logik zur Persistierung eingefügt. Wenn eine Message über das Topic «openhab/blob» empfangen wird, handelt es sich um eine Fotografie der Webcam. Dieses JPG-File wird als Byte-Array übermittelt und wird so auch im Blob-Storage abgelegt. \\
+Bei allen anderen Messages muss es sich um Text handeln, daher werden sie im Table-Storage abgelegt.
+
+\begin{lstlisting}[style=csharp]
+void client_MqttMsgPublishReceived(object sender,
+								   		MqttMsgPublishEventArgs e)
+{
+	if (e.Topic.Equals("openhab/blob"))
+	{
+		CloudBlockBlob blockBlob = container.
+							GetBlockBlobReference(Guid.NewGuid()
+								   							.ToString());
+		blockBlob.UploadFromByteArray(e.Message,
+									  0, e.Message.Length);
+    }
+	else
+	{
+    	var message = System.Text.Encoding.
+    							  Default.GetString(e.Message);
+		Entity entity = new Entity(message);
+		TableOperation insertOperation = TableOperation.
+											Insert(entity);
+		table.Execute(insertOperation);
+	}
+}
+\end{lstlisting}
 
 
 
