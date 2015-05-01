@@ -132,9 +132,32 @@ public override bool OnStart()
 }
 \end{lstlisting}
 
-Im Eventhandler wird dann schlussendlich die Logik zur Persistierung eingefügt. 
+Im Eventhandler wird dann schlussendlich die Logik zur Persistierung eingefügt. Wenn eine Message über das Topic «openhab/blob» empfangen wird, handelt es sich um eine Fotografie der Webcam. Dieses JPG-File wird als Byte-Array übermittelt und wird so auch im Blob-Storage abgelegt. \\
+Bei allen anderen Messages muss es sich um Text handeln, daher werden sie im Table-Storage abgelegt.
 
-
+\begin{lstlisting}[style=csharp]
+void client_MqttMsgPublishReceived(object sender,
+								   		MqttMsgPublishEventArgs e)
+{
+	if (e.Topic.Equals("openhab/blob"))
+	{
+		CloudBlockBlob blockBlob = container.
+							GetBlockBlobReference(Guid.NewGuid()
+								   							.ToString());
+		blockBlob.UploadFromByteArray(e.Message,
+									  0, e.Message.Length);
+    }
+	else
+	{
+    	var message = System.Text.Encoding.
+    							  Default.GetString(e.Message);
+		Entity entity = new Entity(message);
+		TableOperation insertOperation = TableOperation.
+											Insert(entity);
+		table.Execute(insertOperation);
+	}
+}
+\end{lstlisting}
 
 
 
