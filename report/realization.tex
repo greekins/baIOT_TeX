@@ -19,7 +19,7 @@ Wenn Events gelesen und Commands gesendet werden, dann handelt es sich dabei um 
 
 
 \subsection{openHAB Architektur}
-Im Abschnitt zur Konnektivität haben wir bereits erläutert, welche Anforderungen openHAB erfüllen muss, damit verschiedene Systeme miteinander vernetzt werden können. Die grosse Anzahl an Herstellern und die Vielfalt an Protokollen haben dazu geführt, dass openHAB sehr modular konzipiert wurde. Die Basisinstallation kann zur Laufzeit durch Add-ons erweitert werden. Das hat den Vorteil, dass openHAB selbst recht schlank bleibt und Technologien, die gar nicht eingesetzt werden nicht im Weg sind. Ausserdem ist dadurch das spätere Einbinden weiterer Plattformen sehr einfach machbar. Technisch wurde diese modulare Architektur mit Hilfe der OSGI-Plattform umgesetzt. Die Implementierung von Protokollen geschieht über OSGI Service Bundles, die bei openHAB Bindings genannt werden. Abbildung \ref{fig:ohArch} zeigt einen Überblick der Architektur:
+Im Abschnitt zur Konnektivität haben wir bereits erläutert, welche Anforderungen openHAB erfüllen muss, damit verschiedene Systeme miteinander vernetzt werden können. Die grosse Anzahl an Herstellern und die Vielfalt an Protokollen haben dazu geführt, dass openHAB sehr modular konzipiert wurde. Die Basisinstallation kann zur Laufzeit durch Add-ons erweitert werden. Das hat den Vorteil, dass openHAB selbst recht schlank bleibt und Technologien, die gar nicht eingesetzt werden, nicht im Weg sind. Ausserdem ist dadurch das spätere Einbinden weiterer Plattformen sehr einfach machbar. Technisch wurde diese modulare Architektur mit Hilfe der OSGI-Plattform umgesetzt. Die Implementierung von Protokollen geschieht innerhalb von OSGI Service Bundles, die bei openHAB Bindings genannt werden. Abbildung \ref{fig:ohArch} zeigt einen Überblick der Architektur:
 
 \begin{figure}[H]
 	\centering
@@ -28,9 +28,23 @@ Im Abschnitt zur Konnektivität haben wir bereits erläutert, welche Anforderung
 	\label{fig:ohArch}
 \end{figure}
 
+\subsubsection{Event Bus}
+Der Basisservice von openHAB stellt der Event Bus dar. Über diesen Bus werden Events zwischen den verschiedenen OSGI Bundles gesendet. Die Events sind entweder Commands, welche eine Aktion ausführen, oder Status-Updates, welche Zustandsänderungen der Sensoren/Aktoren beinhalten. \\
+Durch den Einsatz dieses Event Bus wird die Kopplung reduziert und Add-ons können somit einfach ausgetauscht werden. \\
+Intern wurde der Event Bus mit Hilfe des OSGI Event Admin umgesetzt. Durch den Event Admin wird es möglich, dass sich weitere OSGI Bundles (also openHAB Add-ons) im Event Bus einklinken können.
+
 \subsubsection{Bindings}
-Bindings sind Verbindungen zwischen openHAB und den externen Systemen und bilden die Grundlage zur Konnektivität. Dadurch muss für jede Technologie ein eigenes Binding geschrieben werden. Für viele Technologien sind Bindings vorhanden, die einzeln heruntergeladen und als «Add-on» installiert werden können. Falls eine Technologie noch nicht unterstützt wird, kann man das Binding dazu selbst programmieren. Die wesentliche Aufgabe besteht darin, sich einerseits mit dem externen Gerät zu verbinden und die ausgetauschten Daten miteinander kompatibel zu machen. \\
+Bindings sind Verbindungen zwischen openHAB und den externen Systemen und bilden die Grundlage zur Konnektivität. Dadurch muss für jede Technologie ein eigenes Binding geschrieben werden. Für viele Technologien sind Bindings vorhanden, die einzeln heruntergeladen und als «Add-on» installiert werden können. Falls eine Technologie noch nicht unterstützt wird, kann man das Binding dazu selbst programmieren. Die wesentliche Aufgabe besteht darin, sich einerseits mit dem externen Gerät zu verbinden, auf dem Event Bus zu lauschen und die ausgetauschten Daten miteinander kompatibel zu machen. \\
 Alle momentan verfügbare Bindings sind unter folgendem Link zu finden: \url{https://github.com/openhab/openhab/wiki/Bindings}
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=0.4]{report/img/communicationOH}
+	\caption{Event Bus als Schnittstelle für Bindings}
+	\label{fig:ohComm}
+\end{figure}
+
+
 
 \subsubsection{Items}
 Wenn so viele unterschiedliche Technologien unterstützt und integriert werden sollen, dann stellt sich die Frage nach dem gemeinsamen Nenner bzw. einer einheitlichen internen Repräsentation. Aus diesem Grund wurden «Items» eingeführt, die zentrale Entität im openHAB Domainmodell. Alle Bindings implementieren ein Mapping zwischen den Daten des Sensors/Aktors und einem zugehörigen Item. Ein Item besteht aus:
@@ -44,30 +58,28 @@ Wenn so viele unterschiedliche Technologien unterstützt und integriert werden s
 	\item Bindingparameter
 \end{itemize}
 
-Die Eigenschaften Typ und Name sind zwingend, die Anderen sind optional. Der Typ ist auf eine vorgegebene Auswahl beschränkt, der Name dient als Identifier und muss eindeutig sein. 
+Die Eigenschaften Typ und Name sind zwingend, die Anderen sind optional. Der Typ ist auf eine vorgegebene Auswahl beschränkt, der Name dient als Identifier und muss eindeutig sein.\\
+\\
+Je nach gewähltem Typ können Items die unterschiedlichsten Dinge repräsentieren. Ein sehr häufig verwendeter Typ ist das SwitchItem mit den beiden möglichen Werten ON und OFF. Dieses Item eignet sich aufgrund seines Wertebereichs hervorragend als Boolean. Ein SwitchItem kann stellvertretend für etwas reales, wie eine Lampe, oder für etwas abstraktes wie die Anwesenheit eines Bewohners stehen. Es ist wichtig zu verstehen, dass ein Item rein virtuell ist. Die Brücke zur echten Hardware wird erst über Bindingparameter geschlagen, denn dann verknüpft openHAB das Item mit dem entsprechenden Binding. Da die Bindingparameter eines Items aber optional sind macht openHAB keinen Unterschied zwischen virtuellen und realen Items.
 
 
-\subsubsection{Kommunikation}
-Der Basisservice von openHAB stellt der Event Bus dar. Über diesen Bus werden Events zwischen den verschiedenen Bundles gesendet. Die Events sind entweder Commands, welche eine Aktion ausführen, oder Status-Updates, welche Statusänderungen der Devices beinhaltet. \\
-Durch den Einsatz dieses EventBus wird die Kopplung reduziert und können somit einfach ausgetauscht werden. \\
-Für die Verwaltung der verschiedenen Status ist das Item Repository zuständig, welches permanent den Event Bus auf Status-Updates abhört und die Änderungen ins Repository schreibt. Falls auf einem GUI ein Status eines Devices angezeigt werden soll, kann dazu das Item Repository abgefragt werden.\\
-Das Repository persistiert die Status und ist somit auch nach einem Neustart verfügbar.
+\subsubsection{Item Repository}
+Der Zustand eines Items muss die Ausführungsdauer einer openHAB Instanz überleben können, beispielsweise nach einem Neustart. Der Zustand muss ausserdem jederzeit abfragbar sein, egal ob sich der Zustand des Items gerade erst durch ein Event geändert hat oder schon über mehrere Startvorgänge hinweg genau so exisitiert. Diese Verantwortung übernimmt das Item Repository, welches permanent den Event Bus auf Status-Updates abhört und die Änderungen persistiert.
 
-\begin{figure}[H]
-	\centering
-		\includegraphics[scale=0.4]{report/img/communicationOH}
-	\caption{Kommunikation openHAB}
-	\label{fig:ohComm}
-\end{figure}
+\subsubsection{Rules}
+Rules sind die Werkzeuge zur Automatisierung. Dank einer Java-ähnlichen DSL können Aktionen ausgelöst werden, wenn gewisse Bedingungen erfüllt wurden. Das können einerseits Zustandsänderungen von Items, aber auch Systemevents oder Events von selbst angelegten Timern sein. 
 
-\subsubsection{Bindings}
-Ein Binding ist eine Verbindung zwischen dem Event Bus und den externen Systemen. Diese Verbindungen sind aufgrund der verschiedenen Technologien verschieden. Dadurch muss für jede Technologie ein eigenes Binding geschrieben werden. Für einige Systeme sind Bindings vorhanden, die einzeln heruntergeladen und als «Add-on» installiert werden können.
-Die Bindings stellen nur sicher, dass Events zwischen Event Bus und den jeweiligen Devices ausgetauscht werden können. Sie müssen sich also nicht um Statusänderungen oder ähnliches kümmern, da dies durch das Item Repository übernommen wird. \\
-Alle momentan verfügbare Bindings sind unter folgendem Link zu finden: \url{https://github.com/openhab/openhab/wiki/Bindings}
+\subsubsection{Sitemaps}
+Sitemaps sind Konfigurationsfiles zur deklarativen Definition von User Interfaces. Sitemaps werden ebenfalls in einer Xtext basierten DSL geschrieben und haben eine baumartige Struktur. OpenHAB liest das Konfigurationsfile und stellt die Sitemap über eine REST API zur Verfügung. Eine mitgelieferte Webapplikation stellt das User Interface anschliessend im Browser dar. Layouttechnisch orientiert sich die Webapplikation am iOS 6 Design mit Listendarstellung und Drill-Down Prinzip. Die nativen iOS und Android Apps von openHAB verfolgen das selbe Bedienkonzept.\\
+Die verschiedenen Elemente, die in Sitemaps verfügbar sind, können Items direkt über deren Name referenzieren. Einige Elemente sind dynamisch und erlauben eine werteabhängige Darstellung.
+
+
+
 
 \pagebreak
 
-\subsection{Installation openHAB}
+\subsection{Konfiguration openHAB}
+
 
 
 
