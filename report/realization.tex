@@ -122,6 +122,47 @@ Text item=Window_Bedroom
 [...]
 \end{lstlisting}
 
+\subsubsection{Konfiguration Bewegungsmelder}
+Der Bewegungsmelder ist ebenfalls von Homematic und wird in den Bindingparametern gleich referenziert wie beim Kontaktsensor. Der Bindingparameter \lstinline!MOTION! erhält einen boolschen Wert und muss mit Hilfe der Map \lstinline!motion.map! in einen benutzerfreundlichen String transformiert werden. Der Parameter \lstinline!ERROR! dient dem Sabotageschutz.\\ \\
+Leider muss bei Homematic jeder Parameter einem eigenen Item zugeordnet werden. Deshalb haben wir ein drittes String-Item \lstinline!Motion_Summary! definiert, indem die Werte der beiden anderen Items zusammengefasst werden. 
+
+
+\begin{lstlisting}[style=csharp, caption=demo.items - Bewegungsmelder Items]
+[...]
+String Motion_Livingroom "Bewegungsmelder [MAP(motion.map):%s]"
+{homematic="address=LEQ0797607, channel=1, parameter=MOTION"}
+
+String Motion_Livingroom_Sabotage "Sabotage"
+{homematic="address=LEQ0797607, channel=1, parameter=ERROR"}
+
+String Motion_Summary "Bewegungsmelder [%s]"
+[...]
+\end{lstlisting}
+
+Die Ermittlung und Zuweisung des korrekten Wertes an das Item \lstinline!Motion_Summary! geschieht mit Hilfe der Rule \lstinline!Motion Aggregator!.
+
+\begin{lstlisting}[style=csharp, caption=demo.rules - Rule «Motion Aggregator»]
+rule "Motion Aggregator"
+	when Item Motion_Livingroom received update or
+	     Item Motion_Livingroom_Sabotage received update
+	then
+	if(Motion_Livingroom.state == "true" &&
+	   Motion_Livingroom_Sabotage.state == "NO_ERROR") {
+		postUpdate(Motion_Summary, "Bewegung erkannt")
+	} else if(Motion_Livingroom.state == "false" && 
+	          Motion_Livingroom_Sabotage.state == "NO_ERROR") {
+		postUpdate(Motion_Summary, "ruhig")	
+	} else if(Motion_Livingroom.state == "true" &&
+	          Motion_Livingroom_Sabotage.state == "SABOTAGE") {
+		postUpdate(Motion_Summary, "Bewegung und Sabotage!")
+	} else if(Motion_Livingroom.state == "false" &&
+	          Motion_Livingroom_Sabotage.state == "SABOTAGE")  {
+		postUpdate(Motion_Summary, "Sabotage")
+	} else {
+		postUpdate(Motion_Summary, "---")
+	}
+end
+\end{lstlisting}
 
 
 \pagebreak
