@@ -178,7 +178,7 @@ end
 	\label{fig:deploymentAzure}
 \end{figure}
 
-\subsection{MQTT}
+\subsection{MQTT} \label{sssec:mqtt}
 MQTT steht für «Message Queue Telemetry Transport» und ist ein Nachrichten-Protokoll, das speziell für IOT-Anwendungen konzipiert wurde. Es setzt auf dem TCP/IP Stack auf und wird für den Nachrichtenaustausch zwischen verschiedenen, verteilten Maschinen verwendet. \\
 Das Protokoll wurde speziell für Systeme designt, die über wenig Speicherplatz und kleiner Netzwerk-Bandbreite verfügen, was bei IOT-Anwendungen meist der Fall ist.
 
@@ -295,12 +295,14 @@ Aus technischer Sicht können folgende Massnahmen getroffen werden, um die im L�
 \end{itemize}
 
 \subsubsection{Verschlüsselung MQTT-Verbindung}
-
+Die Verbindung zum MQTT-Broker wird durch SSL/TLS Verschlüsselt. Dazu wird ein Self-signed Zertifikat eingesetzt. Wie dieses Zertifikat erzeugt wird, ist aus dem Anhang \ref{ch:manual} zu entnehmen. \\
+Die jeweilige Implementierung der TLS-Verbindung wird im Kapitel \ref{sssec:mqtt} erläutert.
 
 \subsubsection{Konfiguration MQTT-Broker}
+\tbd Authentifizierung mit Benutzername und Passwort.
 
 \subsubsection{Verschlüsselung WLAN}
-
+\tbd WPA2
 
 
 
