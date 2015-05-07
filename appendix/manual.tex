@@ -1,0 +1,28 @@
+\chapter{Installationsanleitungen}
+
+\subsection*{Zertifikat Erzeugung}
+Die Zertifikate wurden mit OpenSSL (\url{http://slproweb.com/products/Win32OpenSSL.html}) erzeugt.
+
+\subsubsection*{CA Zertifikat erstellen}
+\lstinline!openssl req -new -x509 -days 3650 -keyout m2mqtt_ca.key -out m2mqtt_ca.crt! \\
+Dieser Command erzeugt ein CA (Certificate Authority) Zertifikat mit einem privatem Schlüssel. Das X.509-Zertifikat ist für 3650 Tage gültig.
+
+\subsubsection*{Server Zertifikat erstellen}
+\lstinline!openssl genrsa -des3 -out m2mqtt_srv.key 1024! \\
+Erzeugt einen 1024 Bit grossen 3DES, privaten Schlüssel. 
+
+\subsubsection*{Signierung des Server Zertifikates}
+\lstinline!openssl req -out m2mqtt_srv.csr -key m2mqtt_srv.key -new! \\
+Dieses Kommando erzeugt ein Zertifikat-Request vom Server zur Signierung an die CA. Durch dieses Kommando wird lediglich der Request erzeugt. Das bedeutet, dass die Signierung noch nicht durchgeführt wurde.
+
+\lstinline!openssl x509 -req -in m2mqtt_srv.csr -CA m2mqtt_ca.crt -CAkey m2mqtt_ca.key -CAcreateserial -out m2mqtt_srv.crt -days 3650!
+
+Mit diesem Kommando wird der Server-Request signiert. Als Produkt entsteht das finale Zertifikat für den Broker.
+
+Für die Client-Library (M2Mqtt) muss das Zertifikat noch ins DER-Format konvertiert werden: \\
+\lstinline!openssl x509 -outform der -in m2mqtt_ca.crt -out m2mqtt_ca.der!
+
+
+
+
+
