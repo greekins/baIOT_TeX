@@ -208,30 +208,33 @@ Wie bereits im Lösugnskonzept erarbeitet, wird als MQTT-Broker «Mosquitto» ei
 Nach der Standard-Installation muss der Broker Konfiguriert werden. Dazu wird das File «mosquitto.conf» bearbeitet.
 \\Folgende Parameter müssen editiert werden:
 
-\begin{tabularx}{\textwidth}{lX}
+\begin{tabularx}{\textwidth}{XX}
 		\textbf{Parameter} & \textbf{Erklärung}
 		\\ \hline
-			bind\_address \tbd &
+			bind\_address \\ mqttbrokerba.cloudapp.net &
 			IP-Adresse, an den der Default-Listener gebunden wird.
 		\\ \hline
 			port 8883 &
 			Port, auf den der Default-Listener hören soll. Wenn er nicht speziell definiert wird, hört der Listener per Default auf den Port 1883. Da aber mit TLS verschlüsselt wird, muss dieser von Hand auf den dafür vorgesehenen Port 8883 gesetzt werden.
 		\\ \hline
-			cafile \tbd &
+			cafile \\ \path{C:\OpenSSL-Win64\bin\m2mqtt_ca.crt} &
 			Hier wird der Pfad eingetragen für das zuvor erstellte CA-Zertifikat.
 		\\ \hline
-			certfile \tbd &
-			Hier wird der Pfad eingetragen für das PEM-Encodete Server Zertifikat.
+			certfile \\ \path{C:\OpenSSL-Win64\bin\m2mqtt_srv.crt\path} &
+			Hier wird der Pfad für das PEM-Encodete Server Zertifikat eingetragen.
 		\\ \hline
-			keyfile \tbd &
-			Hier wird der Pfad eingetragen für das PEM-Encodete Keyfile.
+			keyfile \\ \path{C:\OpenSSL-Win64\bin\m2mqtt_srv.key\path} &
+			Hier wird der Pfad für das PEM-Encodete Keyfile eingetragen.
 		\\ \hline
 			tls\_version tlsv1 &
 			Diese Option definiert die zu verwendende TLS-Version. Für Openssl (Version 1.0.2) wird tlsv1 verwendet.
 		\\ \hline
+			password\_file \\ \path{C:\Program Files (x86)\mosquitto\passwords} &
+			Das Passwords-File beinhaltet die definierten Benutzernamen und Passwörter, um sich am Broker anzumelden. Durch setzen dieses Pfades wird dies automatisch vom Broker berücksichtigt.
+		\\ \hline
 \end{tabularx}
 
-\subsubsection{Client (Azure Worker Role)}
+\subsubsection{Client (Azure Worker Role)} \label{sssec:m2mqttClient}
 Wie die Abbildung \ref{fig:systemView} (Systemübersicht) zeigt, befindet sich nebst dem Broker auch ein Client, in form einer Worker Role, in der Cloud. Die Worker Role abonniert alle Topics und persistiert die Messages im Table bzw. Blob-Storage.
 
 In der \lstinline!OnStart()!-Methode der Worke Role werden zu erst die Referenzen zum Table- und Blob-Storage erzeugt. \\
@@ -248,8 +251,8 @@ public override bool OnStart()
                			  );
   client.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
   client.Connect(Guid.NewGuid().ToString(),
-  				 "mosquitto",
-  				 "baIOT_mq++"
+  				 "username",
+  				 "password"
   				 );
   string[] topics = { "openhab/+" };
   byte[] qos = { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE };
@@ -297,7 +300,8 @@ Da man zwischen Erzeugung des virtuellen Hosts und dem Start der Worker Role nic
 	/>
 </Startup>
 \end{lstlisting}
-Dieser Startup Task führt das Batchfile «startup.cmd» aus, welches das Zertifikat in den Store hinzufügt. Dazu muss das Zertifikat dem Visual-Studio-Projekt als Element hinzugefügt werden, und in dessen Eigenschaften für den Buildvorgang als «Inhalt» deklariert werden.
+Dieser Startup Task führt das Batchfile «startup.cmd» aus, welches das Zertifikat in den Store hinzufügt. Dazu muss das Skript und auch das Zertifikat dem Visual-Studio-Projekt als Element hinzugefügt werden. Für beide Elemente muss in den Eigenschaften der Buildvorgang als «Inhalt» deklariert werden.
+
 \begin{lstlisting}[style=csharp, caption=startup.cmd - Zertifikat hinzufügen]
 certutil -addstore root m2mqtt_ca.cer
 \end{lstlisting}
@@ -316,10 +320,16 @@ Die Verbindung zum MQTT-Broker wird durch SSL/TLS Verschlüsselt. Dazu wird ein 
 Die jeweilige Implementierung der TLS-Verbindung wird im Kapitel \ref{sssec:mqtt} erläutert.
 
 \subsubsection{Konfiguration MQTT-Broker}
-\tbd Authentifizierung mit Benutzername und Passwort.
+Am Broker sollen sich nur authentifizierte und autorisierte Clients anmelden können. Dazu bietet der MQTT-Standard die Möglichkeit ein Password-File zu erzeugen. In dieses File wird der Benutzername und das zugehörige Passwort eingetragen, mit dem sich die Client anmelden können. Nur wenn diese Angaben übereinstimmen, kann eine Verbindung aufgebaut werden. \\
+Mosquitto bringt ein Tool mit, zur Erzeugung und Verschlüsselung dieses Files. Über die Konsole wird das Skript aufgerufen und die Benutzerangaben können als Parameter übergeben werden:
+\begin{lstlisting}[style=csharp, caption=mosquitto\_passwd.exe - generate password-file]
+> mosquitto_passwd -c passwordFile
+> mosquitto_passwd -b passwordFile username password
+\end{lstlisting}
+Wie sich die Clients gegenüber dem Broker authentifizieren, ist im Abschnitt \ref{sssec:m2mqttClient} und \tbd (MQTT Binding) ersichtlich.
 
 \subsubsection{Verschlüsselung WLAN}
-\tbd WPA2
+Über das WLAN kann man ohne Authentifizierung auf das openHAB zugreifen. Um unautorisierten Zugriff zu verhindern, wird das WLAN mit dem Sicherheitsstandard WPA2 verschlüsselt. Die Kommunikation wird also über den symmetrischen AES (Advanced Encription Standard) Algorithmus verschlüsselt. Da es sich um eine symmetrische Verschlüsselung handelt, muss jeder Client ein PSK (Pre Shared Key) besitzen, der jeweils beim Verbindungsaufbau eingegeben werden muss.
 
 
 
