@@ -196,7 +196,7 @@ In Bezug auf erstellen von Topics agiert der Broker passiv. Das bedeutet, Client
 \subsubsection{Broker}
 
 \textbf{Zertifizierungsstelle/Server-Zertifikat} \\
-Da die MQTT-Verbindung verschlüsselt werden soll, müssen verschiedene Zertifikate erstellt werden. Das erstellte Server-Zertifikat muss von einer CA (Certification Authority) signiert werden. Da ein gültiges Zertifikat nicht entgeltlich erworben werden möchte, wird eine eigene Zertifizierungsstelle erstellt. OpenSSl bringt da alle nötigen Mittel für die Erzeugung eines CAs mit. Dies bringt den Nachteil mit, dass Computersysteme diesem Zertifikat nicht automatisch trauen, daher muss dann das Zertifkat von Hand dem Certificate Storea als «Trusted Root Certification Authority» hinzugefügt werden. \\
+Da die MQTT-Verbindung verschlüsselt werden soll, müssen verschiedene Zertifikate erstellt werden. Das erstellte Server-Zertifikat muss von einer CA (Certification Authority) signiert werden. Da ein gültiges Zertifikat nicht entgeltlich erworben werden möchte, wird eine eigene Zertifizierungsstelle erstellt. OpenSSl bringt da alle nötigen Mittel für die Erzeugung eines CAs mit. Dies bringt den Nachteil mit, dass Computersysteme diesem Zertifikat nicht automatisch trauen, daher muss dann das Zertifkat von Hand dem Certificate Store als «Trusted Root Certification Authority» hinzugefügt werden. \\
 
 Nachdem die Zertifizierungsstelle erfolgreich generiert wurde, kann das Server Zertifikat erstellt werden. Anschliessend muss dieses Server Zertifikat von der eben erstellten Zertifizierungsstelle signiert werden.
 
@@ -238,7 +238,7 @@ In der \lstinline!OnStart()!-Methode der Worke Role werden zu erst die Referenze
 Danach wird die Verbindung zum MQTT-Broker hergestellt, die Topics definiert, die er abonnieren möchte und der QoS-Level gesetzt. \\
 Damit der Client benachrichtigt wird, wenn eine Message eintrifft, wird der Eventhandler \lstinline!client_MqttMsgPublishReceived()! definiert. Die Methode muss die gleichen Parameter entgegennehmen, wie die Delegate-Methode. Das ist einerseits der Sender (Object) und die Event-Argumente. Damit der Eventhandler beim Eintreffen einer Message aufgerufen wird, muss dieser auf dem Event registriert werden: \\ \lstinline!client.MqttMsgPublishReceived += client_MqttMsgPublishReceived;! 
 
-\begin{lstlisting}[style=csharp]
+\begin{lstlisting}[style=csharp, caption=WorkerRole.cs - MQTT Topic Subscribe]
 public override bool OnStart()
 {
   setupStorageConnections();
@@ -262,7 +262,7 @@ public override bool OnStart()
 Im Eventhandler wird dann schlussendlich die Logik zur Persistierung eingefügt. Wenn eine Message über das Topic «openhab/blob» empfangen wird, handelt es sich um eine Fotografie der Webcam. Dieses JPG-File wird als Byte-Array übermittelt und wird so auch im Blob-Storage abgelegt. \\
 Bei allen anderen Messages muss es sich um Text handeln, daher werden sie im Table-Storage abgelegt.
 
-\begin{lstlisting}[style=csharp]
+\begin{lstlisting}[style=csharp, caption=WorkerRole.cs - EventHandler]
 void client_MqttMsgPublishReceived(object sender,
 								   		MqttMsgPublishEventArgs e)
 {
@@ -285,6 +285,23 @@ void client_MqttMsgPublishReceived(object sender,
 	}
 }
 \end{lstlisting}
+
+\textbf{Zertifikat} \\
+Da die Verbindung durch SSL/TLS mit einem Self-signed Zertifikat verschlüsselt wird, muss dieses Zertifikat dem Certificate Store des virtuellen Hosts als «Trusted Root Certification Authority» hinzugefügt werden. Dies muss vorgenommen werden, bevor die Worker Role versucht eine Verbindung zum Broker herzustellen. Ansonsten terminiert die Worker Role mit einer Exception, da sie das Zertifikat nicht akzeptiert. \\
+Da man zwischen Erzeugung des virtuellen Hosts und dem Start der Worker Role nicht auf die Maschine zugreifen kann, muss das zertifikat programmatisch als Startup-Skript dem Store hinzugefügt werden. Für solche Aufgaben bietet Microsoft Azure die Möglichkeit Startup Tasks zu definieren. Dies wird in der ServiceDefinition vorgenommen, durch einfügen folgender Anweisung:
+\begin{lstlisting}[style=csharp, caption=ServiceDefinition.csdef - Startup Task]
+<Startup>
+	<
+		Task commandLine="startup.cmd" executionContext="elevated"
+		taskType="simple"
+	/>
+</Startup>
+\end{lstlisting}
+Dieser Startup Task führt das Batchfile «startup.cmd» aus, welches das Zertifikat in den Store hinzufügt. Dazu muss das Zertifikat dem Visual-Studio-Projekt als Element hinzugefügt werden, und in dessen Eigenschaften für den Buildvorgang als «Inhalt» deklariert werden.
+\begin{lstlisting}[style=csharp, caption=startup.cmd - Zertifikat hinzufügen]
+certutil -addstore root m2mqtt_ca.cer
+\end{lstlisting}
+
 
 \subsection{Sicherheit}
 Aus technischer Sicht können folgende Massnahmen getroffen werden, um die im Lösungskonzept beschriebenen Schwachstellen zu sichern:
