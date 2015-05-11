@@ -90,6 +90,7 @@ In unserem Szenario, Einbruchschutz, ist das Thema Sicherheit sehr wichtig. Dahe
 	\item Cloud
 	\item Android App
 	\item Systemaufbau mit Sensoren/Aktoren
+	\item Kommunikation der HomeMatic Komponenten
 \end{itemize}
 
 \subsubsection{Cloud}
@@ -106,6 +107,11 @@ Auch hier wird die Person, die das App verwendet zur Verantwortung gezogen, um d
 \subsubsection{Systemaufbau mit Sensoren/Aktoren}
 Wenn sich die angreifende Person bereits im Haus befindet,hat sie die entsprechenden Alarme bereits ausgelöst und wurde durch die Webcam aufgenommen. \\
 Für dieses Szenario ist das grösste Risiko, dass die Person die Videoüberwachung bemerkt und aus diesem Grund das Raspberry Pi zerstört bzw. mitnimmt. Um die aufgezeichneten Daten zu sichern, werden die von der Kamera erzeugten Bilder über MQTT im Cloud-Storage abgelegt. Auch wenn das Raspberry Pi zerstört wird, sind die Bilder nun gesichert und können im Nachhinein vom Storage heruntergeladen werden.
+
+\subsubsection{HomeMatic Kommunikation}
+Da die HomeMatic Komponenten untereinander drahtlos kommunizieren besteht hier ebenfalls die Gefahr einer Attacke. HomeMatic setzt für die Übertragung auf den Funkstandard BidCos. Diese Standard sieht vor, dass das 868 MHz Band verwendet wird. Im Vergleich zu 2.4 GHz besitzt man so eine grösse Reichweite und die Gefahr von Interferenz durch andere Funkgeräte ist sehr minim.\\
+Bezüglich Sicherheit sieht der Standard lediglich vor, die übertragenen Daten durch XOR-Operationen unleserlich zu machen. HomeMatic hat daher bei der Implentierung dieses Stanards die Verschlüsselung durch AES verstärkt. Der zur Verschlüsselung verwendete Key ist in der Zentrale hinterlegt und kann geändert werden.
+
 
 \subsubsection{Fazit}
 Wie aus den Ausführungen zur Sicherheit ersichtlich ist, können alle technischen Sicherheits-Risiken abgedeckt werden. Die grösste Schwachstellt ist jeweils der Mensch, der durch Social-Engineering-Techniken manipuliert werden kann und so Zugriff auf das Android App gewährt.
