@@ -84,6 +84,9 @@ In unserem Systemaufbau wird es zwei MQTT-Clients geben. Einerseits durch das op
 Das Binding von openHAB besteht bereits, daher muss nur noch eine Client-Implementation für C\# gesuchtwerden. Nach kurzer Rechereche scheint die «M2Mqtt» Library sehr verbreitet zu sein. \\
 Durch aufsetzen eines Prototyps konnte die benötigte Funktionalität erfasst werden. Sie erfüllt alle Kriterien, die auch an den Broker gestellt wurden.
 
+\subsection{Notification}
+Damit ein Sicherheitssystem sinn macht, muss der Besitzer benachrichtigt werden, sobald sich ein Zustand der Sensoren ändert. Ansonsten müsste der Benutzer permanent die Status im Android-App überwachen. Für die Umsetzung bietet sich der Google Cloud Message Dienst (GCM) an, der auch von Microsoft empfohlen wird. Da nur die Android-Platform unterstützt werden muss, wird auf den Einsatz des Azure Notification Hubs verzichtet und die direkte Verbindung zum GCM-Dienst gesucht.
+
 \subsection{Sicherheit}
 In unserem Szenario, Einbruchschutz, ist das Thema Sicherheit sehr wichtig. Daher lohnt es sich dazu  Gedanken zu machen. Man kann das System grob in drei Bereiche einteilen, an denen ein Angriff angesetzt werden kann:
 \begin{itemize}

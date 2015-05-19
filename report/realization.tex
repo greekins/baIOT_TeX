@@ -19,7 +19,7 @@ Wenn Events gelesen und Commands gesendet werden, dann handelt es sich dabei um 
 
 
 \subsection{openHAB Architektur}
-Im Abschnitt zur Konnektivität haben wir bereits erläutert, welche Anforderungen openHAB erfüllen muss, damit verschiedene Systeme miteinander vernetzt werden können. Die grosse Anzahl an Herstellern und die Vielfalt an Protokollen haben dazu geführt, dass openHAB sehr modular konzipiert wurde. Die Basisinstallation kann zur Laufzeit durch Add-ons erweitert werden. Das hat den Vorteil, dass openHAB selbst recht schlank bleibt und Technologien, die gar nicht eingesetzt werden, nicht im Weg sind. Ausserdem ist dadurch das spätere Einbinden weiterer Plattformen sehr einfach machbar. Technisch wurde diese modulare Architektur mit Hilfe der OSGI-Plattform umgesetzt. Die Implementierung von Protokollen geschieht innerhalb von OSGI Service Bundles, die bei openHAB Bindings genannt werden. Abbildung \ref{fig:ohArch} zeigt einen Überblick der Architektur:
+Im Abschnitt zur Konnektivität haben wir bereits erläutert, welche Anforderungen openHAB erfüllen muss, damit verschiedene Systeme miteinander vernetzt werden können. Die grosse Anzahl an Herstellern und die Vielfalt an Protokollen haben dazu geführt, dass openHAB sehr modular konzipiert wurde. Die Basisinstallation kann zur Laufzeit durch Add-ons erweitert werden. Das hat den Vorteil, dass openHAB selbst recht schlank bleibt und Technologien, die gar nicht eingesetzt werden, nicht im Weg sind. Ausserdem ist dadurch das spätere Einbinden weiterer Plattformen sehr einfach machbar. Technisch wurde diese modulare Architektur mit Hilfe der OSGi-Plattform umgesetzt. Die Implementierung von Protokollen geschieht innerhalb von OSGi Service Bundles, die bei openHAB Bindings genannt werden. Abbildung \ref{fig:ohArch} zeigt einen Überblick der Architektur:
 
 \begin{figure}[H]
 	\centering
@@ -29,9 +29,9 @@ Im Abschnitt zur Konnektivität haben wir bereits erläutert, welche Anforderung
 \end{figure}
 
 \subsubsection{Event Bus}
-Der Basisservice von openHAB stellt der Event Bus dar. Über diesen Bus werden Events zwischen den verschiedenen OSGI Bundles gesendet. Die Events sind entweder Commands, welche eine Aktion ausführen, oder Status-Updates, welche Zustandsänderungen der Sensoren/Aktoren beinhalten. \\
+Der Basisservice von openHAB stellt der Event Bus dar. Über diesen Bus werden Events zwischen den verschiedenen OSGi Bundles gesendet. Die Events sind entweder Commands, welche eine Aktion ausführen, oder Status-Updates, welche Zustandsänderungen der Sensoren/Aktoren beinhalten. \\
 Durch den Einsatz dieses Event Bus wird die Kopplung reduziert und Add-ons können somit einfach ausgetauscht werden. \\
-Intern wurde der Event Bus mit Hilfe des OSGI Event Admin umgesetzt. Durch den Event Admin wird es möglich, dass sich weitere OSGI Bundles (also openHAB Add-ons) im Event Bus einklinken können.
+Intern wurde der Event Bus mit Hilfe des OSGi Event Admin umgesetzt. Durch den Event Admin wird es möglich, dass sich weitere OSGi Bundles (also openHAB Add-ons) im Event Bus einklinken können.
 
 \subsubsection{Bindings}
 Bindings sind Verbindungen zwischen openHAB und den externen Systemen und bilden die Grundlage zur Konnektivität. Dadurch muss für jede Technologie ein eigenes Binding geschrieben werden. Für viele Technologien sind Bindings vorhanden, die einzeln heruntergeladen und als «Add-on» installiert werden können. Falls eine Technologie noch nicht unterstützt wird, kann man das Binding dazu selbst programmieren. Die wesentliche Aufgabe besteht darin, sich einerseits mit dem externen Gerät zu verbinden, auf dem Event Bus zu lauschen und die ausgetauschten Daten miteinander kompatibel zu machen. \\
@@ -306,6 +306,35 @@ Dieser Startup Task führt das Batchfile «startup.cmd» aus, welches das Zertif
 certutil -addstore root m2mqtt_ca.cer
 \end{lstlisting}
 
+\subsection{Notification}
+Der Mobile-Client wird durch Notifications benachrichtig, sobald der Alarm ausgelöst wird. Umgesetzt wird dies mithilfe des Google Cloud Messaging Dienstes.
+
+\subsubsection{Cloud}
+Um den GCM-Dienst nutzen zu können, muss zu erst in der Google Developer Console (\url{https://console.developers.google.com}) ein Projekt erstellt werden mit einer Cloud-Messaging-API. Für diese API kann ein Schlüssel erzeugt werden, der für das Versenden der Notification über die neu erstellte API benötigt wird.
+
+Ausgelöst wird der ganze Vorgang durch die MQTT-Nachricht «alarm\_activated». Die Worker Role nimmt diese Nachricht entgegen und erzeugt eine Notification-Message:
+
+\begin{lstlisting}[style=csharp, caption=Notification.cs - Notification Message]
+{
+  "registration_ids" : ["APA91bHun4MxP5egoKMwt2KZFBaFUH-1RYqx..."],
+  "data" : {
+  	"message" : "Alarm wurde ausgeloest!"
+  }
+}
+\end{lstlisting}
+
+Die Registration-Id bezeichnet den Client, der die Message erhalten soll. Dazu müssen sich die Clients zuvor bei GCM registrieren und erhalten dann die Id. Diese Message muss also für jeden Client einzeln über einen HTTP-Post gesendet werden. GCM weiss anhand des Id-Strings an welche Android-Clients er die Message weiterleiten soll.
+
+Folgende Grafik stellt den ganzen Vorgang dar:
+\begin{figure}[h!]
+	\centering
+		\includegraphics[scale=0.7]{report/img/gcm}
+	\caption{Vorgang Push-Notification}
+	\label{fig:deploymentAzure}
+\end{figure}
+
+\subsubsection{Android-Client}
+
 
 \subsection{Sicherheit}
 Aus technischer Sicht können folgende Massnahmen getroffen werden, um die im Lösungskonzept beschriebenen Schwachstellen zu sichern:
@@ -329,7 +358,7 @@ Mosquitto bringt ein Tool mit, zur Erzeugung und Verschlüsselung dieses Files. 
 Wie sich die Clients gegenüber dem Broker authentifizieren, ist im Abschnitt \ref{sssec:m2mqttClient} und \tbd (MQTT Binding) ersichtlich.
 
 \subsubsection{Verschlüsselung WLAN}
-Über das WLAN kann man ohne Authentifizierung auf das openHAB zugreifen. Um unautorisierten Zugriff zu verhindern, wird das WLAN mit dem Sicherheitsstandard WPA2 verschlüsselt. Die Kommunikation wird also über den symmetrischen AES (Advanced Encription Standard) Algorithmus verschlüsselt. Da es sich um eine symmetrische Verschlüsselung handelt, muss jeder Client ein PSK (Pre Shared Key) besitzen, der jeweils beim Verbindungsaufbau eingegeben werden muss.
+Über das WLAN kann man ohne Authentifizierung auf das openHAB zugreifen. Um unautorisierten Zugriff zu verhindern, wird das WLAN mit dem Sicherheitsstandard WPA2 verschlüsselt. Die Kommunikation wird also über den symmetrischen AES (Advanced Encryption Standard) Algorithmus verschlüsselt. Da es sich um eine symmetrische Verschlüsselung handelt, muss jeder Client ein PSK (Pre Shared Key) besitzen, der jeweils beim Verbindungsaufbau eingegeben werden muss.
 
 
 
