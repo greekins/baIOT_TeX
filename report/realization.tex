@@ -171,7 +171,7 @@ end
 \subsection{Deploymentübersicht}
 
 \subsubsection{Binding Azure}
-\begin{figure}[h!]
+\begin{figure}[H]
 	\centering
 		\includegraphics[scale=0.5]{report/img/deployment_binding_azure}
 	\caption{Binding Azure Cloud}
@@ -186,11 +186,11 @@ Das Protokoll wurde speziell für Systeme designt, die über wenig Speicherplatz
 MQTT folgt dem Prinzip «Publish/Subscribe», sprich Clients können bestimmte Topics abonnieren. Wenn Messages auf dieses Topic gesendet werden, leitet der Broker diese an alle interessierten Clients weiter. \\
 In Bezug auf erstellen von Topics agiert der Broker passiv. Das bedeutet, Clients können sich auf beliebigen, selber defnierte, Topics registrieren. Wenn aber niemand auf dieses Topic publiziert, wird der Client nie eine Message erhalten.
 
-\begin{figure}[h!]
+\begin{figure}[H]
 	\centering
 		\includegraphics[scale=0.6]{report/img/mqttFunktionsweise}
 	\caption{Funktionsweise MQTT}
-	\label{fig:deploymentAzure}
+	\label{fig:funktionsweiseMQTT}
 \end{figure}
 
 \subsubsection{Broker}
@@ -306,6 +306,15 @@ Dieser Startup Task führt das Batchfile «startup.cmd» aus, welches das Zertif
 certutil -addstore root m2mqtt_ca.cer
 \end{lstlisting}
 
+Im Sequenzdiagram der Abbildung \ref{fig:sequenzMQTT} wird aufgezeigt, wie die MQTT-Nachrichten nachdem QoS 2 versendet werden.
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=0.8]{report/img/sequenzDiagramMqtt}
+	\caption{Sequenzdiagramm MQTT}
+	\label{fig:sequenzMQTT}
+\end{figure}
+
 \subsection{Notification}
 Der Mobile-Client wird durch Notifications benachrichtig, sobald der Alarm ausgelöst wird. Umgesetzt wird dies mithilfe des Google Cloud Messaging Dienstes.
 
@@ -325,12 +334,21 @@ Ausgelöst wird der ganze Vorgang durch die MQTT-Nachricht «alarm\_activated».
 
 Die Registration-Id bezeichnet den Client, der die Message erhalten soll. Dazu müssen sich die Clients zuvor bei GCM registrieren und erhalten dann die Id. Diese Message muss also für jeden Client einzeln über einen HTTP-Post gesendet werden. GCM weiss anhand des Id-Strings an welche Android-Clients er die Message weiterleiten soll.
 
-Folgende Grafik stellt den ganzen Vorgang dar:
-\begin{figure}[h!]
+Folgende Grafik stellt den Registrations-Vorgang dar:
+\begin{figure}[H]
 	\centering
 		\includegraphics[scale=0.7]{report/img/gcm}
 	\caption{Vorgang Push-Notification}
-	\label{fig:deploymentAzure}
+	\label{fig:notification}
+\end{figure}
+
+Die nachfolgende Grafik (Abbildung \ref{fig:sequenzNotification}) zeigt auf, wie anhand der MQTT-Message die Notifikation ausgelöst wird.
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=0.65]{report/img/sequenzDiagramNotification}
+	\caption{Sequenzdiagramm MQTT-Notification}
+	\label{fig:sequenzNotification}
 \end{figure}
 
 \subsubsection{Android-Client}
@@ -349,7 +367,7 @@ Die Verbindung zum MQTT-Broker wird durch SSL/TLS Verschlüsselt. Dazu wird ein 
 Die jeweilige Implementierung der TLS-Verbindung wird im Kapitel \ref{sssec:mqtt} erläutert.
 
 \subsubsection{Konfiguration MQTT-Broker}
-Am Broker sollen sich nur authentifizierte und autorisierte Clients anmelden können. Dazu bietet der MQTT-Standard die Möglichkeit ein Password-File zu erzeugen. In dieses File wird der Benutzername und das zugehörige Passwort eingetragen, mit dem sich die Client anmelden können. Nur wenn diese Angaben übereinstimmen, kann eine Verbindung aufgebaut werden. \\
+Am Broker sollen sich nur authentifizierte und autorisierte Clients anmelden können. Dazu bietet der MQTT-Standard die Möglichkeit ein Password-File zu erzeugen. In dieses File wird der Benutzername und das zugehörige Passwort eingetragen, mit dem sich die Clients anmelden können. Nur wenn diese Angaben übereinstimmen, kann eine Verbindung aufgebaut werden. \\
 Mosquitto bringt ein Tool mit, zur Erzeugung und Verschlüsselung dieses Files. Über die Konsole wird das Skript aufgerufen und die Benutzerangaben können als Parameter übergeben werden:
 \begin{lstlisting}[style=csharp, caption=mosquitto\_passwd.exe - generate password-file]
 > mosquitto_passwd -c passwordFile
