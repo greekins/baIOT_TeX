@@ -68,7 +68,52 @@ String Motion_Summary "Bewegungsmelder [%s]"
 [...]
 \end{lstlisting}
 
-Die Ermittlung und Zuweisung des korrekten Wertes an das Item \lstinline!Motion_Summary! geschieht mit Hilfe der Rule \lstinline!Motion Aggregator!.
+Die Ermittlung und Zuweisung des korrekten Wertes an das Item \lstinline!Motion_Summary! geschieht mit Hilfe der Rule \lstinline!Motion Aggregator!, die im nächsten Abschnitt erklärt wird.
+
+\subsubsection{Rules}
+Wie im Lösungskonzept beschrieben, werden Rules zur Automatisierung von Aktionen eingesetzt. Die Regeln können im File \lstinline!/etc/openhab/configurations/rules/demo.rules! definiert werden. \\\\
+\textbf{Alarm} \\
+In der Grafik \ref{fig:flowchartAlarm} wird der Ablauf der Alarm-Regel gezeigt. Im Wesentlichen geht es darum, beim Erkennen von Bewegung und offenem Fenster das Licht einzuschalten und die aufgenommenen Bilder der Webcam zu speichern. Dies soll jedoch nur geschehen, wenn der Alarm eingeschaltet ist.
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=0.8]{report/img/RuleAlarm}
+	\caption{Flowchart Alarm Rule}
+	\label{fig:flowchartAlarm}
+\end{figure}
+
+Umgesetzt wird diese Flowchart durch folgenden Code. Diese Rules sind in der von openHAB selbst definierten DSL (Domain Specific Language) geschrieben.
+
+\begin{lstlisting}[style=csharp, caption=demo.rules - Rule «Motion Aggregator»]
+rule "Alarm"
+	when Item Motion_Livingroom received update or
+	     Item Motion_Livingroom_Sabotage received update or
+	     Item Window_Bedroom received update
+	then
+	if(Motion_Livingroom.state == "true" ||
+	   Window_Bedroom.state == "true") {
+		sendCommand(Hue_1, ON)
+		sendCommand(Hue_2, ON)
+		sendMqttFile("openhab/blob",
+					 "http://192.168.1.15/snapshot.jpg")
+	} else {
+		sendCommand(Hue_1, OFF)
+		sendCommand(Hue_2, OFF)
+	}
+end
+\end{lstlisting}
+
+\textbf{Bewegungsmelder Aggregation} \\
+Diese Regel definiert die verschiedenen Status, die der Bewegungsmelder haben kann. Durch diese Regel werden sie ermittelt und für das Item \lstinline!Motion_Summary! gesetzt. \\
+Da der Bewegungsmelder Bewegungen und Sabotage erkennen kann (wenn die Halterung entfernt wird), ergeben sich vier mögliche Zustände: «Ruhig», «Bewegung erkannt», «Bewegung und Sabotage erkannt» und «Sabotage erkannt». Der entsprechende Zustand wird durch diese Regel definiert.
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=0.8]{report/img/RuleMotionAggregator}
+	\caption{Flowchart Motion Aggregator Rule}
+	\label{fig:flowChartMotionAggregator}
+\end{figure}
+
+Nachfolgend ist die Definition der Regel in der openhAB DSL beschrieben. Falls keiner der vier möglichen Zustände zutrifft, was nur in einem Fehlerfall möglich ist, wird «---» im Item \lstinline!Motion_Summary! angezeigt.
 
 \begin{lstlisting}[style=csharp, caption=demo.rules - Rule «Motion Aggregator»]
 rule "Motion Aggregator"
@@ -92,7 +137,6 @@ rule "Motion Aggregator"
 	}
 end
 \end{lstlisting}
-
 
 \pagebreak
 
