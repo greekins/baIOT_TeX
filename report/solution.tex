@@ -119,6 +119,36 @@ Rules sind die Werkzeuge zur Automatisierung. Dank einer Java-ähnlichen DSL kö
 Sitemaps sind Konfigurationsfiles zur deklarativen Definition von User Interfaces. Sitemaps werden ebenfalls in einer Xtext basierten DSL geschrieben und haben eine baumartige Struktur. OpenHAB liest das Konfigurationsfile und stellt die Sitemap über eine REST API zur Verfügung. Eine mitgelieferte Webapplikation stellt das User Interface anschliessend im Browser dar. Layouttechnisch orientiert sich die Webapplikation am iOS 6 Design mit Listendarstellung und Drill-Down Prinzip. Die nativen iOS und Android Apps von openHAB verfolgen das selbe Bedienkonzept.\\
 Die verschiedenen Elemente, die in Sitemaps verfügbar sind, können Items direkt über deren Name referenzieren. Einige Elemente sind dynamisch und erlauben eine werteabhängige Darstellung.
 
+\subsection{Android App}
+Als User Interface für unser System dient eine Android App. Zwar existieren bereits verschiedene openHAB Clients, sowohl als Web-App als auch als Android App, jedoch sind diese zu generisch. Man könnte argumentieren, dass es doch gut ist, wenn die App universell einsetzbar ist und oft hätte man damit recht. In unserem speziellen Szenario «Einbruchschutz» müssten wir aber zu viele Kompromisse eingehen. Deshalb haben wir uns dazu entschieden, die Android App selbst zu programmieren. 
+\\ \\
+Jede openHAB Installation bietet eine offene REST-Schnittstelle an, damit auch Clients von Drittanbietern auf Items und Sitemaps zugreifen können. Der openHAB Server ermöglicht sowohl das explizite Abfragen der Daten, als auch den umgekehrten Weg um Clients proaktiv über Änderungen zu informieren. 
+
+\subsubsection{Features}
+Die Features unserer App orientieren sich an den funktionalen Anforderungen zum Lösungsteil.
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=0.3]{report/img/mockup_overview.png}
+	\caption{In dieser Ansicht soll der Benutzer möglichst auf einen Blick alle relevanten Informationen zum Sicherheitszustand seines Zuhauses erhalten. Von hier aus gelangt man zu den Bereichen «Fenster», «Licht» und «Überwachung». Für alle Bereiche wird eine kleine Zusammenfassung zum Status angezeigt.}
+	\label{fig:mockupOverview}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=0.3]{report/img/mockup_window.png}
+	\caption{Dieser Bereich zeigt alle Fenster, die mit einem Kontaktsensor ausgerüstet sind.}
+	\label{fig:mockupWindow}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=0.3]{report/img/mockup_light.png}
+	\caption{Auf dieser Seite sind alle Lampen aufgelistet, die in openHAB integriert wurden. Mit einem Switch können diese ein- oder ausgeschaltet werden.}
+	\label{fig:mockupLight}
+\end{figure}
+
+
 \subsection{Anbindung Cloud}
 
 In den funktionalen Anforderungen zum Basisszenario wurde festgelegt, dass Geschehnisse auf dem lokalen Bus (openHAB) an die Cloud gesendet werden müssen. Als Cloud-Plattform wurde Microsoft Azure bereits zu Beginn der Arbeit definiert. Damit die Daten von openHAB in die Cloud gelangen gibt es im Wesentlichen zwei Möglichkeiten: Entweder man entwickelt selbst ein Plugin für openHAB oder man verwendet das openHAB MQTT Persistence Plugin. MQTT ist ein Publish/Subscribe Protokoll und besonders gut für IOT Systeme mit langsamer oder instabiler Internetverbindung geeignet. Wir haben uns für die Variante mit MQTT entschieden. OpenHAB fungiert als MQTT-Client und kann so konfiguriert werden, dass Events auf dem Bus automatisch an einen MQTT-Broker gesendet werden, der von uns auf Microsoft Azure installiert wurde. Um die Daten zu verarbeiten muss ein MQTT-Client auf Microsoft Azure laufen und die Nachrichten vom Broker entgegennehmen. Danach steht uns frei, wie die Daten verarbeitet werden.
