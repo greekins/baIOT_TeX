@@ -119,6 +119,30 @@ Rules sind die Werkzeuge zur Automatisierung. Dank einer Java-ähnlichen DSL kö
 Sitemaps sind Konfigurationsfiles zur deklarativen Definition von User Interfaces. Sitemaps werden ebenfalls in einer Xtext basierten DSL geschrieben und haben eine baumartige Struktur. OpenHAB liest das Konfigurationsfile und stellt die Sitemap über eine REST API zur Verfügung. Eine mitgelieferte Webapplikation stellt das User Interface anschliessend im Browser dar. Layouttechnisch orientiert sich die Webapplikation am iOS 6 Design mit Listendarstellung und Drill-Down Prinzip. Die nativen iOS und Android Apps von openHAB verfolgen das selbe Bedienkonzept.\\
 Die verschiedenen Elemente, die in Sitemaps verfügbar sind, können Items direkt über deren Name referenzieren. Einige Elemente sind dynamisch und erlauben eine werteabhängige Darstellung.
 
+\subsection{Allgemeine Systemsicht}
+Anhand der Problembeschreibung wurde ein Plan erarbeitet, der das ganze System verständlich beschreibt. Abbildung \ref{fig:systemView} stellt die wichtigsten Komponenten und Entitäten aus der Problemdomäne in gegenseitiger Beziehung dar.
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=0.55]{report/img/systemuebersicht}
+	\caption{Systemübersicht}
+	\label{fig:systemView}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=0.55]{report/img/hausplan_aktuell}
+	\caption{Systemübersicht}
+	\label{fig:systemView}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=1]{report/img/vernetzung}
+	\caption{Systemübersicht}
+	\label{fig:systemView}
+\end{figure}
+
 \subsection{Android App}
 Als User Interface für unser System dient eine Android App. Zwar existieren bereits verschiedene openHAB Clients, sowohl als Web-App als auch als Android App, jedoch sind diese zu generisch. Man könnte argumentieren, dass es doch gut ist, wenn die App universell einsetzbar ist und oft hätte man damit recht. In unserem speziellen Szenario «Einbruchschutz» müssten wir aber zu viele Kompromisse eingehen. Deshalb haben wir uns dazu entschieden, die Android App selbst zu programmieren. 
 \\ \\
@@ -244,15 +268,3 @@ Bezüglich Sicherheit sieht der Standard lediglich vor, die übertragenen Daten 
 
 \subsubsection{Fazit}
 Wie aus den Ausführungen zur Sicherheit ersichtlich ist, können alle technischen Sicherheits-Risiken abgedeckt werden. Die grösste Schwachstellt ist jeweils der Mensch, der durch Social-Engineering-Techniken manipuliert werden kann und so Zugriff auf das Android App gewährt.
-
-\subsection{Allgemeine Systemsicht}
-Anhand der Problembeschreibung wurde ein Plan erarbeitet, der das ganze System verständlich beschreibt. Abbildung \ref{fig:systemView} stellt die wichtigsten Komponenten und Entitäten aus der Problemdomäne in gegenseitiger Beziehung dar.
-
-\begin{figure}[h!]
-	\centering
-		\includegraphics[scale=0.55]{report/img/systemuebersicht}
-	\caption{Systemübersicht}
-	\label{fig:systemView}
-\end{figure}
-
-\pagebreak
