@@ -120,7 +120,8 @@ Sitemaps sind Konfigurationsfiles zur deklarativen Definition von User Interface
 Die verschiedenen Elemente, die in Sitemaps verfügbar sind, können Items direkt über deren Name referenzieren. Einige Elemente sind dynamisch und erlauben eine werteabhängige Darstellung.
 
 \subsection{Allgemeine Systemsicht}
-Anhand der Problembeschreibung wurde ein Plan erarbeitet, der das ganze System verständlich beschreibt. Abbildung \ref{fig:systemView} stellt die wichtigsten Komponenten und Entitäten aus der Problemdomäne in gegenseitiger Beziehung dar.
+Anhand der Problembeschreibung wurde ein Plan erarbeitet, der das ganze System verständlich beschreibt. Die Abbildung \ref{fig:systemView} stellt die wichtigsten Komponenten und Entitäten aus der Problemdomäne in gegenseitiger Beziehung dar. An zentraler Stelle steht das openHAB-Framework, es verbindet alle Komponenten. Die Cloud wird über MQTT (ein Message-Protokoll) angebunden, um Events zu persistieren.\\
+Die Sensoren/Aktoren kommunizieren durch Bindings über das Netzwerk mit openHAB um deren Status zu übertragen. Der Client kann diese Status über das RESTful-API abfragen und Commands senden.
 
 \begin{figure}[H]
 	\centering
@@ -129,18 +130,25 @@ Anhand der Problembeschreibung wurde ein Plan erarbeitet, der das ganze System v
 	\label{fig:systemView}
 \end{figure}
 
+Für das Szenario wurde eine fiktive Wohnung (Abbildung \ref{fig:housePlan}) gezeichnet, um den Einsatz in einer Zwei-Zimmer-Wohnung zu demonstrieren. Dabei befindet sich das openHAB auf dem Rasperry Pi in zentraler Stelle, damit die anderen Zentralen über kurze Strecken mit LAN-Kabeln vernetzt werden können.\\
+Die Webcam ist so platziert, damit der grosse Wohnbereich mitsamt Küche überwacht werden kann und somit ein potentieller Einbrecher aufgenommen werden kann. Der Fenster Kontaktsensor wird im Zimmer angebracht und der Bewegungsmelder zwischen Küche und Wohnzimmer, um einen möglichst grosse Fläche abzudecken.Die Philips Hue Lampen befinden sich im Schlaf- und Wohnzimmer, um die ganze Wohnung zu beleuchten.
+
+Die Türen und das Fenster im Wohnzimmer werden nicht mit Kontaktsensoren ausgestattet, da dieser Bereich durch den Bewegungsmelder erfasst wird.
+
 \begin{figure}[H]
 	\centering
 		\includegraphics[scale=0.55]{report/img/hausplan_aktuell}
-	\caption{Systemübersicht}
-	\label{fig:systemView}
+	\caption{Hausplan}
+	\label{fig:housePlan}
 \end{figure}
+
+Philips Hue und HomeMatic besitzen beie eine Zentrale, über die kommunizieren sie mit Ihren Gadgets. Die Zentralen werden über LAN (RJ45) an das Raspberry Pi angeschlossen. \tbd
 
 \begin{figure}[H]
 	\centering
 		\includegraphics[scale=1]{report/img/vernetzung}
-	\caption{Systemübersicht}
-	\label{fig:systemView}
+	\caption{Vernetzung der Komponenten}
+	\label{fig:componentsIntegration}
 \end{figure}
 
 \subsection{Android App}

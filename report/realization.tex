@@ -208,6 +208,9 @@ Nach der Standard-Installation muss der Broker Konfiguriert werden. Dazu wird da
 		\\ \hline
 \end{tabularx}
 
+Um den Broker zu starten, muss in der Konsole (cmd.exe) in das Installationsverzeichnis (\path{C:\ProgramFiles(x86)\mosquitto\)} navigiert werden. Dort kann der Broker mit der angepassten Konfiguration gestartet werden. Damit in der Konsole Feedback gezeigt wird, wird der Broker im «Verbose-Modus» gestartet: \\
+\lstinline!mosquitto -c mosquitto.conf -v! \\
+
 \subsubsection{openHAB MQTT Persistence (Publishing Client)}
 Im Lösungskonzept haben wir bereits erklärt, dass wir die Events auf dem openHAB Eventbus via MQTT an die Cloud übertragen wollen und dass es ein MQTT Plugin für openHAB gibt. Nachdem der Broker installiert wurde wollen wir nun unsere openHAB Items an den Broker senden. Dazu installieren wir das openHAB MQTT Persistence Plugin auf unserem Raspberry Pi: \\
 \lstinline!apt-get install openhab-addon-persistence-mqtt!
