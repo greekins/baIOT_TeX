@@ -103,8 +103,9 @@ end
 \end{lstlisting}
 
 \textbf{Bewegungsmelder Aggregation} \\
-Diese Regel definiert die verschiedenen Status, die der Bewegungsmelder haben kann. Durch diese Regel werden sie ermittelt und für das Item \lstinline!Motion_Summary! gesetzt. \\
-Da der Bewegungsmelder Bewegungen und Sabotage erkennen kann (wenn die Halterung entfernt wird), ergeben sich vier mögliche Zustände: «Ruhig», «Bewegung erkannt», «Bewegung und Sabotage erkannt» und «Sabotage erkannt». Der entsprechende Zustand wird durch diese Regel definiert.
+Diese Regel definiert die verschiedenen Status, die der Bewegungsmelder haben kann. Durch diese Regel wird der aktuelle Status ermittelt und für das Item \lstinline!Motion_Summary! gesetzt. \\
+Da der Bewegungsmelder Bewegungen und Sabotage erkennen kann (wenn die Halterung entfernt wird), ergeben sich vier mögliche Zustände: «Ruhig», «Bewegung erkannt», «Bewegung und Sabotage erkannt» und «Sabotage erkannt».\\
+In der Abbildung \ref{fig:flowChartMotionAggregator} wird der Ablauf illustriert.
 
 \begin{figure}[H]
 	\centering
