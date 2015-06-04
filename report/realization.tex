@@ -370,6 +370,13 @@ Wie sich die Clients gegenüber dem Broker authentifizieren, ist im Abschnitt \r
 \subsubsection{Verschlüsselung WLAN}
 Über das WLAN kann man ohne Authentifizierung auf das openHAB zugreifen. Um unautorisierten Zugriff zu verhindern, wird das WLAN mit dem Sicherheitsstandard WPA2 verschlüsselt. Die Kommunikation wird also über den symmetrischen AES (Advanced Encryption Standard) Algorithmus verschlüsselt. Da es sich um eine symmetrische Verschlüsselung handelt, muss jeder Client ein PSK (Pre Shared Key) besitzen, der jeweils beim Verbindungsaufbau eingegeben werden muss.
 
+\subsection{Problematik Systemaufbau}
+In diesem Systemaufbau gibt es aufgrund der Infrastruktur der HSR einige Probleme, die es in einem richtigen Szenario nicht geben würde. \\
+Da die Komponenten nicht in die Infrastruktur der Schule integriert werden durften, musste auf ein eigenes, lokales Netzwerk zurückgegriffen werden. Dabei handelt es sich um ein unabhängiges Netzwerk, auf das von extern nicht zugegriffen werden kann. \\
+Dies stellt einige Herausforderungen an die Erreichbarkeit unseres System. Einerseits die Konektivität mit der Cloud und andererseits das Erreichen des openHabs durch unser Android Client. \\
+Durch das Anbinden des Raspberry Pis an das lokale und das HSR-Netzwerk wird die Erreichbarkeit der Cloud gewährleistet. Es sind also zwei Network-Interfaces konfiguriert. Eines für das lokale und eines für das HSR Netzwerk. Damit die MQTT-Nachrichten an das richtige Interface gesendet wird, muss die Default Route auf das HSR-Interface (eth0) gesetzt werden: \lstinline!ip route add default dev eth0!. \\\\
+Da sich das Raspberry Pi jedoch nicht in der DMZ befindet, besteht keine Möglichkeit die REST-Schnittstelle des openHabs von extern zu erreichen. Aus diesem Grundmuss sich der Android Client zwingend im lokalen Netz befinden. \\
+Aufgrund dieser Tatsache ist der Client nicht für Notifications erreichbar. Für Demonstrations-Zwecke muss zwischen dem HSR und dem lokalen Netzwerk gewechselt werden, um die Notifications zu erhalten.
 
 
 
