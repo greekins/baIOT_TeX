@@ -125,7 +125,16 @@ Als User Interface für unser System dient eine Android App. Zwar existieren ber
 Jede openHAB Installation bietet eine offene REST-Schnittstelle an, damit auch Clients von Drittanbietern auf Items und Sitemaps zugreifen können. Der openHAB Server ermöglicht sowohl das explizite Abfragen der Daten, als auch den umgekehrten Weg um Clients proaktiv über Änderungen zu informieren. 
 
 \subsubsection{Features}
-Die Features unserer App orientieren sich an den funktionalen Anforderungen zum Lösungsteil.
+Die Features unserer App orientieren sich an den funktionalen Anforderungen zum Lösungsteil. Insbesondere sind dies:
+
+\begin{itemize}
+	\item Übersichtsseite für den Status des Hauses
+	\item Überwachung der Fenster
+	\item Funktion zum Ein- und Ausschalten der Lampen
+	\item Scharfstellen oder Deaktivieren des Alarm-Modus via NFC
+	\item Ansicht der Überwachungskamera
+	\item Status des Bewegungsmelders abfragen
+\end{itemize}
 
 \begin{figure}[H]
 	\centering
@@ -148,6 +157,19 @@ Die Features unserer App orientieren sich an den funktionalen Anforderungen zum 
 	\label{fig:mockupLight}
 \end{figure}
 
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=0.3]{report/img/mockup_camera.png}
+	\caption{Diese Ansicht enthält einen Schalter zum Scharfstellen oder deaktivieren des Alarm-Modus, den Status des Bewegungsmelders und das Bild der Überwachungskamera}
+	\label{fig:mockupCamera}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=0.3]{report/img/mockup_nfc.png}
+	\caption{Wenn das Smartphone auf einen vorkonfigurierten NFC Tag gelegt wird erscheint diese Ansicht und der Alarm-Modus wird geswitcht.}
+	\label{fig:mockupCamera}
+\end{figure}
 
 \subsection{Anbindung Cloud}
 
