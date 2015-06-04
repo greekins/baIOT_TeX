@@ -1,5 +1,5 @@
 \section{Lösungskonzept}
-Dieses Kapitel beinhaltet die Beschreibung der Architektur und wichtiger Komponenten. Es werden die theoretischen Grundlagen der eingesetzten Technologien und Systeme erläutert und warum diese verwendet werden. Nicht Teil dieses Kapitels sind Erläuterungen von Konfigurationen und Code. Dies wird separat im Kapitel «Umsetzung» behandelt.
+Dieses Kapitel beinhaltet die Beschreibung der Architektur und wichtiger Komponenten. Es werden die theoretischen Grundlagen der eingesetzten Technologien und Systeme erläutert und warum diese verwendet werden. Nicht Teil dieses Kapitels sind Erläuterungen von Konfigurationen und Code. Dies wird separat im Kapitel «Umsetzung» ab Seite \pageref{sec:chapterRealization} behandelt.
 
 \subsection{Evaluation der Plattform}
 Anhand der Marktsituation und den funkionalen Anforderungen haben wir die Vor- und Nachteile der jeweiligen Plattformen miteinander verglichen und dabei darauf geachtet, welche Kriterien für unsere Lösung von Bedeutung sind.
@@ -36,7 +36,7 @@ Mit openHAB haben wir eine Plattform gefunden, die allen wichtigen Kriterien ent
 Ein Nachteil von openHAB ist, dass die Dokumentation grosse Lücken aufweist. Zwar sind die Konzepte leichte verständlich, jedoch fehlen Detailangaben zur DSL und genauen Konfigurationssyntax. Aus diesem Grund müssen oft Beispiele analysiert oder Benutzerforen zu Rate gezogen werden.
 
 \subsection{Evaluation der Hardware}
-Nachdem wir openHAB als Plattform bestimmt haben konnten wir die Hardware für die Sensoren und Aktoren aussuchen. Dafür haben wir uns an den Vorgaben L02 - L06 aus Abschnitt 2.2.2 orientiert. Durch die Vielzahl an Protokollen, die durch openHAB unterstützt werden, hatten wir genügend Auswahl an Hardware von unterschiedlichen Herstellern. OpenHAB selbst läuft auf einem Raspberry Pi B+.
+Nachdem wir openHAB als Plattform bestimmt haben konnten wir die Hardware für die Sensoren und Aktoren aussuchen. Dafür haben wir uns an den Vorgaben L02 - L06 aus Abschnitt \ref{sec:requirementsSolutionPart} auf Seite \pageref{sec:requirementsSolutionPart} orientiert. Durch die Vielzahl an Protokollen, die durch openHAB unterstützt werden, hatten wir genügend Auswahl an Hardware von unterschiedlichen Herstellern. OpenHAB selbst läuft auf einem Raspberry Pi B+.
 
 \textit{L02:} Als Überwachungskamera haben wir die Edimax IC-3115W Netzwerkkamera ausgesucht. Sie ist mit einem Preis von weniger als 50 Euro relativ günstig und über das HTTP Binding von openHAB kompatibel.
 
@@ -151,6 +151,17 @@ Philips Hue und HomeMatic besitzen beie eine Zentrale, über die kommunizieren s
 	\label{fig:componentsIntegration}
 \end{figure}
 
+\subsubsection{Beispiel Use Case}
+Im System kann verfügt über zwei Alarm-Modi: Scharf und Inaktiv. Wenn der Alarm scharf ist und der HomeMatic Bewegungsmelder oder der Fensterkontakt eine Veränderung registriert, dann sollen die Philips Hue Lampen eingeschaltet werden. Zeitgleich werden Aufnahmen der Webcam an die Cloud gesendet. Die Cloud schickt eine Push-Notification an das Android um den Benutzer über den ausgelösten Alarm zu informieren. Das folgende Sequenzdiagramm veranschaulicht den Use Case:
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=\textwidth]{report/img/sequence_alarm.png}
+	\caption{Sequenzdiagramm Alarm}
+	\label{fig:sequenceAlarm}
+\end{figure}
+
+
 \subsection{Android App}
 Als User Interface für unser System dient eine Android App. Zwar existieren bereits verschiedene openHAB Clients, sowohl als Web-App als auch als Android App, jedoch sind diese zu generisch. Man könnte argumentieren, dass es doch gut ist, wenn die App universell einsetzbar ist und oft hätte man damit recht. In unserem speziellen Szenario «Einbruchschutz» müssten wir aber zu viele Kompromisse eingehen. Deshalb haben wir uns dazu entschieden, die Android App selbst zu programmieren. 
 \\ \\
@@ -205,7 +216,7 @@ Die Features unserer App orientieren sich an den funktionalen Anforderungen zum 
 
 \subsection{Anbindung Cloud}
 
-In den funktionalen Anforderungen zum Basisszenario wurde festgelegt, dass Geschehnisse auf dem lokalen Bus (openHAB) an die Cloud gesendet werden müssen. Als Cloud-Plattform wurde Microsoft Azure bereits zu Beginn der Arbeit definiert. Damit die Daten von openHAB in die Cloud gelangen gibt es im Wesentlichen zwei Möglichkeiten: Entweder man entwickelt selbst ein Plugin für openHAB oder man verwendet das openHAB MQTT Persistence Plugin. MQTT ist ein Publish/Subscribe Protokoll und besonders gut für IOT Systeme mit langsamer oder instabiler Internetverbindung geeignet. Wir haben uns für die Variante mit MQTT entschieden. OpenHAB fungiert als MQTT-Client und kann so konfiguriert werden, dass Events auf dem Bus automatisch an einen MQTT-Broker gesendet werden, der von uns auf Microsoft Azure installiert wurde. Um die Daten zu verarbeiten muss ein MQTT-Client auf Microsoft Azure laufen und die Nachrichten vom Broker entgegennehmen. Danach steht uns frei, wie die Daten verarbeitet werden.
+In den funktionalen Anforderungen zum Basisszenario wurde festgelegt, dass Geschehnisse auf dem lokalen Bus (openHAB) an die Cloud gesendet werden müssen. Als Cloud-Plattform wurde Microsoft Azure bereits zu Beginn der Arbeit definiert. Damit die Daten von openHAB in die Cloud gelangen gibt es im Wesentlichen zwei Möglichkeiten: Entweder man entwickelt selbst ein Plugin für openHAB oder man verwendet das openHAB MQTT Persistence Plugin. MQTT ist ein Publish/Subscribe Protokoll und besonders gut für IOT Systeme mit langsamer oder instabiler Internetverbindung geeignet. Wir haben uns für die Variante mit MQTT entschieden. OpenHAB fungiert als MQTT-Client und kann so konfiguriert werden, dass Events auf dem Bus automatisch an einen MQTT-Broker gesendet werden, der von uns auf Microsoft Azure installiert wurde. Um die Daten zu verarbeiten muss ein MQTT-Client auf Microsoft Azure laufen und die Nachrichten vom Broker entgegennehmen. Danach steht uns frei, wie die Daten verarbeitet werden. Details zur Implementierung und technische Beschreibungen sind im Kapitel «Umsetzung» dieser Dokumentation zu finden. 
 
 \subsubsection{MQTT Broker Evaluation}
 Für die Evaluation des Brokers haben wir eine List mit unseren Anforderungen erstellt: 
@@ -242,8 +253,8 @@ In unserem Systemaufbau wird es zwei MQTT-Clients geben. Einerseits durch das op
 Das Binding von openHAB besteht bereits, daher muss nur noch eine Client-Implementation für C\# gesuchtwerden. Nach kurzer Rechereche scheint die «M2Mqtt» Library sehr verbreitet zu sein. \\
 Durch aufsetzen eines Prototyps konnte die benötigte Funktionalität erfasst werden. Sie erfüllt alle Kriterien, die auch an den Broker gestellt wurden.
 
-\subsection{Notification}
-Damit ein Sicherheitssystem Sinn macht, muss der Besitzer benachrichtigt werden, sobald sich ein Zustand der Sensoren ändert. Genauer gesagt soll der Benutzer informiert werden, wenn der Bewegungsmelder oder der Fensterkontakt im Alarm-Modus eine Veränderung registriert. Ansonsten müsste der Benutzer permanent die Status im Android-App überwachen. Für die Umsetzung bietet sich der Google Cloud Message Dienst (GCM) an, der auch von Microsoft empfohlen wird. Da nur die Android-Platform unterstützt werden muss, wird auf den Einsatz des Azure Notification Hubs verzichtet und die direkte Verbindung zum GCM-Dienst gesucht.
+\subsection{Push-Notifications}
+Damit ein Sicherheitssystem Sinn macht, muss der Besitzer benachrichtigt werden, sobald sich ein Zustand der Sensoren ändert. Genauer gesagt soll der Benutzer informiert werden, wenn der Bewegungsmelder oder der Fensterkontakt im Alarm-Modus eine Veränderung registriert. Ansonsten müsste der Benutzer permanent die Status im Android-App überwachen. Für die Umsetzung bietet sich der Google Cloud Message Dienst (GCM) an, der auch von Microsoft empfohlen wird. Da nur die Android-Platform unterstützt werden muss, wird auf den Einsatz des Azure Notification Hubs verzichtet und die direkte Verbindung zum GCM-Dienst gesucht. Erfahren Sie im entsprechenden Kapitel des Umsetzungsteil auf Seite \pageref{sec:notificationRealization}, wie die Notification Funktion cloud- und androidseitig umgesetzt wurde.
 
 \subsection{Sicherheit}
 In unserem Szenario, Einbruchschutz, ist das Thema Sicherheit sehr wichtig. Daher lohnt es sich dazu  Gedanken zu machen. Man kann das System grob in drei Bereiche einteilen, an denen ein Angriff angesetzt werden kann:

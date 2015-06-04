@@ -1,4 +1,5 @@
 \section{Umsetzung}
+\label{sec:chapterRealization}
 \subsection{Technologie und Plattform}
 In der Problembeschreibung zu dieser Arbeit wurden die Anforderungen an eine SmartHome Lösung diskutiert. In der anschliessenden Marktanalyse wurde openHAB als Grundlage zur Umsetzung unseres Projekts evaluiert. OpenHAB erfüllt die geforderten Kritierien, wie Herstellerunabhängigkeit, Installierbarkeit und Flexibilität. Cloudseitig wird MS Azure Cloud zur Persistierung von Events verwendet.
 
@@ -212,6 +213,7 @@ Um den Broker zu starten, muss in der Konsole (cmd.exe) in das Installationsverz
 \lstinline!mosquitto -c mosquitto.conf -v! \\
 
 \subsubsection{openHAB MQTT Persistence (Publishing Client)}
+\label{sec:mqttPersistenceRealization}
 Im Lösungskonzept haben wir bereits erklärt, dass wir die Events auf dem openHAB Eventbus via MQTT an die Cloud übertragen wollen und dass es ein MQTT Plugin für openHAB gibt. Nachdem der Broker installiert wurde wollen wir nun unsere openHAB Items an den Broker senden. Dazu installieren wir das openHAB MQTT Persistence Plugin auf unserem Raspberry Pi: \\
 \lstinline!apt-get install openhab-addon-persistence-mqtt!
 \\ \\
@@ -248,7 +250,7 @@ Damit erreichen wir, dass ein Item immer dann an den Broker gesendet wird, wenn 
 
 
 \subsubsection{Azure Worker Role (Subscribing Client)} \label{sssec:m2mqttClient}
-Wie die Abbildung \ref{fig:systemView} (Systemübersicht) zeigt, befindet sich nebst dem Broker auch ein Client, in form einer Worker Role, in der Cloud. Die Worker Role abonniert alle Topics und persistiert die Messages im Table bzw. Blob-Storage.
+Wie die Abbildung \ref{fig:systemView} auf Seite \pageref{fig:systemView} (Systemübersicht) zeigt, befindet sich nebst dem Broker auch ein Client, in form einer Worker Role, in der Cloud. Die Worker Role abonniert alle Topics und persistiert die Messages im Table bzw. Blob-Storage.
 
 In der \lstinline!OnStart()!-Methode der Worke Role werden zu erst die Referenzen zum Table- und Blob-Storage erzeugt. \\
 Danach wird die Verbindung zum MQTT-Broker hergestellt, die Topics definiert, die er abonnieren möchte und der QoS-Level gesetzt. \\
@@ -330,7 +332,7 @@ Im Sequenzdiagram der Abbildung \ref{fig:sequenzMQTT} wird aufgezeigt, wie die M
 
 
 \subsubsection{openHAB MQTT Action}
-Normalerweise wird ein openHAB Item direkt via MQTT an die Cloud gesendet, sobald sich der Status des Items ändert. Da unsere Überwachungskamera aber nicht durch ein openHAB Item repräsentiert wird, kann openHAB auch nichts davon an die Cloud schicken. Trotzdem möchten wir gerne einen Snapshot der Kamera an die Cloud senden, sobald der Alarm ausgelöst wurde. \\
+Normalerweise wird ein openHAB Item direkt via MQTT an die Cloud gesendet, sobald sich der Status des Items ändert. Da unsere Überwachungskamera aber nicht durch ein openHAB Item repräsentiert wird, kann openHAB auch nichts davon an die Cloud schicken. Trotzdem möchten wir gerne einen Snapshot der Kamera an die Cloud senden, sobald der Alarm ausgelöst wurde (siehe Abbildung \ref{fig:sequenceAlarm} - Sequenzdiagramm Alarm auf Seite \pageref{fig:sequenceAlarm} im Lösungskonzept). \\
 Deshalb benutzen wir eine sogenannte openHAB Action zum Senden des Snapshots an den MQTT Broker. Die Action kann in der DSL zum beschreiben der Rules ähnlich wie ein statischer Methodenaufruf verwendet werden. Natürlich gibt es diese spezielle Action noch nicht im Standardumfang von openHAB, sondern wir mussten diese in Form eines Action-Plugins selbst programmieren.
 
 \textbf{Programmierung der MQTT Action}\\
@@ -423,8 +425,9 @@ Die MQTT Action implementiert zwei Methoden: sendMQTTString(topic, message) und 
 
 \subsubsection{Material Design}
 
-\subsection{Notification}
-Der Mobile-Client wird durch Notifications benachrichtig, sobald der Alarm ausgelöst wird. Umgesetzt wird dies mithilfe des Google Cloud Messaging Dienstes.
+\subsection{Push-Notifications}
+\label{sec:notificationRealization}
+Der Mobile-Client wird durch Push-Notifications benachrichtig, sobald der Alarm ausgelöst wird. Umgesetzt wird dies mithilfe des Google Cloud Messaging Dienstes.
 
 \subsubsection{Cloud}
 Um den GCM-Dienst nutzen zu können, muss zu erst in der Google Developer Console (\url{https://console.developers.google.com}) ein Projekt erstellt werden mit einer Cloud-Messaging-API. Für diese API kann ein Schlüssel erzeugt werden, der für das Versenden der Notification über die neu erstellte API benötigt wird.
@@ -450,7 +453,7 @@ Folgende Grafik stellt den Registrations-Vorgang dar:
 	\label{fig:notification}
 \end{figure}
 
-Die nachfolgende Grafik (Abbildung \ref{fig:sequenzNotification}) zeigt auf, wie anhand der MQTT-Message die Notifikation ausgelöst wird.
+Die nachfolgende Grafik (Abbildung \ref{fig:sequenzNotification}) zeigt auf, wie anhand der MQTT-Message die Notification ausgelöst wird. OpenHAB bemerkt eine Statusänderung eines Items und weiss anhand der Persistency Konfiguration, dass das Item via MQTT an den Broker geschickt werden soll (näheres dazu im Abschnitt \ref{sec:mqttPersistenceRealization} auf Seite \pageref{sec:mqttPersistenceRealization}). Die Worker Role empfängt die Message und entscheidet aufgrund deren Inhalt, ob eine Notification gesendet werden muss. Sollte dies der Fall sein, wird eine Push-Notification beim GCM-Dienst ausgelöst.
 
 \begin{figure}[H]
 	\centering
@@ -460,7 +463,7 @@ Die nachfolgende Grafik (Abbildung \ref{fig:sequenzNotification}) zeigt auf, wie
 \end{figure}
 
 \subsubsection{Android-Client}
-
+Wie bereits erklärt benötigt die Worker Role eine Registration-Id um das Android Phone referenzieren zu können. Die Registration-Id ist an ein GCM Projekt gekoppelt und wird in der Android App mit Hilfe des Google PlayServices SDK beim GCM-Dienst angefordert. Die Registration-Id muss dann in eigener Verantwortung an die Worker Role übertragen und geheim gehalten werden. Um eine Nachricht zu erhalten muss ein Android BroadcastReceiver im App-Projekt vorhanden sein, der die Nachricht entgegennimmt und zur Verarbeitung an einen IntentService weitergibt. Dort wird das Notification UI-Element (Dialog am oberen Bildschirmrand) erzeugt und angezeigt.
 
 \subsection{Sicherheit}
 Aus technischer Sicht können folgende Massnahmen getroffen werden, um die im Lösungskonzept beschriebenen Schwachstellen zu sichern:
@@ -472,7 +475,7 @@ Aus technischer Sicht können folgende Massnahmen getroffen werden, um die im L�
 
 \subsubsection{Verschlüsselung MQTT-Verbindung}
 Die Verbindung zum MQTT-Broker wird durch SSL/TLS Verschlüsselt. Dazu wird ein Self-signed Zertifikat eingesetzt. Wie dieses Zertifikat erzeugt wird, ist aus dem Anhang \ref{ch:manual} zu entnehmen. \\
-Die jeweilige Implementierung der TLS-Verbindung wird im Kapitel \ref{sssec:mqtt} erläutert.
+Die jeweilige Implementierung der TLS-Verbindung wird im Kapitel \ref{sssec:mqtt} auf Seite \pageref{sssec:mqtt} erläutert.
 
 \subsubsection{Konfiguration MQTT-Broker}
 Am Broker sollen sich nur authentifizierte und autorisierte Clients anmelden können. Dazu bietet der MQTT-Standard die Möglichkeit ein Password-File zu erzeugen. In dieses File wird der Benutzername und das zugehörige Passwort eingetragen, mit dem sich die Clients anmelden können. Nur wenn diese Angaben übereinstimmen, kann eine Verbindung aufgebaut werden. \\
@@ -481,7 +484,7 @@ Mosquitto bringt ein Tool mit, zur Erzeugung und Verschlüsselung dieses Files. 
 > mosquitto_passwd -c passwordFile
 > mosquitto_passwd -b passwordFile username password
 \end{lstlisting}
-Wie sich die Clients gegenüber dem Broker authentifizieren, ist im Abschnitt \ref{sssec:m2mqttClient} und \tbd (MQTT Binding) ersichtlich.
+Wie sich die Clients gegenüber dem Broker authentifizieren, ist im Abschnitt \ref{sec:mqttPersistenceRealization} auf Seite \pageref{sec:mqttPersistenceRealization} (openHAB Client) und im Abschnitt \ref{sssec:m2mqttClient} auf Seite \pageref{sssec:m2mqttClient} (Worker Role Client) ersichtlich.
 
 \subsubsection{Verschlüsselung WLAN}
 Über das WLAN kann man ohne Authentifizierung auf das openHAB zugreifen. Um unautorisierten Zugriff zu verhindern, wird das WLAN mit dem Sicherheitsstandard WPA2 verschlüsselt. Die Kommunikation wird also über den symmetrischen AES (Advanced Encryption Standard) Algorithmus verschlüsselt. Da es sich um eine symmetrische Verschlüsselung handelt, muss jeder Client ein PSK (Pre Shared Key) besitzen, der jeweils beim Verbindungsaufbau eingegeben werden muss.
