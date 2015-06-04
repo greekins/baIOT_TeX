@@ -208,7 +208,43 @@ Nach der Standard-Installation muss der Broker Konfiguriert werden. Dazu wird da
 		\\ \hline
 \end{tabularx}
 
-\subsubsection{Client (Azure Worker Role)} \label{sssec:m2mqttClient}
+\subsubsection{openHAB MQTT Persistence (Publishing Client)}
+Im Lösungskonzept haben wir bereits erklärt, dass wir die Events auf dem openHAB Eventbus via MQTT an die Cloud übertragen wollen und dass es ein MQTT Plugin für openHAB gibt. Nachdem der Broker installiert wurde wollen wir nun unsere openHAB Items an den Broker senden. Dazu installieren wir das openHAB MQTT Persistence Plugin auf unserem Raspberry Pi: \\
+\lstinline!apt-get install openhab-addon-persistence-mqtt!
+\\ \\
+Danach müssen wir in der openHAB Konfiguration (openhab.cfg) angeben, wie wir uns auf den Broker verbinden wollen:
+\begin{lstlisting}[style=csharp, caption=openhab.cfg - MQTT Config]
+mqtt:mosquitto.url =  ssl://mqttbrokerba.cloudapp.net:8883
+mqtt:mosquitto.user=mosquitto
+mqtt:mosquitto.pwd=******************
+
+mqtt-persistence:broker=mosquitto
+mqtt-persistence:topic=openhab/items
+mqtt-persistence:message={
+	"name":"%1$s",
+	"state":"%3$s", 
+	"date":"%4$s"
+}
+\end{lstlisting}
+
+Jetzt müssen wir openHAB noch beibringen, wann genau die Items an den Broker gesendet werden sollen. Das geschieht über eine Persistence-Konfiguration. Im Ordner \lstinline!configuration/persistence! erstellen wir ein File namens \lstinline!mqtt.persist! mit dem folgenden Inhalt:
+
+\begin{lstlisting}[style=csharp, caption=mqtt.persist]
+Strategies {
+	everyMinute : "1 * * * * ?"
+	everyHour : "0 0 * * * ?"
+	default = everyChange
+}
+
+Items {
+	* : strategy = everyChange, restoreOnStartup
+}
+\end{lstlisting}
+
+Damit erreichen wir, dass ein Item immer dann an den Broker gesendet wird, wenn sich der Status des Items ändert. Zudem sollen bei jedem Systemstart alle Items an den Broker geschickt werden. Jetzt fungiert openHAB als ein Publisher.
+
+
+\subsubsection{Azure Worker Role (Subscribing Client)} \label{sssec:m2mqttClient}
 Wie die Abbildung \ref{fig:systemView} (Systemübersicht) zeigt, befindet sich nebst dem Broker auch ein Client, in form einer Worker Role, in der Cloud. Die Worker Role abonniert alle Topics und persistiert die Messages im Table bzw. Blob-Storage.
 
 In der \lstinline!OnStart()!-Methode der Worke Role werden zu erst die Referenzen zum Table- und Blob-Storage erzeugt. \\
@@ -288,6 +324,83 @@ Im Sequenzdiagram der Abbildung \ref{fig:sequenzMQTT} wird aufgezeigt, wie die M
 	\caption{Sequenzdiagramm MQTT}
 	\label{fig:sequenzMQTT}
 \end{figure}
+
+
+\subsubsection{openHAB MQTT Action}
+Normalerweise wird ein openHAB Item direkt via MQTT an die Cloud gesendet, sobald sich der Status des Items ändert. Da unsere Überwachungskamera aber nicht durch ein openHAB Item repräsentiert wird, kann openHAB auch nichts davon an die Cloud schicken. Trotzdem möchten wir gerne einen Snapshot der Kamera an die Cloud senden, sobald der Alarm ausgelöst wurde. \\
+Deshalb benutzen wir eine sogenannte openHAB Action zum Senden des Snapshots an den MQTT Broker. Die Action kann in der DSL zum beschreiben der Rules ähnlich wie ein statischer Methodenaufruf verwendet werden. Natürlich gibt es diese spezielle Action noch nicht im Standardumfang von openHAB, sondern wir mussten diese in Form eines Action-Plugins selbst programmieren.
+
+\textbf{Programmierung der MQTT Action}\\
+Zum Entwickeln von openHAB Plugins muss eine entsprechende Eclipse Umgebung eingerichtet werden. Dies sollte sich noch als der schwierigste Teil davon herausstellen. Eine Anleitung dazu findet man unter \url{https://github.com/openhab/openhab/wiki/IDE-Setup}. Bei uns hat nur die Variante mit «yoxos» funktioniert. Und auch bei dieser Anleitung mussten wir einige Tricks anwenden. Bei Schritt 8) musste die JDK Version in den Projekteinstellungen zunächst auf 1.6 zurückgestuft werden und vor Schritt 9) wieder auf Version 1.7. Beim Kompilieren werden alle openHAB Artifakte erstellt: OpenHAB selbst, alle Bindings, Actions und sonstige Plugins, sowie auch die Eclipse RCP's des openHAB Designers für alle Zielsysteme. 
+\\ \\
+Sobald Eclipse vollständig eingericht wurde kann ein Action Skeleton anhand eines Maven Archetypes generiert werden. Eine Anleitung dazu befindet sich im openHAB GitHub Wiki: \url{https://github.com/openhab/openhab/wiki/How-To-Implement-An-Action}. \\
+Die openHAB Runtime wird die Action-Aufrufe in den Rules später zur Laufzeit an die statischen Java-Methoden im Action-Plugin binden. Damit das später alles sauber funktioniert und auch die Dependency Injection von gewissen Service-Objekten gemacht werden kann müssen die Dateien OSGI-INF/action.xml und META-INF/MANIFEST.MF angepasst werden:
+
+\begin{lstlisting}[style=csharp, caption=OSGI-INF/action.xml]
+<?xml version="1.0" encoding="UTF-8"?>
+
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+     activate="activate" deactivate="deactivate" immediate="true"
+     name="org.openhab.action.mqtt.action">
+	<implementation class="org.openhab.action
+		.mqtt.internal.MqttActionService" />
+	<service>
+		<provide interface="org.openhab.core
+			.scriptengine.action.ActionService" />
+		<provide interface="org.osgi.service
+			.cm.ManagedService" />
+	</service>
+	<property name="service.pid" type="String" 
+		value="org.openhab.mqtt-action" />
+	<reference bind="setMqttService" cardinality="1..1"
+	     interface="org.openhab.io
+	     	.transport.mqtt.MqttService" name="MqttService"
+	     policy="static" unbind="unsetMqttService"/>	
+</scr:component>
+
+\end{lstlisting}
+
+\begin{lstlisting}[style=csharp, caption=META-INF/MANIFEST.MF]
+Manifest-Version: 1.0
+Private-Package: org.openhab.action.mqtt.internal
+Ignore-Package: org.openhab.action.mqtt.internal
+Bundle-License: http://www.eclipse.org/legal/epl-v10.html
+Bundle-Name: openHAB Mqtt Action
+Bundle-SymbolicName: org.openhab.action.mqtt
+Bundle-Vendor: openHAB.org
+Bundle-Version: 1.7.0.qualifier
+Bundle-Activator: org.openhab.action.mqtt.internal.MqttActivator
+Bundle-ManifestVersion: 2
+Bundle-Description: This is the Mqtt action of the open Home Aut
+ omation Bus (openHAB)
+Import-Package: org.apache.commons.lang,
+ org.openhab.core.scriptengine.action,
+ org.openhab.io.transport.mqtt,
+ org.osgi.framework,
+ org.osgi.service.cm,
+ org.slf4j
+Bundle-DocURL: http://www.openhab.org
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Service-Component: OSGI-INF/action.xml
+Bundle-ClassPath: .
+Bundle-ActivationPolicy: lazy
+
+\end{lstlisting}
+
+Dank diesen Konfigurationen wird der gleiche MQTT-Service Injected, der auch im MQTT-Persistence Plugin eingesetzt wird und die statischen Java Methoden aus der Klasse org.openhab.action.mqtt.internal.Mqtt werden für die DSL sichtbar. Zudem stellt die openHAB Runtime der MQTT Action die zugehörigen Konfigurationen zur Verfügung, die in der globalen Konfigurationsdatei hinterlegt wurden (openhab.cfg).\\ \\
+
+\textbf{Installation MQTT Action}\\
+Nachdem wir die MQTT Action programmiert hatten, mussten wir sie mit Hilfe von Eclipse als .jar Datei exportieren. Danach haben wir in der Konfigurationsdatei von openHAB (openhab.cfg) den Eintrag für die MQTT Action gemacht. Diese verweist auf den selben Broker, den wir auch für das Persitence Plugin benötigen.
+
+
+\begin{lstlisting}[style=csharp, caption=openhab.cfg]
+mqtt-action:broker=mosquitto
+\end{lstlisting}
+
+Anschliessend haben wir die .jar Datei ins Add-on Verzeichnis unserer openHAB Installation kopiert. Die openHAB Runtime erkennt das neue OSGI-Modul sofort und aktiviert es.
+
+\textbf{Verwendung der MQTT Action}\\
+Die MQTT Action implementiert zwei Methoden: sendMQTTString(topic, message) und sendMQTTFile(topic, fileUrl). Die erste Methode sendet einen String an das Topic des vorkonfigurierten Brokers. Die zweite Methode ist diejenige, weswegen wir das Plugin überhaupt entwickelt haben. Sie nimmt eine URL entgegen, lädt den Inhalt von dort herunter und sendet ihn an das gewünschte Topic des Brokers. Beide Methoden können von jetzt an in openHAB Rules oder Scripts verwendet werden.
 
 \subsection{Android App}
 \subsubsection{Technologien}
