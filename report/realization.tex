@@ -408,8 +408,50 @@ Anschliessend haben wir die .jar Datei ins Add-on Verzeichnis unserer openHAB In
 Die MQTT Action implementiert zwei Methoden: sendMQTTString(topic, message) und sendMQTTFile(topic, fileUrl). Die erste Methode sendet einen String an das Topic des vorkonfigurierten Brokers. Die zweite Methode ist diejenige, weswegen wir das Plugin überhaupt entwickelt haben. Sie nimmt eine URL entgegen, lädt den Inhalt von dort herunter und sendet ihn an das gewünschte Topic des Brokers. Beide Methoden können von jetzt an in openHAB Rules oder Scripts verwendet werden.
 
 \subsection{Android App}
-\subsubsection{Technologien}
+Im Lösungskonzept in Abschnitt \ref{sec:androidArchSolution} ab Seite \pageref{sec:androidArchSolution} haben wir bereits erklärt, wie die Architektur der App aussieht. In diesem Abschnitt gehen wir auf die eingesetzten Frameworks, wichtige Klassen und das Design ein.
+
+\subsubsection{Frameworks und Libraries}
+Für Android gibt es mittlerweile eine grosse Vielzahl an äusserst hilfreichen und robusten Frameworks und Libraries, die den Entwickleralltag enorm erleichtern. Folgende Gradle Dependencies sind in unserem Projekt enthalten:
+
+\begin{itemize}
+	\item com.squareup.retrofit:retrofit:1.9.0
+    \item io.reactivex:rxandroid:0.24.0
+    \item com.android.support:appcompat-v7:22.0.+
+    \item com.android.support:cardview-v7:21.0.+
+    \item com.android.support:recyclerview-v7:21.0.+
+    \item com.squareup.okhttp:okhttp:2.4.0-RC1
+    \item com.rengwuxian.materialedittext:library:2.0.3
+    \item com.jakewharton:butterknife:6.1.0
+    \item jp.wasabeef:recyclerview-animators:1.2.0@aar
+    \item com.nispok:snackbar:2.10.+
+    \item com.github.clans:fab:1.5.0
+    \item com.google.android.gms:play-services:6.5.87
+\end{itemize}
+
+
 \textbf{ReactiveX} \\
+Die Reactive Extension wurde usprünglich für .NET entwickelt und ist mittlerweile fester Bestandteil davon. Heute gibt es die Library auch für diverse andere Plattformen, darunter Java bzw. auch eine spezielle Version für Android. ReactiveX verwendet das Programmierparadigma der reaktiven Programmierung und unterstützt den Programmierer beim Ausdrücken von komplizierten Datenflüssen. In der konventionellen, imperativen Programmierung herrscht das Pull-prinzip, sodass Änderungen an Daten aktiv geholt werden müssen. ReactiveX hingegen «pusht» neue Daten in die Konsumenten hinein. Dabei berücksichtigt ReactiveX auch viele Concurrency-aspekte automatisch.\\
+
+Das Folgende (leicht vereinfachte) Beispiel stammt aus unserer App und demonstriert sehr gut die Vorteile von ReactiveX. Von der openHAB REST API soll ein Item geladen werden, danach soll der boolsche Wert invertiert und wieder an die API zurückgesendet werden. Bevor der neue Status im User Interface angezeigt wird, wird der Status aus Konsistenzgründen noch einmal geladen:
+\pagebreak
+\begin{lstlisting}[style=csharp, caption=ToggleActivity.java - toggleAlarm]
+api.getItem("Alarm_active")
+.flatMap(item -> {
+	 return Observable.just(item.state.equals("ON") ? "OFF" : "ON")
+})
+.flatMap(state -> api.sendCommand("Alarm_active", state))
+.flatMap(aVoid -> api.getItem("Alarm_active"))
+.subscribeOn(Schedulers.io())
+.observeOn(AndroidSchedulers.mainThread())
+.subscribe(item-> {
+	updateUi(item.state);
+});
+\end{lstlisting}
+
+Jede dieser aneinander gereihten Methoden gibt ein Objekt von Typ \lstinline!Observable<T>! zurück und modifiziert das vorherige Observable. Der Code in den Lambdas wird aber noch nicht ausgeführt sondern lediglich als Callable im Observable hinterlegt, für den Zeitpunkt wo Daten «hindurchfliessen». Erst beim Aufruf von \lstinline!subscribe()! auf Zeile 9 wird die Maschine in Gang gesetzt. Die beiden Methoden auf Zeile 7 und 8 sind dazu gedacht, dass die API Calls in einem Hintergrundthread und das letzte Resultat wieder im Android Mainthread ausgeführt werden. \\
+Ohne ReactiveX müsste man für diese Aufgabe drei Callback-Handler registrieren, die dann jeweils den nächsten API Call anstossen. Deshalb haben wir ReactiveX so oft wie möglich verwendet, mit Ausnahme von einigen Spezialfällen. 
+
+
 \tbd
 
 \textbf{Retrofit} \\
@@ -421,7 +463,7 @@ Die MQTT Action implementiert zwei Methoden: sendMQTTString(topic, message) und 
 \textbf{Butterknife} \\
 \tbd
 
-\subsubsection{Architektur}
+\subsubsection{Wichtige Klassen}
 
 \subsubsection{Material Design}
 

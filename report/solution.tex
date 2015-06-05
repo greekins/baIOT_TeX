@@ -214,6 +214,35 @@ Die Features unserer App orientieren sich an den funktionalen Anforderungen zum 
 	\label{fig:mockupCamera}
 \end{figure}
 
+\subsubsection{Architektur}
+\label{sec:androidArchSolution}
+Die Architektur von Android Apps sieht meistens relativ ähnlich aus. Sie bestehen aus einem Manifest-File, Activities, BroadcastReceiver, ContentProvider und Services. In unserer App benötigen wir alle diese Komponenten, mit Ausnahme eines ContentProvider.
+
+\textbf{Manifest-File}\\
+In diesem XML-File werden die Rahmenbedingungen der App festgehalten. Beispielsweise welche Berechtigungen die App benötigt, welche Activities und Services sie anbietet oder verwendet.
+
+\textbf{Activities}\\
+Alle Ansichtsseiten einer Android App werden mit Hilfe von Activities umgesetzt und erben von der Klasse Activity. Eine Activity besitzt ein zugehöriges Layout (in Form eines XML-Files) und ermöglicht die Manipulation der Layoutelemente. Dazu gehört auch das Verarbeiten von Events, die von Layoutelementen gesendet wurden. Jede Ansichtsseite hat also in der Regel seine eigene Activity, die an einen Lebenszyklus gebunden ist. Das Android OS ruft bei jeder Phase des Lebenszyklus (onCreate, onResume, onPause, onDestroy etc.) die jeweilige Methode der Activity auf. Diese Methoden müssen in den eigenen Activity Subklassen überschrieben und korrekt implementiert werden. Gestartet werden Activities nicht durch Instanziierung mit dem new-Keyword, sondern über einen Intent. Für Activities der selben App kann einfach die Klassenreferenz (Activity.class) beim Intent übergeben werden und Android übernimmt die Instanziierung. Im Manifest-File kann eine App seine Activities einzeln nach aussen anbieten, z.B. eine Activity zum Aufnehmen eines Fotos. Andere Apps können mit einem allgemein formulierten Intent diese Activity starten. Sollte es mehrere Apps geben, die Activities zur Fotoaufnahme anbieten, kann der Benutzer eine App aus der Liste auswählen und als Standard speichern. Aus diesem Grund können einer Activity keine Konstruktorargumente und dadurch auch keine Referenzen auf Model-Objekte oder ähnliches übergeben werden. Alle Parameter sind serialisierte Objekte (meist Strings), die in einer Key/Value Datenstruktur über den Intent zugreifbar sind. Oft möchte man aber in mehreren Activities auf die gleichen Domainmodell-Objekte zugreifen können. Zur Lösung des Problems kann man Dependency Injection Frameworks einsetzen, die so konfiguriert werden, dass die entsprechenden Objekte automatisch den annotierten Instanzvariablen zugewiesen werden. Das lohnt sich aber nur für grössere Apps, da ein gewisser Initialaufwand damit verbunden ist. Ansonsten bleibt nur die Verwendung von Singletons bzw. statischen Methoden übrig. Streng genommen benutzen auch Dependency Injection Frameworks diese Variante.
+
+\textbf{BroadcastReceiver}\\
+Werden benötigt um auf Ereignisse von Android oder von anderen Apps zu reagieren. Sie sind Teil der App und werden im Manifest-File deklariert. Die Implementierung erfolgt durch Erben der Klasse BroadcastReceiver. Wir verwenden in unserer App einen BroadcastReceiver um Push-Notifications empfangen zu können.
+
+\textbf{Services}\\
+Sind Android-Klassen zum Ausführen von Code im Hintergrund, ohne dass eine Activity für den Benutzer sichtbar ist. Wir verwenden einen Service, um die Push-Notification, die vom BroadcastReceiver empfangen wurde, zu verarbeiten. Nicht zu verwechseln sind diese (Android-)Services mit den Service-Klassen im Schichtenmodell auf dem Business-Logic-Layer als allgemeines Programmierkonzept. Es können auch eigene Service-Klassen zum kapseln von Businesslogik verwendet werden, die nichts mit den Android-Services zu tun haben.
+
+\textbf{openHAB SDK}
+In unserer Android App verwenden wir die REST API von openHAB. Dazu braucht es eigene Service-Klassen zum Ausführen der REST Calls und zum Mappen der JSON Responses in Domain-Objekte (Sitemaps, Pages, Widgets, Items). Ebenso braucht es eine Schnittstelle zum persistenten Speichern von Verbindungsinformationen. Als wir die Android App planten, wären wir sehr froh gewesen, wenn es ein openHAB SDK für Android gäbe, das all diese Aufgaben schon für uns übernehmen würde. Dann müssten wir nur noch Activities mit entsprechenden Layouts entwickeln und uns wäre ein Grossteil des Aufwands erspart geblieben. Die offizielle Android App von openHAB ist zwar Open Source, jedoch derart schlecht aufgebaut, dass nichts davon wiederzuverwenden war. Deshalb möchten wir während der Entwicklung unserer App gleich selbst solch ein SDK aufbauen. Aus Zeitgründen werden wir uns aber auf diejenigen Funktionen beschränken, die wir tatsächlich benötigen. Die Architektur der App teilt sich deshalb auf in einen Teil SDK und einen Teil App (siehe Abbildung \ref{fig:androidArchSdk}). 
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=\textwidth]{report/img/android_arch_sdk.png}
+	\caption{Aufteilung SDK und APP}
+	\label{fig:androidArchSdk}
+\end{figure}
+
+
+
+
 \subsection{Anbindung Cloud}
 
 In den funktionalen Anforderungen zum Basisszenario wurde festgelegt, dass Geschehnisse auf dem lokalen Bus (openHAB) an die Cloud gesendet werden müssen. Als Cloud-Plattform wurde Microsoft Azure bereits zu Beginn der Arbeit definiert. Damit die Daten von openHAB in die Cloud gelangen gibt es im Wesentlichen zwei Möglichkeiten: Entweder man entwickelt selbst ein Plugin für openHAB oder man verwendet das openHAB MQTT Persistence Plugin. MQTT ist ein Publish/Subscribe Protokoll und besonders gut für IOT Systeme mit langsamer oder instabiler Internetverbindung geeignet. Wir haben uns für die Variante mit MQTT entschieden. OpenHAB fungiert als MQTT-Client und kann so konfiguriert werden, dass Events auf dem Bus automatisch an einen MQTT-Broker gesendet werden, der von uns auf Microsoft Azure installiert wurde. Um die Daten zu verarbeiten muss ein MQTT-Client auf Microsoft Azure laufen und die Nachrichten vom Broker entgegennehmen. Danach steht uns frei, wie die Daten verarbeitet werden. Details zur Implementierung und technische Beschreibungen sind im Kapitel «Umsetzung» dieser Dokumentation zu finden. 
