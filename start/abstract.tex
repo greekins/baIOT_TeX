@@ -4,6 +4,14 @@
 % etwa 200 Worte (etwa 20 Zeilen). Es sind keine Bilder zu verwenden.
 
 \chapter*{Abstract}\addcontentsline{toc}{chapter}{Abstract}
-\tbd
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+Unsere Arbeit befasst sich mit dem Thema "Internet of Things". Das Ziel ist der Aufbau einer Smart-Home Beispielapplikation. Es sollen wesentliche Aspekte einer Internet-of-Things-Anwendung demonstriert werden, die in einem praktischen Szenario denkbar sind. \\
+Wir haben uns das Szenario Einbruchschutz erarbeitet und möchten zeigen, wie verschiedene Produkte kombiniert werden können, so wie es in einem Privathaushalt üblich ist. Dazu wurden verschiedene Hardware, Technologien und Frameworks analysiert.
+
+Wir haben entsprechend den Anforderungen das Framework openHAB evaluiert. Aufgrund der modularen Architektur, die auf OSGi basiert, können diverse Protokolle und Features in eine bestehende Installation zur Laufzeit hinzugefügt werden.
+
+OpenHAB bezeichnet sich selbst als Platform für Intranet of Things. Mit unserer MQTT-Verbindung in die Cloud schlagen wir die Brücke zwischen einem lokalen System und den vielseitigen Möglichkeiten der Cloud. Dadurch sind wir in der Lage, die gesendeten Events von Sensoren und Aktoren im Table Storage zu persistieren. Mit den Funktionen der MS Azure Cloud könnten diese Daten zur Analyse weiterverarbeitet werden (nicht Teil der Arbeit).
+
+Zugriff auf den Systemaufbau wird über ein Android App ermöglicht. Dazu wurde eigens ein SDK geschrieben, um den Umgang mit der openHAB REST-API zu vereinfachen und wiederverwendbar zu machen. Mit modernen Frameworks und reaktiver Programmierung, sowie ansprechendem Design runden wir die User Experience ab. Falls ein Alarm ausgelöst wird, informiert das System den Benutzer mit einer Push Notification. Dazu wird der GCM-Dienst von Google verwendet.
+
+Zusammenfassend bietet unser System einen kostengünstigen Einbruchschutz für Einsteiger in der IoT-Smart-Home Welt.
