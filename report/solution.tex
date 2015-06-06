@@ -230,7 +230,7 @@ Werden benötigt um auf Ereignisse von Android oder von anderen Apps zu reagiere
 \textbf{Services}\\
 Sind Android-Klassen zum Ausführen von Code im Hintergrund, ohne dass eine Activity für den Benutzer sichtbar ist. Wir verwenden einen Service, um die Push-Notification, die vom BroadcastReceiver empfangen wurde, zu verarbeiten. Nicht zu verwechseln sind diese (Android-)Services mit den Service-Klassen im Schichtenmodell auf dem Business-Logic-Layer als allgemeines Programmierkonzept. Es können auch eigene Service-Klassen zum kapseln von Businesslogik verwendet werden, die nichts mit den Android-Services zu tun haben.
 
-\textbf{openHAB SDK}
+\textbf{openHAB SDK}\\
 In unserer Android App verwenden wir die REST API von openHAB. Dazu braucht es eigene Service-Klassen zum Ausführen der REST Calls und zum Mappen der JSON Responses in Domain-Objekte (Sitemaps, Pages, Widgets, Items). Ebenso braucht es eine Schnittstelle zum persistenten Speichern von Verbindungsinformationen. Als wir die Android App planten, wären wir sehr froh gewesen, wenn es ein openHAB SDK für Android gäbe, das all diese Aufgaben schon für uns übernehmen würde. Dann müssten wir nur noch Activities mit entsprechenden Layouts entwickeln und uns wäre ein Grossteil des Aufwands erspart geblieben. Die offizielle Android App von openHAB ist zwar Open Source, jedoch derart schlecht aufgebaut, dass nichts davon wiederzuverwenden war. Deshalb möchten wir während der Entwicklung unserer App gleich selbst solch ein SDK aufbauen. Aus Zeitgründen werden wir uns aber auf diejenigen Funktionen beschränken, die wir tatsächlich benötigen. Die Architektur der App teilt sich deshalb auf in einen Teil SDK und einen Teil App (siehe Abbildung \ref{fig:androidArchSdk}). 
 
 \begin{figure}[H]

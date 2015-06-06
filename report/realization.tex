@@ -408,24 +408,24 @@ Anschliessend haben wir die .jar Datei ins Add-on Verzeichnis unserer openHAB In
 Die MQTT Action implementiert zwei Methoden: sendMQTTString(topic, message) und sendMQTTFile(topic, fileUrl). Die erste Methode sendet einen String an das Topic des vorkonfigurierten Brokers. Die zweite Methode ist diejenige, weswegen wir das Plugin überhaupt entwickelt haben. Sie nimmt eine URL entgegen, lädt den Inhalt von dort herunter und sendet ihn an das gewünschte Topic des Brokers. Beide Methoden können von jetzt an in openHAB Rules oder Scripts verwendet werden.
 
 \subsection{Android App}
-Im Lösungskonzept in Abschnitt \ref{sec:androidArchSolution} ab Seite \pageref{sec:androidArchSolution} haben wir bereits erklärt, wie die Architektur der App aussieht. In diesem Abschnitt gehen wir auf die eingesetzten Frameworks, wichtige Klassen und das Design ein.
+Im Lösungskonzept in Abschnitt \ref{sec:androidArchSolution} ab Seite \pageref{sec:androidArchSolution} haben wir bereits erklärt, wie die Architektur der App aussieht. In diesem Abschnitt gehen wir auf die eingesetzten Frameworks, wichtige Klassen und das User Interface Design ein.
 
 \subsubsection{Frameworks und Libraries}
 Für Android gibt es mittlerweile eine grosse Vielzahl an äusserst hilfreichen und robusten Frameworks und Libraries, die den Entwickleralltag enorm erleichtern. Folgende Gradle Dependencies sind in unserem Projekt enthalten:
 
 \begin{itemize}
-	\item com.squareup.retrofit:retrofit:1.9.0
-    \item io.reactivex:rxandroid:0.24.0
-    \item com.android.support:appcompat-v7:22.0.+
-    \item com.android.support:cardview-v7:21.0.+
-    \item com.android.support:recyclerview-v7:21.0.+
-    \item com.squareup.okhttp:okhttp:2.4.0-RC1
-    \item com.rengwuxian.materialedittext:library:2.0.3
-    \item com.jakewharton:butterknife:6.1.0
-    \item jp.wasabeef:recyclerview-animators:1.2.0@aar
-    \item com.nispok:snackbar:2.10.+
-    \item com.github.clans:fab:1.5.0
-    \item com.google.android.gms:play-services:6.5.87
+	\item \lstinline!com.squareup.retrofit:retrofit:1.9.0!
+    \item \lstinline!io.reactivex:rxandroid:0.24.0!
+    \item \lstinline!com.android.support:appcompat-v7:22.0.+!
+    \item \lstinline!com.android.support:cardview-v7:21.0.+!
+    \item \lstinline!com.android.support:recyclerview-v7:21.0.+!
+    \item \lstinline!com.squareup.okhttp:okhttp:2.4.0-RC1!
+    \item \lstinline!com.rengwuxian.materialedittext:library:2.0.3!
+    \item \lstinline!com.jakewharton:butterknife:6.1.0!
+    \item \lstinline!jp.wasabeef:recyclerview-animators:1.2.0@aar!
+    \item \lstinline!com.nispok:snackbar:2.10.+!
+    \item \lstinline!com.github.clans:fab:1.5.0!
+    \item \lstinline!com.google.android.gms:play-services:6.5.87!
 \end{itemize}
 
 
@@ -434,7 +434,7 @@ Die Reactive Extension wurde usprünglich für .NET entwickelt und ist mittlerwe
 
 Das Folgende (leicht vereinfachte) Beispiel stammt aus unserer App und demonstriert sehr gut die Vorteile von ReactiveX. Von der openHAB REST API soll ein Item geladen werden, danach soll der boolsche Wert invertiert und wieder an die API zurückgesendet werden. Bevor der neue Status im User Interface angezeigt wird, wird der Status aus Konsistenzgründen noch einmal geladen:
 \pagebreak
-\begin{lstlisting}[style=csharp, caption=ToggleActivity.java - toggleAlarm]
+\begin{lstlisting}[style=csharp, label={lst:reactiveXSample}, caption=ReactiveX Beispiel]
 api.getItem("Alarm_active")
 .flatMap(item -> {
 	 return Observable.just(item.state.equals("ON") ? "OFF" : "ON")
@@ -451,17 +451,69 @@ api.getItem("Alarm_active")
 Jede dieser aneinander gereihten Methoden gibt ein Objekt von Typ \lstinline!Observable<T>! zurück und modifiziert das vorherige Observable. Der Code in den Lambdas wird aber noch nicht ausgeführt sondern lediglich als Callable im Observable hinterlegt, für den Zeitpunkt wo Daten «hindurchfliessen». Erst beim Aufruf von \lstinline!subscribe()! auf Zeile 9 wird die Maschine in Gang gesetzt. Die beiden Methoden auf Zeile 7 und 8 sind dazu gedacht, dass die API Calls in einem Hintergrundthread und das letzte Resultat wieder im Android Mainthread ausgeführt werden. \\
 Ohne ReactiveX müsste man für diese Aufgabe drei Callback-Handler registrieren, die dann jeweils den nächsten API Call anstossen. Deshalb haben wir ReactiveX so oft wie möglich verwendet, mit Ausnahme von einigen Spezialfällen. 
 
-
-\tbd
-
 \textbf{Retrofit} \\
-\tbd
+Diese Library erleichtert das Konsumieren von REST Webservices. Man erstellt zunächst ein Java Interface und schreibt die Methodensignaturen für die Requests. Der Rückgabetyp ist entweder das erwartete POJO oder \lstinline!void!. Methoden mit dem Rückgabetyp \lstinline!void! werden automatisch asynchron ausgeführt, verlangen aber einen Callback Handler als zusätzlichen Parameter. Methoden mit POJO Rückgabetypen werden synchron ausgeführt. Danach müssen alle Methoden noch mit den Annotations von Retrofit versehen werden. Unter anderem werden die gewünschte HTTP Methode (\lstinline!GET, PUT, POST, DELETE,! \ldots), ein relativer URL Pfad und die Parameter angegeben. Besonders komfortabel ist, dass das Interface nicht selbst implementiert werden muss. Retrofit generiert die entsprechende Klasse anhand der Annotations. Das Erzeugen einer Instanz ist denkbar einfach:
 
-\textbf{OkHttp} \\
-\tbd
+\begin{lstlisting}[style=csharp, label=lst:retrofitCreation, caption=Retrofit - Service-Klasse generieren]
+RestAdapter adapter = new RestAdapter.Builder()
+	.setEndpoint(endpoint)
+	.setConverter(new GsonConverter(gson))
+	.build();
+	
+OpenHabApi api = adapter.create(OpenHabApi.class);
+\end{lstlisting}
+
+In Listing \ref{lst:retrofitCreation} auf Zeile 3 wird ein \lstinline!GsonConverter! übergeben. Dieser sorgt dafür, dass die JSON Response korrekt deserialisiert und auf den gewünschten POJO Typ gemappt wird. Dem \lstinline!gson!-Objekt selbst können noch sogenannte TypeAdapter hinzugefügt werden, um mehr Kontrolle beim Mapping zu haben.\\
+\\ 
+Noch besser als das automatische Generieren der Service-Klassen ist an Retrofit der Support für ReactiveX. Wenn man asynchrone REST Calls machen möchte, würde man normalerweise einen Callback Handler übergeben, wie bereits beschrieben. Es gibt allerdings eine elegantere Variante. Sofern ReactiveX als Dependency im Projekt aufgelöst werden kann, ist es möglich, den Rückgabetyp der Methoden im Service-Interface mit \lstinline!Observable<T>! zu deklarieren. Anschliessend weiss Retrofit, dass die Methode asynchron und mit Hilfe von ReactiveX ausgeführt werden soll. Beim Aufruf der Methode erhält man also nicht direkt das POJO, sondern ein Observable, welches man subscriben kann. Sobald sich ein Subscriber anmeldet wird der Request ausgeführt und das Resultat an den Subscriber geschickt. Folgendes Service-Interface deklariert die Methoden, welche bereits aus dem ReactiveX Code-Beispiel in Listing \ref{lst:reactiveXSample} bekannt sind:
+
+\begin{lstlisting}[style=csharp, label=lst:retrofitInterface, caption=OpenHabApi Service-Interface]
+public interface OpenHabApi {
+	@GET("/rest/items/{item}?type=json")
+	Observable<Item> getItem(@Path("item") String item);
+    
+	@Headers("Content-type: text/plain")
+	@POST("/rest/items/{item}")
+	Observable<Void> sendCommand(@Path("item") String item, 
+		@Body TypedInput command
+	);
+}
+\end{lstlisting}
+
+Dank dem Zusammenspiel von ReactiveX und Retrofit wird dem Programmierer ein gewaltiger Teil an Fleissarbeit abgenommen. Es kann schneller entwickelt werden, die möglichen Fehlerquellen werden reduziert und die Lesbarkeit bzw. Nachvollziehbarkeit verbessert sich.
+
 
 \textbf{Butterknife} \\
-\tbd
+Butterknife ist eine nützliche kleine Library zur Dependency Injection von View Komponenten in Activities. Jede Activity besitzt in der Regel eine Root-View, die in einem Layout Resource File mit XML definiert wird. In diesen Layout Files befinden sich typischerweise weitere User Interface Elemente, wie Buttons, Input-Felder oder Bilder. Die Activity ist dazu gedacht, jene Elemente mit Code zu beleben, also Events zu behandeln, Texte zu aktualisieren und so weiter. Die Referenzen auf diese Elemente muss sich die Activity selbst beschaffen, indem sie die \lstinline!findViewById(int id)! Methode aufruft und das Element anschliessend einer lokalen- oder Instanzvariablen zuweist. Die Methode \lstinline!findViewById(int id)! hat den Rückgabetyp \lstinline!View!, deshalb müssen alle Element explizit gecastet werden.\\
+
+Butterknife macht diese Tipparbeit überflüssig, indem die Elemente als Instanzvariablen deklariert und mit einer Annotation versehen werden:
+
+\begin{lstlisting}[style=csharp, label=lst:butterknifeSample1, caption=Butterknife Beispiel 1]
+public class SampleActivity extends Activity {
+
+	@InjectView(R.id.button)
+	Button mButton;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_sample);
+		ButterKnife.inject(this);
+		// instead of: mButton = (Button) findViewById(R.id.Button);
+	}
+}
+\end{lstlisting}
+
+Ein Vorteil ergibt sich vorallem bei Activities mit vielen referenzierten User Interface Elementen. Butterknife erleichtert zudem das Behandeln von Events, indem Methoden ebenfalls mit einer Annotation versehen werden, anstatt dass die Activity ein Callback Interface implementieren muss bzw. anonyme Klassen verwendet werden:
+
+\begin{lstlisting}[style=csharp, label=lst:butterknifeSample2, caption=Butterknife Beispiel 2]
+@OnClick(R.id.button)
+public void onClickButton(View view) {
+	// do something useful
+}
+\end{lstlisting}
+
+
 
 \subsubsection{Wichtige Klassen}
 
