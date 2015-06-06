@@ -240,7 +240,17 @@ In unserer Android App verwenden wir die REST API von openHAB. Dazu braucht es e
 	\label{fig:androidArchSdk}
 \end{figure}
 
+Im SDK befinden sich Klassen für die Verwendung der REST API und Model-Klassen, um die Daten der API intern zu repräsentieren. Zudem werden im SDK auch diverse Hilfsklassen zu finden sein. \\
+Das App Package besteht aus allen Klassen, die speziell für diese App so genötigt werden und nicht zwingenderweise für andere Apps wiederverwendbar sein müssen. Das betriffet hauptsächlich alle Activities und diverse UI Elemente.
 
+\textbf{Klassendiagramm}\\
+Die nachfolgende Abbildung zeigt einen vereinfachten Auszug aus dem geplanten Klassendiagramm der App. Auch hier wird wieder die Trennung zwischen SDK und App sichtbar. Eine Erklärung zu ausgewählten Klassen befindet sich im Umsetzungsteil der Dokumentation im Abschnitt \ref{sec:importantClasses} auf Seite \pageref{sec:importantClasses}. Hinweis: Die dargestellten Klassen können in der tatsächlichen Implementierung in Methoden und Instanzvariablen abweichen.
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=\textwidth]{report/img/android_uml.png}
+	\caption{Klassendiagramm mit PageActivity und SDK}
+	\label{fig:androidUML}
+\end{figure}
 
 
 \subsection{Anbindung Cloud}

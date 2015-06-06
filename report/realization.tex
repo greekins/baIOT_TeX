@@ -411,7 +411,7 @@ Die MQTT Action implementiert zwei Methoden: sendMQTTString(topic, message) und 
 Im Lösungskonzept in Abschnitt \ref{sec:androidArchSolution} ab Seite \pageref{sec:androidArchSolution} haben wir bereits erklärt, wie die Architektur der App aussieht. In diesem Abschnitt gehen wir auf die eingesetzten Frameworks, wichtige Klassen und das User Interface Design ein.
 
 \subsubsection{Frameworks und Libraries}
-Für Android gibt es mittlerweile eine grosse Vielzahl an äusserst hilfreichen und robusten Frameworks und Libraries, die den Entwickleralltag enorm erleichtern. Folgende Gradle Dependencies sind in unserem Projekt enthalten:
+Für Android gibt es mittlerweile eine grosse Vielzahl an äusserst hilfreichen und robusten Frameworks und Libraries, die den Entwickleralltag enorm erleichtern. Manche der Frameworks haben einen starken Einfluss darauf, wie der Code strukturiert wird. Für das Verständnis des Codes ist es deshalb wichtig, sich mit ReactiveX, Retrofit und Butterknife vertraut zu machen. Folgende Liste beinhaltet alle Gradle Build Dependencies:
 
 \begin{itemize}
 	\item \lstinline!com.squareup.retrofit:retrofit:1.9.0!
@@ -516,6 +516,22 @@ public void onClickButton(View view) {
 
 
 \subsubsection{Wichtige Klassen}
+\label{sec:importantClasses}
+Zum besseren Verständnis werden hier einige ausgewählte Klassen und Packages genauer erklärt.
+
+\textbf{ch.hsr.baiot.openhab.sdk.model.*}\\
+Dieses Package ist Teil des SDK und beinhaltet die POJO Model-Klassen sowie einige Hilfsklassen. Die JSON Responses der REST API werden auf diese Model-Klassen gemappt. Manche Model-Klassen implementieren das von uns definierte Interface \lstinline!MemberEquals! mit der Methode \lstinline!hasEqualMembers(other)!. Grund dafür ist, dass die Methode \lstinline!equals(other)! bereits überschrieben wird und die Gleichheit zweier Objekte nur anhand des jeweiligen «Primärschlüssels» festgestellt wird. In einigen Fällen soll aber auch überprüft werden können, ob alle Instanzvariablen gleich sind, beispielsweise um zu bemerken, ob ein Objekt sich nach dem erneuten Laden verändert hat.
+
+\textbf{ch.hsr.baiot.openhab.sdk.model.WidgetListModel}\\
+OpenHAB Sitemaps definieren eine baumartige Stuktur aus Pages und Widgets. Jede Page besteht aus einer Collection von Widgets. Widgets können weitere Pages referenzieren. In der App wird immer jeweils eine Page angezeigt, die durch HTTP Long-Polling oder manuelles Laden oft aktualisiert wird. Die Klasse \lstinline!WidgetListModel! hat eine Setter-Methode für eine Liste von Widgets. Danach stellt die Klasse fest, ob Widgets innerhalb der Liste hinzugefügt, entfernt, verschoben oder sonst inhaltlich verändert wurden. Die Änderungen werden danach jeweils in Form eines \lstinline!ListModificationEvent! auf einem ReactiveX Observable emittiert. User Interface Elemente (z.B. \lstinline!RecyclerView! bzw. \lstinline!RecyclerView.Adapter!) können dann auf dieses Observable subscriben und werden aktiv über Modifikationen an der Liste benachrichtigt, ohne dass das User Interface Element etwas über den Reload wissen muss. Für das User Interface unterscheidet sich dieses Design nur geringfügig vom klassischen Observer-Pattern. 
+
+\textbf{ch.hsr.baiot.openhab.app.adapter.WidgetListAdapter}\\
+Diese Klasse erbt vom Typ \lstinline!RecyclerView.Adapter! und verbindet eine Collection von Widgets mit einer \lstinline!RecyclerView!. Die RecyclerView fragt den Adapter nach der Anzahl von Elementen, lässt die Elemente erzeugen und sagt dem Adapter, dass er ein Element an das jeweilige Pendent in der Liste binden soll. Wenn sich die Liste im Adapter ändert, kann dar Adapter der RecyclerView mitteilen, inwiefern sich die Liste verändert hat. Die RecylcerView fragt den Adapter danach wieder entsprechend ab. Dieses Pattern wird in vielen User Interface Frameworks zum Anzeigen von Listen verwendet, so auch in Android. Die Klasse \lstinline!WidgetListAdapter! ist ein Subscriber des \lstinline!WidgetListModel!, wie bereits im Abschnitt zuvor beschrieben. Jedoch kennt der Adapter das ListModel nicht direkt, sondern betrachtet dieses nur als ReactiveX Observable.
+
+\textbf{ch.hsr.baiot.openhab.app.widget.*}\\
+Die User Interface Elemente, die in der RecyclerView als Listeneinträge dargestellt werden, haben pro «Typ» jeweils ein eigenes XML Layout Resource File. Das Layout wird danach vom Android OS instanziiert und einem sogenannten \lstinline!ViewHolder! zugewiesen. ViewHolder sind jene Objekte, die zwischen RecyclerView und Adapter ausgetauscht werden. ViewHolder Objekte referenzieren die Layoutinstanz und werden im Adapter erzeugt. Das Einsetzen der Daten geschieht auf Anfrage der RecyclerView im Adapter und nennt man «Binding». Im Package \lstinline!ch.hsr.baiot.openhab.app.widget! befinden sich Subklassen von ViewHolder (\lstinline!Widget*.java!). Die Subklassen werden benötigt, damit unterschiedliche Arten von Listeneinträgen in der RecyclerView dargestellt werden können. Beispielsweise solche mit Icon und Text, Detailtext oder solche mit einem Schalter und so weiter. 
+
+
 
 \subsubsection{Material Design}
 
