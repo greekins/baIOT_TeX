@@ -3,6 +3,16 @@
 
 In diesem Hauptkapitel werden Details zur Umsetzung dokumentiert. Hier sind Konfigurationen, Technologiebeschreibungen, Code Listings und sonstige technische Erklärungen über openHAB, MQTT und die Android App zu finden.
 
+Zu Beginn geht es darum, die Hardware zu vernetzen und zu konfigurieren, so dass die einzlnen Komponenten im Zusammenspiel mit openHAB funktionieren. Dazu wird zu erst das Raspberry Pi konfiguriert und das openHAB Framework installiert. Als nächstes werden die beiden Zentralen von HomeMatic und Philips Hue in Betrieb genommen, sowie die Überwachungskamera. Jede Zentrale muss dabei die eigenen Geräte «anlernen», damit sie weiss, welche Sensoren und Aktoren existieren. Dazu bietet das HomeMatic ein Webinterface und von Philips gibt es ein Android bzw. iPhone App. \\
+Damit die Zentralen mit openHAB kommunizieren können, werden sie zusammen mit dem Raspberry Pi über LAN-Kabel an den Router angeschlossen. Die Webcam kann über dessen Webinterface über WLAN eingebunden werden.
+
+Damit openHAB mit den Komponenten kommunizieren kann, werden die Zentralen im Config-File eingetragen und die einzelnen Sensoren und Aktoren als Item definiert.\\
+Um intelligente Abläufe zu definieren, bietet openHAB Regeln an. Über dise kann beispielsweise definiert werden, dass das Licht eingeschaltet wird, sobald das Fenster geöffnet wurde.
+
+Damit alle Events und auch die Bilder der Webcam gesichert werden können, wird MQTT (weiteres dazu im Kapitel \ref{sssec:mqtt}) eingesetzt. Über dieses Protokoll werden die Daten an die Cloud gesendet und dort im Storage abgelegt. Dazu gibt es in der Azure Cloud ein Clouddienst mit einer Worker Role und einem MQTT-Broker. Der Broker nimmt die Messages entgegen, die Worker Role konsumiert diese und speichert sie ab.
+
+Zugänglich ist das System über ein selbst geschriebenes Android App. Über dieses App können die einzelnen Glühbirnen, der Fensterkontakt und der Bewegungsmelder über openHAB angesprochen werden.
+
 
 \subsection{openHAB Konfiguration}
 Items, Rules, Sitemaps und Persitence Strategies werden in openHAB in einer eigens dafür entwickelten DSL beschrieben. Für alle diese Bereiche werden Konfigurationsdateien im entsprechenden Unterverzeichnis des openHAB Konfigurationsordner abgelegt. Änderungen an den Konfigurationsdateien werden von openHAB zur Laufzeit sofort erkannt und berücksichtigt. Nebst den genannten Bereichen existiert noch eine globale Konfigurationsdatei um beispielsweise IP-Adressen für Bindings einzutragen. Folgende Dateien sind für diese Arbeit relevant:
