@@ -179,40 +179,69 @@ Die Features unserer App orientieren sich an den funktionalen Anforderungen zum 
 	\item Status des Bewegungsmelders abfragen
 \end{itemize}
 
-\begin{figure}[H]
-	\centering
-		\includegraphics[scale=0.3]{report/img/mockup_overview.png}
-	\caption{In dieser Ansicht soll der Benutzer möglichst auf einen Blick alle relevanten Informationen zum Sicherheitszustand seines Zuhauses erhalten. Von hier aus gelangt man zu den Bereichen «Fenster», «Licht» und «Überwachung». Für alle Bereiche wird eine kleine Zusammenfassung zum Status angezeigt.}
-	\label{fig:mockupOverview}
+\subsubsection{Mockups}
+\begin{figure}[htbp]
+	\begin{minipage}{0.6\textwidth} 
+In dieser Ansicht soll der Benutzer möglichst auf einen Blick alle relevanten Informationen zum Sicherheitszustand seines Zuhauses erhalten. Von hier aus gelangt man zu den Bereichen «Fenster», «Licht» und «Überwachung». Für alle Bereiche wird eine kleine Zusammenfassung zum Status angezeigt.
+	\end{minipage}
+	\hfill
+	\begin{minipage}{0.32\textwidth}
+		\includegraphics[width=\textwidth]{report/img/mockup_overview.png}
+		\caption{Übersichtsseite}
+		\label{fig:mockupOverview}
+	\end{minipage}
+\end{figure}
+
+
+\begin{figure}[htbp]
+	\begin{minipage}{0.6\textwidth} 
+Auf der Detailseite «Fenster» können die entsprechend ausgerüsteten Fenster überwacht werden. In unserem Versuchsaufbau ist nur ein Konaktsensor vorgesehen, sollten es aber mehrere sein, würden Fenster untereinander aufgelistet.
+	\end{minipage}
+	\hfill
+	\begin{minipage}{0.32\textwidth}
+		\includegraphics[width=\textwidth]{report/img/mockup_window.png}
+		\caption{Fenster}
+		\label{fig:mockupWindow}
+	\end{minipage}
+\end{figure}
+
+\begin{figure}[htbp]
+	\begin{minipage}{0.6\textwidth} 
+Auf dieser Seite sind alle Lampen aufgelistet, die in openHAB integriert wurden. Mit einem Switch können diese ein- oder ausgeschaltet werden. Auf eine Funktion zum Dimmen der Lampen wird verzichtet.
+	\end{minipage}
+	\hfill
+	\begin{minipage}{0.32\textwidth}
+		\includegraphics[width=\textwidth]{report/img/mockup_light.png}
+		\caption{Licht}
+		\label{fig:mockupLight}
+	\end{minipage}
+\end{figure}
+
+\begin{figure}[htbp]
+	\begin{minipage}{0.6\textwidth} 
+Diese Ansicht enthält einen Schalter zum Scharfstellen oder deaktivieren des Alarm-Modus, den Status des Bewegungsmelders und das Bild der Überwachungskamera. 
+	\end{minipage}
+	\hfill
+	\begin{minipage}{0.32\textwidth}
+		\includegraphics[width=\textwidth]{report/img/mockup_camera.png}
+		\caption{Überwachung}
+		\label{fig:mockupCamera}
+	\end{minipage}
 \end{figure}
 
 \begin{figure}[H]
-	\centering
-		\includegraphics[scale=0.3]{report/img/mockup_window.png}
-	\caption{Dieser Bereich zeigt alle Fenster, die mit einem Kontaktsensor ausgerüstet sind.}
-	\label{fig:mockupWindow}
+	\begin{minipage}{0.6\textwidth} 
+Wenn das Smartphone auf einen vorkonfigurierten NFC-Tag gelegt wird erscheint diese Ansicht, auch wenn die App zuvor nicht geöffnet war. Da der Alarm-Modus nur die beiden Zustände «Scharf» oder «Inaktiv» kennt, wird der Modus bei jedem Auflegen jeweils umgekehrt.
+	\end{minipage}
+	\hfill
+	\begin{minipage}{0.32\textwidth}
+		\includegraphics[width=\textwidth]{report/img/mockup_nfc.png}
+		\caption{NFC-Tag}
+		\label{fig:mockupNfc}
+	\end{minipage}
 \end{figure}
 
-\begin{figure}[H]
-	\centering
-		\includegraphics[scale=0.3]{report/img/mockup_light.png}
-	\caption{Auf dieser Seite sind alle Lampen aufgelistet, die in openHAB integriert wurden. Mit einem Switch können diese ein- oder ausgeschaltet werden.}
-	\label{fig:mockupLight}
-\end{figure}
 
-\begin{figure}[H]
-	\centering
-		\includegraphics[scale=0.3]{report/img/mockup_camera.png}
-	\caption{Diese Ansicht enthält einen Schalter zum Scharfstellen oder deaktivieren des Alarm-Modus, den Status des Bewegungsmelders und das Bild der Überwachungskamera}
-	\label{fig:mockupCamera}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-		\includegraphics[scale=0.3]{report/img/mockup_nfc.png}
-	\caption{Wenn das Smartphone auf einen vorkonfigurierten NFC Tag gelegt wird erscheint diese Ansicht und der Alarm-Modus wird geswitcht.}
-	\label{fig:mockupCamera}
-\end{figure}
 
 \subsubsection{Architektur}
 \label{sec:androidArchSolution}
