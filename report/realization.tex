@@ -689,6 +689,13 @@ Wie schon erwähnt lädt die PageActivity initial die gewünschte Page. Anschlie
 In Abbildung \ref{fig:pageActivityWorkflow} wird der Ablauf beim Laden anhand eines Flussdiagramms vereinfacht aufgezeigt. In dieser Darstellung ist nicht ersichtlich, wie die PageActivity den Ablauf bei Fehlern oder beim Pausieren (im Sinne des Android Activity Lifecycle) unterbricht.
 
 \subsubsection{Material Design}
+Das App wurde nach den Prinzipien des Material Designs gestaltet. Google bietet dazu Guidelines (\url{https://www.google.com/design/spec/material-design/introduction.html}).
+
+Für die Darstellung unserer verschiedenen Komponenten wurden Card-Views eingesetzt. Cards werden verwendet, um einzelne Bereiche abzugrenzen. Sie dienen als Eintrittspunkt für weitere Informationen. In unserem Fall gibt es folgende Bereiche: Fenster, Lichter und Überwachung. Jede dieser Bereiche enthalten detaillierte Informationen und speziefische Aktionen, die ausgeführt werden können. Zum Beispiel beinhaltet der Bereich Überwachung die Information, ob der Bewegungsmelder ausschlägt oder das Bild der Überwachungskamera kann betrachtet werden. Weiter kann der Alarm ein- bzw. ausgeschaltet werden.
+
+Innerhalb dieser Cards wird eine List-View eingesetzt. Sie dient dazu, Elemente in Listen form übersichtlich darzustellen. In unserem Fall werden die einzelnen Elemente durch Trennstriche abgegrenzt.
+
+Die einzelnen Screens sind im Anhang \ref{sec:manualAndroidApp}, in der Benutzeranleitung der App zu finden.
 
 \subsection{Push-Notifications}
 \label{sec:notificationRealization}
