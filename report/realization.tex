@@ -522,16 +522,161 @@ Zum besseren Verständnis werden hier einige ausgewählte Klassen und Packages g
 \textbf{ch.hsr.baiot.openhab.sdk.model.*}\\
 Dieses Package ist Teil des SDK und beinhaltet die POJO Model-Klassen sowie einige Hilfsklassen. Die JSON Responses der REST API werden auf diese Model-Klassen gemappt. Manche Model-Klassen implementieren das von uns definierte Interface \lstinline!MemberEquals! mit der Methode \lstinline!hasEqualMembers(other)!. Grund dafür ist, dass die Methode \lstinline!equals(other)! bereits überschrieben wird und die Gleichheit zweier Objekte nur anhand des jeweiligen «Primärschlüssels» festgestellt wird. In einigen Fällen soll aber auch überprüft werden können, ob alle Instanzvariablen gleich sind, beispielsweise um zu bemerken, ob ein Objekt sich nach dem erneuten Laden verändert hat.
 
+\begin{lstlisting}[style=csharp, label=lst:modelSample, caption=Item.java - Beispiel einer Model-Klasse]
+package ch.hsr.baiot.openhab.sdk.model;
+
+[...] // Imports
+
+public class Item implements MemberEquals<Item>{
+	public String type  = "";
+	public String name = "";
+	public String state = "";
+	public String link = "";
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Item item = (Item) o;
+		if (!name.equals(item.name)) return false;
+		return true;
+	}
+
+	@Override
+	public int hashCode() { return name.hashCode();}
+
+	@Override
+	public boolean hasEqualMembers(Item other) {
+		if(this == other) return true;
+		if(other == null) return false;
+
+		if(this.type != null ? !this.type.equals(other.type) : 
+			other.type != null) return false;
+		if(this.state != null ? !this.state.equals(other.state) : 
+			other.state != null) return false;
+		if(this.link != null ? !this.link.equals(other.link) : 
+			other.link != null) return false;
+		return true;
+	}
+}
+\end{lstlisting}
+
 \textbf{ch.hsr.baiot.openhab.sdk.model.WidgetListModel}\\
 OpenHAB Sitemaps definieren eine baumartige Stuktur aus Pages und Widgets. Jede Page besteht aus einer Collection von Widgets. Widgets können weitere Pages referenzieren. In der App wird immer jeweils eine Page angezeigt, die durch HTTP Long-Polling oder manuelles Laden oft aktualisiert wird. Die Klasse \lstinline!WidgetListModel! hat eine Setter-Methode für eine Liste von Widgets. Danach stellt die Klasse fest, ob Widgets innerhalb der Liste hinzugefügt, entfernt, verschoben oder sonst inhaltlich verändert wurden. Die Änderungen werden danach jeweils in Form eines \lstinline!ListModificationEvent! auf einem ReactiveX Observable emittiert. User Interface Elemente (z.B. \lstinline!RecyclerView! bzw. \lstinline!RecyclerView.Adapter!) können dann auf dieses Observable subscriben und werden aktiv über Modifikationen an der Liste benachrichtigt, ohne dass das User Interface Element etwas über den Reload wissen muss. Für das User Interface unterscheidet sich dieses Design nur geringfügig vom klassischen Observer-Pattern. 
+
+\begin{lstlisting}[style=csharp, label=lst:widgetListModel, caption=Auszug aus WidgetListModel.java]
+package ch.hsr.baiot.openhab.sdk.model;
+
+[...] // Imports
+
+public class WidgetListModel {
+	
+	[...] // Instance variables, getters
+
+	public void setWidgets(List<Widget> modified) {
+
+		List<Widget> original = new ArrayList<>(widgets);
+		List<Widget> state = new ArrayList<>(widgets);
+
+		List<Widget> changed = ListUtils.changed(original, modified);
+		notifyChanged(changed, original);
+		state = ListUtils.update(state, changed);
+
+		[...] // Detect removed, added, moves
+		
+		widgets = modified;
+	}
+
+	public void notifyChanged(List<Widget> changed, 
+							 List<Widget> original) {
+		for(Widget widget : changed) {
+			int index = original.indexOf(widget);
+			subject.onNext( new ListModificationEvent<Widget>(
+					widget,
+					ListModificationEvent.CHANGED,
+					index,
+					index
+			));
+		}
+	}
+
+	[...] // notifyRemoved, notifyAdded, getMoves
+
+	public Observable<ListModificationEvent<Widget>>
+	onModification() {
+		return subject;
+	}
+}
+
+\end{lstlisting}
 
 \textbf{ch.hsr.baiot.openhab.app.adapter.WidgetListAdapter}\\
 Diese Klasse erbt vom Typ \lstinline!RecyclerView.Adapter! und verbindet eine Collection von Widgets mit einer \lstinline!RecyclerView!. Die RecyclerView fragt den Adapter nach der Anzahl von Elementen, lässt die Elemente erzeugen und sagt dem Adapter, dass er ein Element an das jeweilige Pendent in der Liste binden soll. Wenn sich die Liste im Adapter ändert, kann dar Adapter der RecyclerView mitteilen, inwiefern sich die Liste verändert hat. Die RecylcerView fragt den Adapter danach wieder entsprechend ab. Dieses Pattern wird in vielen User Interface Frameworks zum Anzeigen von Listen verwendet, so auch in Android. Die Klasse \lstinline!WidgetListAdapter! ist ein Subscriber des \lstinline!WidgetListModel!, wie bereits im Abschnitt zuvor beschrieben. Jedoch kennt der Adapter das ListModel nicht direkt, sondern betrachtet dieses nur als ReactiveX Observable.
 
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=\textwidth]{report/img/recycler_view.png}
+	\caption{Klassendiagramm WidgetListAdapter mit Collaborators}
+	\label{fig:recylerViewClasses}
+\end{figure}
+
 \textbf{ch.hsr.baiot.openhab.app.widget.*}\\
-Die User Interface Elemente, die in der RecyclerView als Listeneinträge dargestellt werden, haben pro «Typ» jeweils ein eigenes XML Layout Resource File. Das Layout wird danach vom Android OS instanziiert und einem sogenannten \lstinline!ViewHolder! zugewiesen. ViewHolder sind jene Objekte, die zwischen RecyclerView und Adapter ausgetauscht werden. ViewHolder Objekte referenzieren die Layoutinstanz und werden im Adapter erzeugt. Das Einsetzen der Daten geschieht auf Anfrage der RecyclerView im Adapter und nennt man «Binding». Im Package \lstinline!ch.hsr.baiot.openhab.app.widget! befinden sich Subklassen von ViewHolder (\lstinline!Widget*.java!). Die Subklassen werden benötigt, damit unterschiedliche Arten von Listeneinträgen in der RecyclerView dargestellt werden können. Beispielsweise solche mit Icon und Text, Detailtext oder solche mit einem Schalter und so weiter. 
+Die User Interface Elemente, die in der RecyclerView als Listeneinträge dargestellt werden, haben pro «Typ» jeweils ein eigenes XML Layout Resource File. Das Layout wird danach vom Android OS instanziiert und einem sogenannten \lstinline!ViewHolder! zugewiesen. ViewHolder sind jene Objekte, die zwischen RecyclerView und Adapter ausgetauscht werden (siehe Abbildung \ref{fig:recylerViewClasses}). ViewHolder Objekte referenzieren die Layoutinstanz und werden im Adapter erzeugt. Das Einsetzen der Daten geschieht auf Anfrage der RecyclerView im Adapter und nennt man «Binding». Im Package \lstinline!ch.hsr.baiot.openhab.app.widget! befinden sich Subklassen von ViewHolder (\lstinline!Widget*.java!). Die Subklassen werden benötigt, damit unterschiedliche Arten von Listeneinträgen in der RecyclerView dargestellt werden können. Beispielsweise solche mit Icon und Text, Detailtext oder solche mit einem Schalter und so weiter. 
 
+\begin{lstlisting}[style=csharp, label=lst:widgetLayoutSample, caption={Layout mit Icon, Text und Detailtext}]
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="72dp">
 
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_marginTop="16dp"
+		android:layout_marginLeft="72dp"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<TextView
+			android:id="@+id/text_view"
+			android:fontFamily="sans-serif-medium"
+			android:textColor="#000000"
+			android:textSize="16sp"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+
+		<TextView
+			android:id="@+id/text_detail"
+			android:fontFamily="sans-serif"
+			android:textColor="#000000"
+			android:textSize="14sp"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+
+	</LinearLayout>
+
+	<ImageView
+		android:id="@+id/icon"
+		android:src="@drawable/icon_dummy"
+		android:layout_marginLeft="16dp"
+		android:layout_marginTop="16dp"
+		android:layout_width="40dp"
+		android:layout_height="40dp" />
+</RelativeLayout>
+\end{lstlisting}
+
+\textbf{ch.hsr.baiot.openhab.app.activity.PageActivity}\\
+Die wichtigste Activity in unserer App ist die \lstinline!PageActivity!. Sie stellt jeweils eine Page einer Sitemap dar. Für jede Hierarchiestufe in der Sitemap kommt eine neue PageActivity auf den Android Activity Stack. Die PageActivity besitzt unter anderem eine \lstinline!RecyclerView!, einen \lstinline!WidgetListAdapter! und ein \lstinline!WidgetListModel!. Mit Hilfe der Klassen aus dem SDK wird die Page via REST API geladen und die Widgets der Page an das WidgetListModel übergeben. Das WidgetListModel erkennt die Veränderung an der Liste von Widgets (zu Beginn war diese leer) und benachrichtigt die Subscriber über die Veränderungen. Der WidgetListAdapter ist solch ein Subscriber, wodurch die Widgets letztlich in die RecyclerView gelangen. Die PageActivity koordiniert also das Zusammenspiel dieser Komponenten. Das mag etwas komplex erscheinen, jedoch ist somit eine hohe Kohäsion und eine geringe Kopplung erreicht und der Code in den einzelnen Klassen ist leicht nachzuvollziehen. In der offiziellen openHAB App für Android sieht man was passiert, wenn versucht wird die gleiche Aufgabe mit nur einer Klasse zu lösen. Das Ergebnis ist eine gigantische Klasse mit Methoden, die zweihundert Zeilen gerne überschreiten.\\ \\
+Wie schon erwähnt lädt die PageActivity initial die gewünschte Page. Anschliessend soll der openHAB Server die App informieren, sobald sich etwas auf dieser Page verändert hat. Dazu verwendet die PageActivity den \lstinline!LongPollingSocketClient! aus unserem SDK. Durch einen Bug von openHAB ist die Response des Long-Polling Requests oftmals leer, sodass die Page konventionell aktualisiert werden muss. Wenn der Long-Polling Request ein Timeout überschreitet, ohne eine Response erhalten zu haben, passiert dasselbe.
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=\textwidth]{report/img/page_activity.png}
+	\caption{PageActivity Ablauf (vereinfacht dargestellt)}
+	\label{fig:pageActivityWorkflow}
+\end{figure}
+
+In Abbildung \ref{fig:pageActivityWorkflow} wird der Ablauf beim Laden anhand eines Flussdiagramms vereinfacht aufgezeigt. In dieser Darstellung ist nicht ersichtlich, wie die PageActivity den Ablauf bei Fehlern oder beim Pausieren (im Sinne des Android Activity Lifecycle) unterbricht.
 
 \subsubsection{Material Design}
 
