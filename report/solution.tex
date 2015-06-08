@@ -1,8 +1,8 @@
 \section{Lösungskonzept}
-Dieses Kapitel beinhaltet die Beschreibung der Architektur und wichtiger Komponenten. Es werden die theoretischen Grundlagen der eingesetzten Technologien und Systeme erläutert und warum diese verwendet werden. Nicht Teil dieses Kapitels sind Erläuterungen von Konfigurationen und Code. Dies wird separat im Kapitel «Umsetzung» ab Seite \pageref{sec:chapterRealization} behandelt.
+Dieses Kapitel beinhaltet die Beschreibung der Architektur und wichtiger Komponenten. Es werden die theoretischen Grundlagen der eingesetzten Technologien und Systeme erläutert und warum diese verwendet werden. Nicht Teil dieses Kapitels sind Erläuterungen von Konfigurationen und Code. Diese werden separat im Kapitel «Umsetzung» ab Seite \pageref{sec:chapterRealization} behandelt.
 
 \subsection{Evaluation der Plattform}
-Anhand der Marktsituation und den funkionalen Anforderungen haben wir die Vor- und Nachteile der jeweiligen Plattformen miteinander verglichen und dabei darauf geachtet, welche Kriterien für unsere Lösung von Bedeutung sind.
+Anhand der Marktsituation und den funktionalen Anforderungen haben wir die Vor- und Nachteile der jeweiligen Plattformen miteinander verglichen und dabei darauf geachtet, welche Kriterien für unsere Lösung von Bedeutung sind.
 
 Wichtige Kriterien:
 \begin{itemize}
@@ -33,35 +33,35 @@ Mit openHAB haben wir eine Plattform gefunden, die allen wichtigen Kriterien ent
 
 
 \textbf{Nachteile} \\
-Ein Nachteil von openHAB ist, dass die Dokumentation grosse Lücken aufweist. Zwar sind die Konzepte leichte verständlich, jedoch fehlen Detailangaben zur DSL und genauen Konfigurationssyntax. Aus diesem Grund müssen oft Beispiele analysiert oder Benutzerforen zu Rate gezogen werden.
+Ein Nachteil von openHAB ist, dass die Dokumentation grosse Lücken aufweist. Zwar sind die Konzepte leicht verständlich, jedoch fehlen Detailangaben zur DSL und genauen Konfigurationssyntax. Aus diesem Grund müssen oft Beispiele analysiert oder Benutzerforen zu Rate gezogen werden.
 
 \subsection{Evaluation der Hardware}
-Nachdem wir openHAB als Plattform bestimmt haben konnten wir die Hardware für die Sensoren und Aktoren aussuchen. Dafür haben wir uns an den Vorgaben L02 - L06 aus Abschnitt \ref{sec:requirementsSolutionPart} auf Seite \pageref{sec:requirementsSolutionPart} orientiert. Durch die Vielzahl an Protokollen, die durch openHAB unterstützt werden, hatten wir genügend Auswahl an Hardware von unterschiedlichen Herstellern. OpenHAB selbst läuft auf einem Raspberry Pi B+.
+Nachdem wir openHAB als Plattform bestimmt haben, konnten wir die Hardware für die Sensoren und Aktoren aussuchen. Dafür haben wir uns an den Vorgaben L02 - L06 aus Abschnitt \ref{sec:requirementsSolutionPart} auf Seite \pageref{sec:requirementsSolutionPart} orientiert. Durch die Vielzahl an Protokollen, die durch openHAB unterstützt werden, hatten wir genügend Auswahl an Hardware von unterschiedlichen Herstellern. OpenHAB selbst läuft auf einem Raspberry Pi B+.
 
 \textit{L02:} Als Überwachungskamera haben wir die Edimax IC-3115W Netzwerkkamera ausgesucht. Sie ist mit einem Preis von weniger als 50 Euro relativ günstig und über das HTTP Binding von openHAB kompatibel.
 
-\textit{L03:} Beim Fensterkontaktsensor war uns ein kabelloses Modell wichtig, das unkompliziert montiert werden kann. Aus diesem Grund haben wir uns für den optischen Fensterkontakt HM-Sec-Sco von eQ-3 HomeMatic entschieden. Der Fensterkontakt erfordert jedoch eine Zentrale, die separat bestellt werden musste. Für HomeMatic existiert ein Binding seitens openHAB.
+\textit{L03:} Beim Fensterkontaktsensor war uns ein kabelloses Modell wichtig, das unkompliziert montiert werden kann. Aus diesem Grund haben wir uns für den optischen Fensterkontakt HM-Sec-Sco von eQ-3 HomeMatic entschieden. Der Fensterkontakt erfordert jedoch eine Zentrale, die separat bestellt werden muss. Für HomeMatic existiert ein Binding seitens openHAB.
 
 \textit{L04:} Der Funk Bewegungsmelder HM-Sec-MDIR-2, ebenfalls von eQ-3 HomeMatic, benutzt die gleiche Zentrale wie der Fensterkontaktsensor und ist für den Indoorgebrauch ausgelegt.
 
 \textit{L05:} Das Philips Hue Lux Starterkit beinhaltet zwei dimmbare LED-Birnen und eine Zentrale, die ans lokale Netzwerk angeschlossen werden muss. Ein openHAB Binding für Philips Hue ist vorhanden.
 
-\textit{L06:} Da wir durch den Fensterkontakt und den Bewegungsmelder schon eine HomeMatic Zentrale besitzen, liegt es nahe auch die Funksteckdose von diesem Hersteller zu verwenden.
+\textit{L06:} Da wir durch den Fensterkontakt und den Bewegungsmelder schon eine HomeMatic Zentrale besitzen, liegt es nahe, auch die Funksteckdose von diesem Hersteller zu verwenden.
 
 \subsection{Einführung openHAB}
-Das System openHAB wird eingesetzt, um verschiedene Home-Automatisierungssysteme unter einen Hut zu bringen. Um dies zu erreichen müssen Lösungen für die vier Disziplinen Konnektivität, User Interface, Automatisierung und Persistenz gefunden werden. In den nächsten Abschnitten werden diese Disziplinen kurz beschrieben.
+Das System openHAB wird eingesetzt, um verschiedene Home-Automatisierungssysteme unter einen Hut zu bringen. Um dies zu erreichen, müssen Lösungen für die vier Disziplinen Konnektivität, User Interface, Automatisierung und Persistenz gefunden werden. In den nächsten Abschnitten werden diese Disziplinen kurz beschrieben.
 
 \subsubsection{Konnektivität}
-Mit Konnektivität ist gemeint, wie die Sensoren/Aktoren integriert werden können. Es braucht ein Konzept um Protokolle miteinander kompatibel zu machen. Nehmen wir als Beispiel den Use Case \emph{L03: Event Kontaktsensor}. An einem Fenster wird ein Kontaktsensor angebracht, der bei jedem Öffnen oder Schliessen den Status bekannt gibt. OpenHAB muss einerseits das verwendete Protokoll verstehen und zudem die Daten in eine interne, abstrakte Form übersetzen, sodass Herstellerspezifische Details vor dem restlichen System verborgen bleiben. Ein weiters Beispiel ist Use Case \emph{L05: Aktor: Lampe}. Hierbei müssen keine Events gelesen, sondern Commands geschickt werden, da es sich bei der Lampe um einen Aktor handelt. Dazu muss openHAB auch den umgekehrten Fall beherrschen, nämlich aus einer internen Repräsentation des Commands in diejenige des Protokolls der Lampe zu übersetzen und letztlich auch die Lampe erreichen können. Durch Konnektivität ist es also möglich, SmartHome Zubehör von verschiedenen Herstellen in openHAB einzubinden. 
+Mit Konnektivität ist gemeint, wie die Sensoren/Aktoren integriert werden können. Es braucht ein Konzept, um Protokolle miteinander kompatibel zu machen. Nehmen wir als Beispiel den Use Case \emph{L03: Event Kontaktsensor}. An einem Fenster wird ein Kontaktsensor angebracht, der bei jedem Öffnen oder Schliessen den Status bekannt gibt. OpenHAB muss einerseits das verwendete Protokoll verstehen und zudem die Daten in eine interne, abstrakte Form übersetzen, sodass herstellerspezifische Details vor dem restlichen System verborgen bleiben. Ein weiteres Beispiel ist Use Case \emph{L05: Aktor: Lampe}. Hierbei müssen keine Events gelesen, sondern Commands geschickt werden, da es sich bei der Lampe um einen Aktor handelt. Dazu muss openHAB auch den umgekehrten Fall beherrschen, nämlich aus einer internen Repräsentation des Commands in diejenige des Protokolls der Lampe zu übersetzen und letztlich auch die Lampe erreichen können. Durch Konnektivität ist es also möglich, SmartHome Zubehör von verschiedenen Herstellern in openHAB einzubinden. 
 
 \subsubsection{User Interface}
-Nehmen wir an, der Fensterkontakt und die Lampe aus dem vorherigen Abschnitt sind von zwei völlig verschiedenen Herstellern. Der Status des Fensterkontakts soll bei der Verwendung ohne openHAB über eine Website im Browser ausgelesen werden können. Das Steuern der Lampe geschehe mittels einer eigens dafür vorgesehenen App. Dank dem Konzept zur Konnektivität können aber beide Geräte auch über openHAB zugegriffen werden. Einen echten Vorteil hat man dadurch aber nur, wenn es auch ein User Interface dazu gibt. Denn dann hat man alle Geräte in einer Smartphone- oder Web App vereint. OpenHAB benötigt demnach eine Möglichkeit um User Interfaces für verschiedene Clients zu gestalten.
+Nehmen wir an, der Fensterkontakt und die Lampe aus dem vorherigen Abschnitt sind von zwei völlig verschiedenen Herstellern. Der Status des Fensterkontakts soll bei der Verwendung ohne openHAB über eine Website im Browser ausgelesen werden können. Das Steuern der Lampe geschehe mittels einer eigens dafür vorgesehenen App. Dank dem Konzept der Konnektivität können auf beide Geräte auch über openHAB zugegriffen werden. Einen echten Vorteil hat man dadurch aber nur, wenn es auch ein User Interface dazu gibt. Denn dann hat man alle Geräte in einer Smartphone- oder Web App vereint. OpenHAB benötigt demnach eine Möglichkeit, um User Interfaces für verschiedene Clients zu gestalten.
 
 \subsubsection{Automatisierung}
-Durch die Konnektivität und das User Interface kann also SmartHome Zubehör von verschiedenen Herstellern in einer einzigen Anwendung verwendet werden. Das alleine ist schon ein grosser Mehrwert. Doch es fehlt noch etwas der smarte Teil des SmartHomes. Interessant wird es nämlich dann, wenn die verschiedenen Geräte sich gegenseitig beeinflussen sollen. Nehmen wir den Bewegungsmelder aus Use Case L04 hinzu. Sobald er eine Bewegung registriert soll die Lampe eingeschaltet werden. Es sind aber auch wesentlich komplexere Szenarien denkbar. Damit solche automatisierten Vorgänge stattfinden können benötigt openHAB eine Rule Engine. Die Grundlage dazu bildet die interne Repräsentation der Sensoren und Aktoren, die bereits durch die Konzepte zur Konnektivität geschaffen wurde.
+Durch die Konnektivität und das User Interface kann also SmartHome Zubehör von verschiedenen Herstellern in einer einzigen Anwendung verwendet werden. Das alleine ist schon ein grosser Mehrwert. Doch es fehlt noch etwas, nämlich der smarte Teil des SmartHomes. Interessant wird es nämlich dann, wenn die verschiedenen Geräte sich gegenseitig beeinflussen sollen. Nehmen wir den Bewegungsmelder aus Use Case L04 hinzu. Sobald er eine Bewegung registriert, soll die Lampe eingeschaltet werden. Es sind aber auch wesentlich komplexere Szenarien denkbar. Damit solche automatisierten Vorgänge stattfinden können, benötigt openHAB eine Rule Engine. Die Grundlage dazu bildet die interne Repräsentation der Sensoren und Aktoren, die bereits durch die Konzepte zur Konnektivität geschaffen wurde.
 
 \subsubsection{Persistenz}
-Wenn Events gelesen und Commands gesendet werden, dann handelt es sich dabei um Momentaufnahmen. Im User Interface könnte man beobachten, wenn der Status des Fensterkontakts von offen auf zu wechselt. Doch was ist, wenn man wissen möchte, wann das Fenster zuletzt geöffnet wurde? Aus diesem Grund reicht es nicht, Events lediglich zu verarbeiten, sondern sie müssen auch persistiert werden. Zudem können manche Sensoren wie der Fensterkontakt möglicherweise nur immer einen Statuswechsel bekanntgeben, der aktuelle Status kann aber nicht direkt abgefragt werden. Damit trotzdem jederzeit der aktuelle Status bekannt ist, muss openHAB den Status bei jedem Wechsel speichern. 
+Wenn Events gelesen und Commands gesendet werden, dann handelt es sich dabei um Momentaufnahmen. Im User Interface könnte man beobachten, wenn der Status des Fensterkontakts von «offen» auf «zu» wechselt. Doch was ist, wenn man wissen möchte, wann das Fenster zuletzt geöffnet wurde? Aus diesem Grund reicht es nicht, Events lediglich zu verarbeiten, sondern sie müssen auch persistiert werden. Zudem können manche Sensoren wie der Fensterkontakt möglicherweise nur immer einen Statuswechsel bekanntgeben, der aktuelle Status kann aber nicht direkt abgefragt werden. Damit trotzdem jederzeit der aktuelle Status bekannt ist, muss openHAB den Status bei jedem Wechsel speichern. 
 
 
 \subsection{openHAB Architektur}
@@ -74,14 +74,17 @@ Im Abschnitt zur Konnektivität haben wir bereits erläutert, welche Anforderung
 	\label{fig:ohArch}
 \end{figure}
 
+\subsection{OSGi}
+OSGi ist eine Softwareplattform, 
+
 \subsubsection{Event Bus}
-Der Basisservice von openHAB stellt der Event Bus dar. Über diesen Bus werden Events zwischen den verschiedenen OSGi Bundles gesendet. Die Events sind entweder Commands, welche eine Aktion ausführen, oder Status-Updates, welche Zustandsänderungen der Sensoren/Aktoren beinhalten. \\
+Der Event Bus stellt den Basisservice von openHAB dar. Über diesen Bus werden Events zwischen den verschiedenen OSGi Bundles gesendet. Die Events sind entweder Commands, welche eine Aktion ausführen, oder Status-Updates, welche Zustandsänderungen der Sensoren/Aktoren beinhalten. \\
 Durch den Einsatz dieses Event Bus wird die Kopplung reduziert und Add-ons können somit einfach ausgetauscht werden. \\
 Intern wurde der Event Bus mit Hilfe des OSGi Event Admin umgesetzt. Durch den Event Admin wird es möglich, dass sich weitere OSGi Bundles (also openHAB Add-ons) im Event Bus einklinken können.
 
 \subsubsection{Bindings}
 Bindings sind Verbindungen zwischen openHAB und den externen Systemen und bilden die Grundlage zur Konnektivität. Dadurch muss für jede Technologie ein eigenes Binding geschrieben werden. Für viele Technologien sind Bindings vorhanden, die einzeln heruntergeladen und als «Add-on» installiert werden können. Falls eine Technologie noch nicht unterstützt wird, kann man das Binding dazu selbst programmieren. Die wesentliche Aufgabe besteht darin, sich einerseits mit dem externen Gerät zu verbinden, auf dem Event Bus zu lauschen und die ausgetauschten Daten miteinander kompatibel zu machen. \\
-Alle momentan verfügbare Bindings sind unter folgendem Link zu finden: \url{https://github.com/openhab/openhab/wiki/Bindings}
+Alle momentan verfügbaren Bindings sind unter folgendem Link zu finden: \url{https://github.com/openhab/openhab/wiki/Bindings}
 
 \begin{figure}[H]
 	\centering

@@ -6,8 +6,8 @@ Als SmartHome Beispielszenario soll ein System aufgesetzt werden, das einen gros
 
 \subsection{Funktionale Anforderungen}
 \subsubsection{Basisszenario}
-Dieser Abschnitt beschreibt die theoretischen Voraussetzungen, die für das Basiszenario gegeben sein müssen, unabhängig von der späteren Implementierung der konkreten Anwendungsfälle.
-In der Gebäudeautomation spricht man häufig von sogenannten Sensoren und Aktoren. Beide Begriffe stammen ursprünglich aus der Steuerungs- und Regelungstechnik. Sensoren sind Geräte, die kontinuierlich Messdaten erfassen und die Daten über eine Schnittstelle verfügbar machen. Ob die Daten aktiv vom Sensor an eine Zentrale übermittelt werden, oder ob die Zentrale den Sensor selbstständig abfragen muss ist für die Definition eines Sensors in unserem Rahmen nebensächlich. Ein Aktor kann als Gegenstück zum Sensor betrachtet werden, da er eine aktive Rolle einnimmt. Ein Aktor empfängt Befehle und greift in das Regelungssystem ein. Einige Geräte beinhalten sowohl Sensor- als auch Aktorschnittstellen. Wenn ein Sensor eine Zustandsänderung registriert und diese dem System bekannt gibt, dann sprechen wir von einem \textit{Event}. Als \textit{Command} bezeichnen wir einen Befehl, der an einen Aktor gesendet wird.
+Dieser Abschnitt beschreibt die theoretischen Voraussetzungen, die für das Basisszenario gegeben sein müssen, unabhängig von der späteren Implementierung der konkreten Anwendungsfälle.
+In der Gebäudeautomation spricht man häufig von sogenannten Sensoren und Aktoren. Beide Begriffe stammen ursprünglich aus der Steuerungs- und Regelungstechnik. Sensoren sind Geräte, die kontinuierlich Messdaten erfassen und die Daten über eine Schnittstelle verfügbar machen. Ob die Daten aktiv vom Sensor an eine Zentrale übermittelt werden, oder ob die Zentrale den Sensor selbstständig abfragen muss, ist für die Definition eines Sensors in unserem Rahmen nebensächlich. Ein Aktor kann als Gegenstück zum Sensor betrachtet werden, da er eine aktive Rolle einnimmt. Ein Aktor empfängt Befehle und greift in das Regelungssystem ein. Einige Geräte beinhalten sowohl Sensor- als auch Aktorschnittstellen. Wenn ein Sensor eine Zustandsänderung registriert und diese dem System bekannt gibt, dann sprechen wir von einem \textit{Event}. Als \textit{Command} bezeichnen wir einen Befehl, der an einen Aktor gesendet wird.
 
 Beispiele für Sensoren aus der Gebäudeautomation:
 
@@ -33,7 +33,7 @@ Kombinierte Geräte:
 	\item Moderner Backofen (Sensor: Temperatur, Aktor: Programmauswahl)
 \end{itemize}
 
-Für das Basisszenario benötigen wir eine Infrastruktur, über die wir alle angeschlossenen Sensoren und Aktoren erreichen können. Konkret ausgedrückt müssen wir in der Lage sein, Events von Sensoren zu Empfangen und Commands an Aktoren zu senden. Darüber hinaus sollen möglichst viele Vorgänge automatisiert werden. Das bedeutet, wir benötigen eine Zentrale, um Events zu verarbeiten und gegebenenfalls mit Befehlen an Aktoren auf diese Events zu reagieren. Neben Aktoren und Sensoren existieren noch Clients. Clients sind Geräte, die von einem Benutzer des Systems verwendet werden, um Sensoren abzufragen und Commands an Aktoren zu senden. Clients greifen in der Regel nicht direkt auf Sensoren und Aktoren zu, sondern benutzen zu diesem Zweck die Zentrale. Das Netz, über das alle Sensoren, Aktoren, Clients und die Zentrale miteinander verbunden sind Bezeichnen wir von nun an als \textit{Bus}.
+Für das Basisszenario benötigen wir eine Infrastruktur, über die wir alle angeschlossenen Sensoren und Aktoren erreichen können. Konkret ausgedrückt müssen wir in der Lage sein, Events von Sensoren zu empfangen und Commands an Aktoren zu senden. Darüber hinaus sollen möglichst viele Vorgänge automatisiert werden. Das bedeutet, wir benötigen eine Zentrale, um Events zu verarbeiten und gegebenenfalls mit Befehlen an Aktoren auf diese Events zu reagieren. Neben Aktoren und Sensoren existieren noch Clients. Clients sind Geräte, die von einem Benutzer des Systems verwendet werden, um Sensoren abzufragen und Commands an Aktoren zu senden. Clients greifen in der Regel nicht direkt auf Sensoren und Aktoren zu, sondern benutzen zu diesem Zweck die Zentrale. Das Netz, über das alle Sensoren, Aktoren, Clients und die Zentrale miteinander verbunden sind, Bezeichnen wir von nun an als \textit{Bus}.
 
 \textbf{F01: Sensoren Status} \\
 Der Status eines Sensors kann über den Bus abgefragt werden. Sensoren können auch selbstständig Events auf den Bus senden.
@@ -54,7 +54,7 @@ Ein Client kann auf die Zentrale zugreifen, um den Status des Systems abzufragen
 \label{sec:requirementsSolutionPart}
 
 \textbf{L01: Sicherheits-Status abfragen} \\
-Der Client soll den Status des Einbrecherschutzes abgefragt werden können. \\
+Der Client soll den Status des Einbrecherschutzes abfragen können. \\
 Status «OK»:
 \begin{itemize}
 	\item Fenster ist geschlossen
@@ -78,25 +78,25 @@ Der Kontaktsensor hat permanent einen Status. Der Status ist entweder «offen» 
 Sobald der Bewegungsmelder eine Bewegung registriert, sendet dieser einen Event. Dieser wird nach interner Logik verarbeitet.
 
 \textbf{L05: Aktor: Lampe} \\
-Der Aktor wird via Command angesteuert. Das Licht kann durch eine Regel (Zeit-Mechanismus zur Prävention) oder durch eine Aktion des Clients ein bzw. abgeschaltet werden.
+Der Aktor wird via Command angesteuert. Das Licht kann durch eine Regel (Zeit-Mechanismus zur Prävention) oder durch eine Aktion des Clients ein- bzw. abgeschaltet werden.
 
 \textbf{L06: Aktor: Funksteckdose} \\
 Die Funksteckdose kann ebenfalls vielseitig eingesetzt werden. Etwas abstrahiert betrachtet, kann jedes Gerät per Remote ein- bzw. ausgeschaltet werden. An dieser Funktsteckdose kann zum Beispiel eine Musikanlage oder ein Fernsehgerät eingeschaltet werden.
 
 \textbf{L07: NFC Sticker} \\
-Die NFC Stickers können sehr vielfältig eingesetzt werden und dienen in erster Linie zur Entlastung des User Interface. Generell wird durch Auflegen eines NFC-fähigen Smartphones (also ein Client) eine Aktion ausgeführt. Was diese Aktion genau beinhaltet ist offen und könnte genauso gut direkt im User Interface benutzt werden. Beispielsweise könnte ein Command zum «scharf stellen» des Sicherheitssystems auf den Bus gesendet werden.
+Die NFC Stickers können sehr vielfältig eingesetzt werden und dienen in erster Linie zur Entlastung des User Interface. Generell wird durch Auflegen eines NFC-fähigen Smartphones (also ein Client) eine Aktion ausgeführt. Was diese Aktion genau beinhaltet, ist offen und könnte genauso gut direkt im User Interface benutzt werden. Beispielsweise könnte ein Command zum «Scharfstellen» des Sicherheitssystems auf den Bus gesendet werden.
 
 \subsection{Marktsituation}
-Das Thema IoT, insbesondere SmartHome, erlebt derzeit einen regelrechten Boom. Zwar gibt es schon seit Jahrzehnten Lösungen zur Heimautomatisierung, jedoch standen auch einfache Systeme bisher nur wenigen privilegierten zur Verfügung, denn meist musste man sich bereits beim Hausbau auf einen Anbieter  festlegen und dessen Produkt- und Preispolitik akzeptieren. Folglich ist es aufwändig, den Anbieter nachträglich zu wechseln oder das System zu erweitern. Als Vorteile von klassischen Gesamtlösungen sind jedoch das einheitliche Bild und die nahtlose bauliche Integration zu nennen.
+Das Thema IoT, insbesondere SmartHome, erlebt zurzeit einen regelrechten Boom. Zwar gibt es schon seit Jahrzehnten Lösungen zur Heimautomatisierung, jedoch standen auch einfache Systeme bisher nur wenigen Privilegierten zur Verfügung, denn meistens musste man sich bereits beim Hausbau auf einen Anbieter  festlegen und dessen Produkt- und Preispolitik akzeptieren. Folglich ist es aufwändig, den Anbieter nachträglich zu wechseln oder das System zu erweitern. Als Vorteile von klassischen Gesamtlösungen sind jedoch das einheitliche Bild und die nahtlose bauliche Integration zu nennen.
 
 \textbf{KNX} \\
-KNX ist ein europäischer Standard für kommerzielle Gebäudeautomation. KNX trennt Gerätesteuerung und Stromversorgung in von einander unabhängige Netze. Mit KNX können Schalter und Steuerungen relativ einfach neu zugewiesen werden, ohne dass erneut bauliche Arbeiten vorgenommen. KNX bringt hohe Anschaffungskosten mit sich und eignet sich eher für Neubauten, da eine nachträgliche Installation noch viel teurer wäre.
+KNX ist ein europäischer Standard für kommerzielle Gebäudeautomation. KNX trennt Gerätesteuerung und Stromversorgung in von einander unabhängige Netze. Mit KNX können Schalter und Steuerungen relativ einfach neu zugewiesen werden, ohne dass erneut bauliche Arbeiten vorgenommen werden müssen. KNX bringt hohe Anschaffungskosten mit sich und eignet sich eher für Neubauten, da eine nachträgliche Installation noch viel teurer wäre.
 
 \textbf{digitalSTROM} \\
-Ursprünglich ein Projekt der ETH, das die nachträgliche Gebäudeautomation ermöglichen soll. Durch den Einsatz von mit einander kommunizierenden, speziellen Kabelklemmen lassen sich vorallem Beleuchtungskonzepte und Energiesparlösungen recht schnell und einfach realisieren. Das Absetzen von Befehlen oder auslesen von Messdaten aus unterschiedlichen Protokollen ist kaum möglich. Leider sind die vielen benötigten Komponenten immer noch sehr teuer (ca. 100.- CHF für eine Klemme). 
+Ursprünglich ein Projekt der ETH, das die nachträgliche Gebäudeautomation ermöglichen soll. Durch den Einsatz von mit einander kommunizierenden, speziellen Kabelklemmen lassen sich vorallem Beleuchtungskonzepte und Energiesparlösungen recht schnell und einfach realisieren. Das Absetzen von Befehlen oder Auslesen von Messdaten aus unterschiedlichen Protokollen ist kaum möglich. Leider sind die vielen benötigten Komponenten immer noch sehr teuer (ca. 100.- CHF für eine Klemme). 
 
 \textbf{RWE Smarthome} \\
-Der Energieversorgerkonzern RWE bietet seit einigen Jahren ein nachrüstbares System für die Heimautomation. Der Fokus liegt vorallem auf der Automatisierung von Beleuchtung, Heizung, Rollläden und Stromversorgung. RWE bietet eine Zentrale, Sensoren, Aktoren sowie Software zur Steuerung und Konfiguration. Die Auswahl an Komponenten ist auf das Angebot von RWE beschränkt.
+Der Energieversorgungskonzern RWE bietet seit einigen Jahren ein nachrüstbares System für die Heimautomation. Der Fokus liegt vorallem auf der Automatisierung von Beleuchtung, Heizung, Rollläden und Stromversorgung. RWE bietet eine Zentrale, Sensoren, Aktoren sowie Software zur Steuerung und Konfiguration. Die Auswahl an Komponenten ist auf das Angebot von RWE beschränkt.
 
 \textbf{Qivicon} \\
 Qivicon ist eine Allianz verschiedener Industriepartner und wurde von der Deutschen Telekom gegründet. Im Unterschied zum RWE Smarthome können also Komponenten aller beteiligten Hersteller miteinander vernetzt werden. Die Bedienung ist etwas einfacher, dafür sind die Konfigurationsmöglichkeiten weniger umfassend als beim RWE Smarthome.
