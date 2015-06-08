@@ -28,58 +28,112 @@ Items, Rules, Sitemaps und Persitence Strategies werden in openHAB in einer eige
 
 Anhand diesen Konfigurationen werden die User Cases modelliert.
 
-\subsubsection{Konfiguration Überwachungskamera} 
-Für die Überwachungskamera existiert kein entsprechendes Item. Stattdessen wird in der Sitemap ein Image-Element angezeigt, dessen URL auf das HTTP Snapshot Interface der Netzwerkkamera verweist.\\ \\
-Das Bild wird dank dem Attribut \lstinline!visibility!  immer dann angezeigt, wenn das Item \lstinline!Alarm_activated! den Wert \lstinline!ON! hat. Das \lstinline!refresh! Interval bewirkt einen Reload des Bildes alle 200 Millisekunden.
+\subsubsection{Items}
+Die Definition der Items erfolgt in der Datei \lstinline!demo.items! und verwendet die openHAB Item DSL. Details zur Syntax sind auf dem openHAB Wiki (unvollständig) dokumentiert. Siehe \url{https://github.com/openhab/openhab/wiki/Explanation-of-items#syntax}.
 
-\begin{lstlisting}[style=csharp, caption=demo.sitemap - Webcam Bild]
-[...]
-Image url="http://192.168.1.15/snapshot.jpg" refresh=200
-visibility=[Alarm_activated==ON]
-[...]
+Nachfolgend werden die wichtigsten Items anhand von Listing \ref{lst:itemsConfig} erklärt.
+
+\begin{lstlisting}[style=csharp, label={lst:itemsConfig}, caption=demo.items - Konfiguration der Items]
+Switch Alarm_active 
+	"Alarm-Modus [MAP(alarm.map):%s]"
+	<siren>
+	(Alarms)
+	
+Group:Switch:AND(ON, OFF) Alarms
+	"Ueberwachung [MAP(alarm.map):%s]"
+	<house>
+
+/* Bewegung */
+String Motion_Livingroom
+	"Bewegungsmelder [MAP(motion.map):%s]"
+	{homematic="address=LEQ0797607, channel=1, parameter=MOTION"}
+	
+String Motion_Livingroom_Sabotage
+	"Sabotage"
+	{homematic="address=LEQ0797607, channel=1, parameter=ERROR"}
+
+String Motion_Summary
+	"Bewegungsmelder [%s]"
+	<siren>
+
+/* Lichter */
+Switch Hue_1
+	"Schlafzimmer [MAP(switch.map):%s]"
+	(Lights)
+	{hue="1"}
+	
+Switch Hue_2
+	"Wohnzimmer [MAP(switch.map):%s]"
+	(Lights)
+	{hue="2"}
+	
+Group:Switch:OR(ON, OFF) Lights
+	"Lichter [%d an]"
+
+/* Fenster */
+String Window_Bedroom
+	"Schlafzimmerfenster [MAP(window.map):%s]"
+	<contact>
+	(Windows)
+	{homematic="address=LEQ1469091,channel=1,parameter=STATE"}
+	
+Group:String:OR(true, false) Windows
+	"Fenster [%d offen]"
+	<contact>
 \end{lstlisting}
 
 
-
-
-\subsubsection{Konfiguration Kontaktsensor} 
-Der Kontaktsensor ist ein Use Case der in openHAB sehr oft vorkommt. Deshalb existiert ein Item Type «Contact» mit den beiden möglichen Werten OPEN und CLOSED. Das Homematic Binding liefert aber die Werte \lstinline!true! oder \lstinline!false! und kann deshalb nicht an ein Contact Item gebunden werden. Als Alternative haben wir ein String Item verwendet und mit Hilfe einer Transformation-Map \lstinline!false! mit «geschlossen» und \lstinline!true! mit «offen» übersetzt. Das Icon <contact> kann trotzdem noch verwendet werden. Allerdings wird nun nicht mehr automatisch das Icon für das offene bzw. geschlossene Fenster angezeigt, da openHAB den Basisnamen des Icons mit dem State konkateniert. Wir haben dementsprechend die Icons kopiert und ein File contact-false.png und contact-true.png im Ressourcen-Ordner hinterlegt.\\ \\
+\textbf{Kontaktsensor, Zeile 38 - 42}\\
+Der Kontaktsensor ist ein Use Case der in openHAB sehr oft vorkommt. Deshalb existiert ein Item Type «Contact» mit den beiden möglichen Werten OPEN und CLOSED. Das Homematic Binding liefert aber die Werte \lstinline!true! oder \lstinline!false! und kann deshalb nicht an ein Contact Item gebunden werden. Als Alternative haben wir ein String Item verwendet und mit Hilfe einer Transformation-Map \lstinline!false! mit «geschlossen» und \lstinline!true! mit «offen» übersetzt. Das Icon <contact> kann trotzdem noch verwendet werden. Allerdings wird nun nicht mehr automatisch das Icon für das offene bzw. geschlossene Fenster angezeigt, da openHAB den Basisnamen des Icons mit dem State konkateniert. Wir haben dementsprechend die Icons umbenannt.\\ \\
 Auf der letzten Zeile werden die Bindingparameter für Homematic angegeben.\\ \lstinline!address=LEQ1469091! bezieht sich auf die Seriennummer des Kontaktsensors und\\ \lstinline!parameter=STATE! gibt an, welche Eigenschaft gebunden werden soll. \lstinline!channel=1! ist ein Defaultwert.
 
-\begin{lstlisting}[style=csharp, caption=demo.items - Kontaktsensor]
-[...]
-String Window_Bedroom "Schlafzimmerfenster [MAP(window.map):%s]"
-<contact> (OV_Windows, Windows)
-{homematic="address=LEQ1469091,channel=1,parameter=STATE"}
-[...]
-\end{lstlisting}
-
-In der Sitemap wird das Item in einem Text-Element referenziert. Weitere Attribute sind nicht notwendig.
-
-\begin{lstlisting}[style=csharp, caption=demo.sitemap - Kontaktsensor]
-[...]
-Text item=Window_Bedroom
-[...]
-\end{lstlisting}
-
-\subsubsection{Konfiguration Bewegungsmelder}
+\textbf{Bewegungsmelder, Zeile 11 - 21}\\
 Der Bewegungsmelder ist ebenfalls von Homematic und wird in den Bindingparametern gleich referenziert wie beim Kontaktsensor. Der Bindingparameter \lstinline!MOTION! erhält einen boolschen Wert und muss mit Hilfe der Map \lstinline!motion.map! in einen benutzerfreundlichen String transformiert werden. Der Parameter \lstinline!ERROR! dient dem Sabotageschutz.\\ \\
 Leider muss bei Homematic jeder Parameter einem eigenen Item zugeordnet werden. Deshalb haben wir ein drittes String-Item \lstinline!Motion_Summary! definiert, indem die Werte der beiden anderen Items zusammengefasst werden. 
 
+\textbf{Lichter, Zeile 24 - 32}\\
+Die Philips Hue Lampen können direkt an ein Switch Item gekoppelt werden. Im Bindingparameter muss lediglich die Nummer der Birne eingetragen werden. Der Status (\lstinline!ON/OFF!) wird mit der Transformation-Map in «Ein» bzw. «Aus» übersetzt.
 
-\begin{lstlisting}[style=csharp, caption=demo.items - Bewegungsmelder Items]
-[...]
-String Motion_Livingroom "Bewegungsmelder [MAP(motion.map):%s]"
-{homematic="address=LEQ0797607, channel=1, parameter=MOTION"}
+\textbf{Alarm, Zeile 1 - 4}\\
+Dieses Switch Item dient zum Wechseln des Alarm-Modus. Der Status wird ähnlich wie bei den Lichtern mit einer Transformation-Map in einen sinnvollen deutschen Ausdruck übersetzt.
 
-String Motion_Livingroom_Sabotage "Sabotage"
-{homematic="address=LEQ0797607, channel=1, parameter=ERROR"}
+\textbf{Aggregierte Gruppen}\\
+Die restlichen Items sind Group Items. Sie werden für die Sitemap als Zusammenfassung der zugehörigen Items verwendet. Das Item \lstinline!Lights! zählt beispielsweise die Anzahl eingeschalteter Lichter.
 
-String Motion_Summary "Bewegungsmelder [%s]"
-[...]
+
+\subsubsection{Sitemap}
+Mit einer Sitemap wird das User Interface beschrieben, um Items für verschiedene Frontends Verfügbar zu machen. In einer baumartigen Struktur können Items an sogenannte Widgets gebunden werden. Ein Widget ist einfach gesagt ein Listenelement im User Interface. Je nach Widget und zugehörigem Icon ist das Element neben Icon und Text auch noch mit Controls ausgestattet. Group-Widgets führen den Benutzer auf eine neue Seite. Die Navigation ist nach dem Drill-Down Prinzip aufgebaut. Unsere Sitemap Definition ist leicht an die Bedürfnisse der Android App angepasst. Weitere Informationen zur Android App befinden sich im Abschnitt \ref{sec:androidRealization} ab Seite \pageref{sec:androidRealization}.	
+
+\begin{lstlisting}[style=csharp, caption=demo.sitemap - User Interface Deklaration]
+sitemap demo label="Ihr Haus" {
+	Group item=Windows {
+		Frame label="Nordseite" {
+			Text item=Window_Bedroom
+		}
+	}
+	Group item=Lights icon="light" {
+		Frame label="Nordseite" {
+			Switch item=Hue_1
+		}
+		Frame label="Suedseite" {
+			Switch item=Hue_2
+		}
+	}
+	Group item=Alarms {
+		Frame label="Alarm" {
+			Switch item=Alarm_active
+		}
+		Frame label="Bewegung" {
+			Text item=Motion_Summary
+		}
+		Frame label="Kamera" {
+			Webview url="http://192.168.1.15:80/jpg/1/image.jpg"
+		}
+	}
+}
+
 \end{lstlisting}
 
-Die Ermittlung und Zuweisung des korrekten Wertes an das Item \lstinline!Motion_Summary! geschieht mit Hilfe der Rule \lstinline!Motion Aggregator!, die im nächsten Abschnitt erklärt wird.
 
 \subsubsection{Rules}
 Wie im Lösungskonzept beschrieben, werden Rules zur Automatisierung von Aktionen eingesetzt. Die Regeln können im File \lstinline!/etc/openhab/configurations/rules/demo.rules! definiert werden. \\\\
@@ -125,7 +179,7 @@ In der Abbildung \ref{fig:flowChartMotionAggregator} wird der Ablauf illustriert
 	\label{fig:flowChartMotionAggregator}
 \end{figure}
 
-Nachfolgend ist die Definition der Regel in der openhAB DSL beschrieben. Falls keiner der vier möglichen Zustände zutrifft, was nur in einem Fehlerfall möglich ist, wird «---» im Item \lstinline!Motion_Summary! angezeigt.
+Nachfolgend ist die Definition der Regel in der openHAB DSL beschrieben. Falls keiner der vier möglichen Zustände zutrifft, was nur in einem Fehlerfall möglich ist, wird «---» im Item \lstinline!Motion_Summary! angezeigt.
 
 \begin{lstlisting}[style=csharp, caption=demo.rules - Rule «Motion Aggregator»]
 rule "Motion Aggregator"
@@ -418,6 +472,7 @@ Anschliessend haben wir die .jar Datei ins Add-on Verzeichnis unserer openHAB In
 Die MQTT Action implementiert zwei Methoden: sendMQTTString(topic, message) und sendMQTTFile(topic, fileUrl). Die erste Methode sendet einen String an das Topic des vorkonfigurierten Brokers. Die zweite Methode ist diejenige, weswegen wir das Plugin überhaupt entwickelt haben. Sie nimmt eine URL entgegen, lädt den Inhalt von dort herunter und sendet ihn an das gewünschte Topic des Brokers. Beide Methoden können von jetzt an in openHAB Rules oder Scripts verwendet werden.
 
 \subsection{Android App}
+\label{sec:androidRealization}
 Im Lösungskonzept in Abschnitt \ref{sec:androidArchSolution} ab Seite \pageref{sec:androidArchSolution} haben wir bereits erklärt, wie die Architektur der App aussieht. In diesem Abschnitt gehen wir auf die eingesetzten Frameworks, wichtige Klassen und das User Interface Design ein.
 
 \subsubsection{Frameworks und Libraries}
