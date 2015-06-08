@@ -6,20 +6,11 @@
 % - Ausgangslage - Vorgehen, Technologien - Ergebnisse - Ausblick (optional)
 
 \chapter*{Management Summary}\addcontentsline{toc}{chapter}{Management Summary}
-\tbd
+\textbf{Ausgangslage}\\
+Das «Internet of Things» ist eine Bezeichnung für ein Netzwerk aus intelligenten Gegenständen des Alltags. Viele dieser Things sind durch Herstellergrenzen technologisch von einander isoliert. Es gibt spezielle Softwareprodukte, damit eine heterogene Landschaft an Things zu einem Netzwerk zusammengeschlossen werden kann. Danach wird versucht eine kollektive Intelligenz im Internet of Things zu erreichen. In dieser Bachelorarbeit wollen wir nicht gleich alle Things der Welt vernetzen. Wir skalieren die Konzepte herunter und projizieren sie auf etwas vertrautes: Das eigene Zuhause -- ein Smart-Home. 
 
-\textbf{Ausgangslage}
+\textbf{Vorgehen / Technologien}\\
+Nach einer Marktanalyse haben wir uns auf die Open Source Software «openHAB» festgelegt. OpenHAB definiert ein gemeinsames und abstraktes Modell eines Things und verbirgt die verwendete Technologie dahinter. Auf diesem Modell aufbauend können Regeln zur Interaktion zwischen Things beschreiben werden. OpenHAB wurde für die Verwendung in Privathaushalten entwickelt und kann keine beliebig grossen Netzwerke verwalten. Alle Geschehnisse im Haushalt werden sicher in der Cloud protokolliert.
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea.
-
-\textbf{Vorgehen / Technologien}
-
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea. 
-
-\textbf{Ergebnisse}
-
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea. 
-
-\textbf{Ausblick}
-
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea.
+\textbf{Ergebnisse}\\
+Für das Beispielszenario «Einbruchschutz» haben wir einen Versuchsaufbau mit Things eingerichtet. Unsere Things sind ein Fensterkontakt, zwei Lampen, ein Bewegungsmelder und eine Webcam. Wir entwickelten eine Smartphone App, damit der Bewohner seine Things überwachen und steuern kann. Auf Wunsch benachrichtigt ihn das Smartphone, sobald sich ein Fenster unerwartet öffnet oder der Bewegungsmelder anschlägt. Durch unsere Cloud-Anwendung kann der Privathaushalt an einen Verbund weiterer Haushalte angeschlossen werden, womit sich das Internet of Things wieder nach oben skalieren lässt. 
