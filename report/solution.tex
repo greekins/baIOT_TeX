@@ -26,7 +26,7 @@ Mit openHAB haben wir eine Plattform gefunden, die allen wichtigen Kriterien ent
 
 \textit{F03:} OpenHAB kann den Verkehr auf dem EventBus über verschiedene Wege auf externen Systemen protokollieren. Zu unserem Zweck eignet sich das MQTT Persistence Modul.
 
-\textit{F04:} Über die Rule Engine von openHAB können Regeln mit Hilfe einer Java-ähnlichen DSL beschrieben werden. Regeln werden bei gewissen Events auf dem EventBus ausgeführt. Die DLS erlaubt den Zugriff auf den Zustand von Items und kann auch Commands an Items und somit an Aktoren senden.
+\textit{F04:} Über die Rule Engine von openHAB können Regeln mit Hilfe einer Java-ähnlichen DSL beschrieben werden. Regeln werden bei gewissen Events auf dem EventBus ausgeführt. Die DSL erlaubt den Zugriff auf den Zustand von Items und kann auch Commands an Items und somit an Aktoren senden.
 
 \textit{F05:} Eine REST-API bietet umfassenden Zugriff auf die openHAB Runtime. Über sogenannte Sitemaps können deskriptive User Interfaces automatisch generiert werden.
 
@@ -143,7 +143,7 @@ Die Türen und das Fenster im Wohnzimmer werden nicht mit Kontaktsensoren ausges
 	\label{fig:housePlan}
 \end{figure}
 
-Philips Hue und HomeMatic besitzen beide eine Zentrale, über die kommunizieren sie mit Ihren Gadgets. Die Zentralen werden über LAN (RJ45) an das Raspberry Pi angeschlossen.
+Philips Hue und HomeMatic besitzen beide eine Zentrale, über die kommunizieren sie mit Ihren Gadgets über Funk. Die Zentralen werden über LAN (RJ45) an das Raspberry Pi angeschlossen. Die Abbildung \ref{fig:componentsIntegration} zeigt die Vernetzung der Komponenten. An zentraler Stelle steht das Raspberry Pi, welches via Router mit den beiden Zentralen der Philips Hue und HomeMatic verbunden ist.
 
 \begin{figure}[H]
 	\centering
