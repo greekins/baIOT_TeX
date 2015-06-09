@@ -2,7 +2,7 @@
 Dieses Kapitel beinhaltet die Beschreibung der Architektur und wichtiger Komponenten. Es werden die theoretischen Grundlagen der eingesetzten Technologien und Systeme erläutert und warum diese verwendet werden. Nicht Teil dieses Kapitels sind Erläuterungen von Konfigurationen und Code. Diese werden separat im Kapitel «Umsetzung» ab Seite \pageref{sec:chapterRealization} behandelt.
 
 \subsection{Evaluation der Plattform}
-Anhand der Marktsituation und den funktionalen Anforderungen haben wir die Vor- und Nachteile der jeweiligen Plattformen miteinander verglichen und dabei darauf geachtet, welche Kriterien für unsere Lösung von Bedeutung sind.
+Anhand der Marktsituation und den funktionalen Anforderungen haben wir die Vor- und Nachteile der jeweiligen Plattformen miteinander verglichen und darauf geachtet, welche Kriterien für unsere Lösung von Bedeutung sind.
 
 Wichtige Kriterien:
 \begin{itemize}
@@ -22,13 +22,13 @@ Vernachlässigbare Kriterien:
 Mit openHAB haben wir eine Plattform gefunden, die allen wichtigen Kriterien entspricht und zudem kostenlos ist. Da wir openHAB sofort auf unseren Notebooks installieren konnten, war es sehr einfach zu beurteilen, ob die Plattform auch in der Praxis unsere Anforderungen erfüllt. Die mitgelieferte Demo-Konfiguration beinhaltete bereits viele anschauliche Beispiele, die später als Vorlage für unsere eigenen Anwendungsfälle dienen können. 
 
 \textbf{Erfüllung der funktionalen Anforderungen} \\
-\textit{F01 - F02:} Über sogenannte Items können Sensoren und Aktoren virtuell und genügend abstrakt definiert werden. Der OSGi EventBus von openHAB ermöglicht den Transport von Events und Commands zwischen Items und der Zentrale (OpenHAB Runtime). Bindings mappen die Items auf tatsächliche Sensoren und Aktoren.
+\textit{F01 - F02:} Über sogenannte Items können Sensoren und Aktoren virtuell und genügend abstrakt definiert werden. Der OSGi EventBus von openHAB ermöglicht den Transport von Events und Commands zwischen Items und der Zentrale (openHAB Runtime). Bindings mappen die Items auf tatsächliche Sensoren und Aktoren.
 
 \textit{F03:} OpenHAB kann den Verkehr auf dem EventBus über verschiedene Wege auf externen Systemen protokollieren. Zu unserem Zweck eignet sich das MQTT Persistence Modul.
 
 \textit{F04:} Über die Rule Engine von openHAB können Regeln mit Hilfe einer Java-ähnlichen DSL beschrieben werden. Regeln werden bei gewissen Events auf dem EventBus ausgeführt. Die DLS erlaubt den Zugriff auf den Zustand von Items und kann auch Commands an Items und somit an Aktoren senden.
 
-\textit{F05:} Ein RESTful API bietet umfassenden Zugriff auf die openHAB Runtime. Über sogenannte Sitemaps können deskriptive User Interfaces automatisch generiert werden.
+\textit{F05:} Eine REST-API bietet umfassenden Zugriff auf die openHAB Runtime. Über sogenannte Sitemaps können deskriptive User Interfaces automatisch generiert werden.
 
 
 
@@ -36,7 +36,7 @@ Mit openHAB haben wir eine Plattform gefunden, die allen wichtigen Kriterien ent
 Ein Nachteil von openHAB ist, dass die Dokumentation grosse Lücken aufweist. Zwar sind die Konzepte leicht verständlich, jedoch fehlen Detailangaben zur DSL und genauen Konfigurationssyntax. Aus diesem Grund müssen oft Beispiele analysiert oder Benutzerforen zu Rate gezogen werden.
 
 \subsection{Evaluation der Hardware}
-Nachdem wir openHAB als Plattform bestimmt haben, konnten wir die Hardware für die Sensoren und Aktoren aussuchen. Dafür haben wir uns an den Vorgaben L02 - L06 aus Abschnitt \ref{sec:requirementsSolutionPart} auf Seite \pageref{sec:requirementsSolutionPart} orientiert. Durch die Vielzahl an Protokollen, die durch openHAB unterstützt werden, hatten wir genügend Auswahl an Hardware von unterschiedlichen Herstellern. OpenHAB selbst läuft auf einem Raspberry Pi B+.
+Nachdem wir openHAB als Plattform bestimmt haben, konnten wir die Hardware für die Sensoren und Aktoren aussuchen. Dafür haben wir uns an den Vorgaben L02 - L05 aus Abschnitt \ref{sec:requirementsSolutionPart} auf Seite \pageref{sec:requirementsSolutionPart} orientiert. Durch die Vielzahl an Protokollen, die durch openHAB unterstützt werden, hatten wir genügend Auswahl an Hardware von unterschiedlichen Herstellern. OpenHAB selbst läuft auf einem Raspberry Pi B+.
 
 \textit{L02:} Als Überwachungskamera haben wir die Edimax IC-3115W Netzwerkkamera ausgesucht. Sie ist mit einem Preis von weniger als 50 Euro relativ günstig und über das HTTP Binding von openHAB kompatibel.
 
@@ -46,19 +46,17 @@ Nachdem wir openHAB als Plattform bestimmt haben, konnten wir die Hardware für 
 
 \textit{L05:} Das Philips Hue Lux Starterkit beinhaltet zwei dimmbare LED-Birnen und eine Zentrale, die ans lokale Netzwerk angeschlossen werden muss. Ein openHAB Binding für Philips Hue ist vorhanden.
 
-\textit{L06:} Da wir durch den Fensterkontakt und den Bewegungsmelder schon eine HomeMatic Zentrale besitzen, liegt es nahe, auch die Funksteckdose von diesem Hersteller zu verwenden.
-
 \subsection{Einführung openHAB}
 Das System openHAB wird eingesetzt, um verschiedene Home-Automatisierungssysteme unter einen Hut zu bringen. Um dies zu erreichen, müssen Lösungen für die vier Disziplinen Konnektivität, User Interface, Automatisierung und Persistenz gefunden werden. In den nächsten Abschnitten werden diese Disziplinen kurz beschrieben.
 
 \subsubsection{Konnektivität}
-Mit Konnektivität ist gemeint, wie die Sensoren/Aktoren integriert werden können. Es braucht ein Konzept, um Protokolle miteinander kompatibel zu machen. Nehmen wir als Beispiel den Use Case \emph{L03: Event Kontaktsensor}. An einem Fenster wird ein Kontaktsensor angebracht, der bei jedem Öffnen oder Schliessen den Status bekannt gibt. OpenHAB muss einerseits das verwendete Protokoll verstehen und zudem die Daten in eine interne, abstrakte Form übersetzen, sodass herstellerspezifische Details vor dem restlichen System verborgen bleiben. Ein weiteres Beispiel ist Use Case \emph{L05: Aktor: Lampe}. Hierbei müssen keine Events gelesen, sondern Commands geschickt werden, da es sich bei der Lampe um einen Aktor handelt. Dazu muss openHAB auch den umgekehrten Fall beherrschen, nämlich aus einer internen Repräsentation des Commands in diejenige des Protokolls der Lampe zu übersetzen und letztlich auch die Lampe erreichen können. Durch Konnektivität ist es also möglich, SmartHome Zubehör von verschiedenen Herstellern in openHAB einzubinden. 
+Mit Konnektivität ist gemeint, wie die Sensoren/Aktoren integriert werden können. Es braucht ein Konzept, um Protokolle miteinander kompatibel zu machen. Nehmen wir als Beispiel den Use Case \emph{L03: Event Kontaktsensor}. An einem Fenster wird ein Kontaktsensor angebracht, der bei jedem Öffnen oder Schliessen den Status bekannt gibt. OpenHAB muss einerseits das verwendete Protokoll verstehen und zudem die Daten in eine interne, abstrakte Form übersetzen, sodass herstellerspezifische Details vor dem restlichen System verborgen bleiben. Ein weiteres Beispiel ist Use Case \emph{L05: Aktor: Lampe}. Hierbei müssen keine Events gelesen, sondern Commands geschickt werden, da es sich bei der Lampe um einen Aktor handelt. Dazu muss openHAB auch den umgekehrten Fall beherrschen, nämlich aus einer internen Repräsentation des Commands in diejenige des Protokolls der Lampe zu übersetzen und letztlich auch die Lampe erreichen können. Durch Konnektivität ist es also möglich, Smart-Home Zubehör von verschiedenen Herstellern in openHAB einzubinden. 
 
 \subsubsection{User Interface}
 Nehmen wir an, der Fensterkontakt und die Lampe aus dem vorherigen Abschnitt sind von zwei völlig verschiedenen Herstellern. Der Status des Fensterkontakts soll bei der Verwendung ohne openHAB über eine Website im Browser ausgelesen werden können. Das Steuern der Lampe geschehe mittels einer eigens dafür vorgesehenen App. Dank dem Konzept der Konnektivität können auf beide Geräte auch über openHAB zugegriffen werden. Einen echten Vorteil hat man dadurch aber nur, wenn es auch ein User Interface dazu gibt. Denn dann hat man alle Geräte in einer Smartphone- oder Web App vereint. OpenHAB benötigt demnach eine Möglichkeit, um User Interfaces für verschiedene Clients zu gestalten.
 
 \subsubsection{Automatisierung}
-Durch die Konnektivität und das User Interface kann also SmartHome Zubehör von verschiedenen Herstellern in einer einzigen Anwendung verwendet werden. Das alleine ist schon ein grosser Mehrwert. Doch es fehlt noch etwas, nämlich der smarte Teil des SmartHomes. Interessant wird es nämlich dann, wenn die verschiedenen Geräte sich gegenseitig beeinflussen sollen. Nehmen wir den Bewegungsmelder aus Use Case L04 hinzu. Sobald er eine Bewegung registriert, soll die Lampe eingeschaltet werden. Es sind aber auch wesentlich komplexere Szenarien denkbar. Damit solche automatisierten Vorgänge stattfinden können, benötigt openHAB eine Rule Engine. Die Grundlage dazu bildet die interne Repräsentation der Sensoren und Aktoren, die bereits durch die Konzepte zur Konnektivität geschaffen wurde.
+Durch die Konnektivität und das User Interface kann also Smart-Home Zubehör von verschiedenen Herstellern in einer einzigen Anwendung verwendet werden. Das alleine ist schon ein grosser Mehrwert. Doch es fehlt noch etwas der smarte Teil des Smart-Homes. Interessant wird es nämlich dann, wenn die verschiedenen Geräte sich gegenseitig beeinflussen sollen. Nehmen wir den Bewegungsmelder aus Use Case L04 hinzu. Sobald er eine Bewegung registriert, soll die Lampe eingeschaltet werden. Es sind aber auch wesentlich komplexere Szenarien denkbar. Damit solche automatisierten Vorgänge stattfinden können, benötigt openHAB eine Rule Engine. Die Grundlage dazu bildet die interne Repräsentation der Sensoren und Aktoren, die bereits durch die Konzepte zur Konnektivität geschaffen wurde.
 
 \subsubsection{Persistenz}
 Wenn Events gelesen und Commands gesendet werden, dann handelt es sich dabei um Momentaufnahmen. Im User Interface könnte man beobachten, wenn der Status des Fensterkontakts von «offen» auf «zu» wechselt. Doch was ist, wenn man wissen möchte, wann das Fenster zuletzt geöffnet wurde? Aus diesem Grund reicht es nicht, Events lediglich zu verarbeiten, sondern sie müssen auch persistiert werden. Zudem können manche Sensoren wie der Fensterkontakt möglicherweise nur immer einen Statuswechsel bekanntgeben, der aktuelle Status kann aber nicht direkt abgefragt werden. Damit trotzdem jederzeit der aktuelle Status bekannt ist, muss openHAB den Status bei jedem Wechsel speichern. 
@@ -119,12 +117,12 @@ Der Zustand eines Items muss die Ausführungsdauer einer openHAB Instanz überle
 Rules sind die Werkzeuge zur Automatisierung. Dank einer Java-ähnlichen DSL können Aktionen ausgelöst werden, wenn gewisse Bedingungen erfüllt wurden. Das können einerseits Zustandsänderungen von Items, aber auch Systemevents oder Events von selbst angelegten Timern sein. 
 
 \subsubsection{Sitemaps}
-Sitemaps sind Konfigurationsfiles zur deklarativen Definition von User Interfaces. Sitemaps werden ebenfalls in einer Xtext basierten DSL geschrieben und haben eine baumartige Struktur. OpenHAB liest das Konfigurationsfile und stellt die Sitemap über eine REST API zur Verfügung. Eine mitgelieferte Webapplikation stellt das User Interface anschliessend im Browser dar. Layouttechnisch orientiert sich die Webapplikation am iOS 6 Design mit Listendarstellung und Drill-Down Prinzip. Die nativen iOS und Android Apps von openHAB verfolgen das selbe Bedienkonzept.\\
+Sitemaps sind Konfigurationsfiles zur deklarativen Definition von User Interfaces. Sitemaps werden ebenfalls in einer Xtext basierten DSL geschrieben und haben eine baumartige Struktur. OpenHAB liest das Konfigurationsfile und stellt die Sitemap über ein REST-API zur Verfügung. Eine mitgelieferte Webapplikation stellt das User Interface anschliessend im Browser dar. Layouttechnisch orientiert sich die Webapplikation am iOS 6 Design mit Listendarstellung und Drill-Down Prinzip. Die nativen iOS und Android Apps von openHAB verfolgen das selbe Bedienkonzept.\\
 Die verschiedenen Elemente, die in Sitemaps verfügbar sind, können Items direkt über deren Name referenzieren. Einige Elemente sind dynamisch und erlauben eine werteabhängige Darstellung.
 
 \subsection{Allgemeine Systemsicht}
 Anhand der Problembeschreibung wurde ein Plan erarbeitet, der das ganze System verständlich beschreibt. Die Abbildung \ref{fig:systemView} stellt die wichtigsten Komponenten und Entitäten aus der Problemdomäne in gegenseitiger Beziehung dar. An zentraler Stelle steht das openHAB-Framework, es verbindet alle Komponenten. Die Cloud wird über MQTT (ein Message-Protokoll) angebunden, um Events zu persistieren.\\
-Die Sensoren/Aktoren kommunizieren durch Bindings über das Netzwerk mit openHAB um deren Status zu übertragen. Der Client kann diese Status über das RESTful-API abfragen und Commands senden.
+Die Sensoren/Aktoren kommunizieren durch Bindings über das Netzwerk mit openHAB um deren Status zu übertragen. Der Client kann diesen Status über ein REST-API abfragen und Commands senden.
 
 \begin{figure}[H]
 	\centering
@@ -145,7 +143,7 @@ Die Türen und das Fenster im Wohnzimmer werden nicht mit Kontaktsensoren ausges
 	\label{fig:housePlan}
 \end{figure}
 
-Philips Hue und HomeMatic besitzen beide eine Zentrale, über die kommunizieren sie mit Ihren Gadgets. Die Zentralen werden über LAN (RJ45) an das Raspberry Pi angeschlossen. \tbd
+Philips Hue und HomeMatic besitzen beide eine Zentrale, über die kommunizieren sie mit Ihren Gadgets. Die Zentralen werden über LAN (RJ45) an das Raspberry Pi angeschlossen.
 
 \begin{figure}[H]
 	\centering
@@ -155,7 +153,7 @@ Philips Hue und HomeMatic besitzen beide eine Zentrale, über die kommunizieren 
 \end{figure}
 
 \subsubsection{Beispiel Use Case}
-Das System verfügt über zwei Alarm-Modi: Scharf und Inaktiv. Wenn der Alarm scharf ist und der HomeMatic Bewegungsmelder oder der Fensterkontakt eine Veränderung registriert, dann sollen die Philips Hue Lampen eingeschaltet werden. Zeitgleich werden Aufnahmen der Webcam an die Cloud gesendet. Die Cloud schickt eine Push-Notification an das Android um den Benutzer über den ausgelösten Alarm zu informieren. Das folgende Sequenzdiagramm veranschaulicht den Use Case:
+Das System verfügt über zwei Alarm-Modi: Scharf und Inaktiv. Wenn der Alarm scharf ist und der HomeMatic Bewegungsmelder oder der Fensterkontakt eine Veränderung registriert, dann sollen die Philips Hue Lampen eingeschaltet werden. Zeitgleich werden Aufnahmen der Webcam an die Cloud gesendet. Die Cloud schickt eine Push-Notification an das Android App um den Benutzer über den ausgelösten Alarm zu informieren. Das folgende Sequenzdiagramm veranschaulicht den Use Case:
 
 \begin{figure}[H]
 	\centering
@@ -222,7 +220,7 @@ Auf dieser Seite sind alle Lampen aufgelistet, die in openHAB integriert wurden.
 
 \begin{figure}[htbp]
 	\begin{minipage}{0.6\textwidth} 
-Diese Ansicht enthält einen Schalter zum Scharfstellen oder deaktivieren des Alarm-Modus, den Status des Bewegungsmelders und das Bild der Überwachungskamera. 
+Diese Ansicht enthält einen Schalter zum Scharfstellen oder Deaktivieren des Alarm-Modus, den Status des Bewegungsmelders und das Bild der Überwachungskamera. 
 	\end{minipage}
 	\hfill
 	\begin{minipage}{0.32\textwidth}
@@ -263,17 +261,17 @@ Werden benötigt um auf Ereignisse von Android oder von anderen Apps zu reagiere
 Sind Android-Klassen zum Ausführen von Code im Hintergrund, ohne dass eine Activity für den Benutzer sichtbar ist. Wir verwenden einen Service, um die Push-Notification, die vom BroadcastReceiver empfangen wurde, zu verarbeiten. Nicht zu verwechseln sind diese (Android-)Services mit den Service-Klassen im Schichtenmodell auf dem Business-Logic-Layer als allgemeines Programmierkonzept. Es können auch eigene Service-Klassen zum kapseln von Businesslogik verwendet werden, die nichts mit den Android-Services zu tun haben.
 
 \textbf{openHAB SDK}\\
-In unserer Android App verwenden wir die REST API von openHAB. Dazu braucht es eigene Service-Klassen zum Ausführen der REST Calls und zum Mappen der JSON Responses in Domain-Objekte (Sitemaps, Pages, Widgets, Items). Ebenso braucht es eine Schnittstelle zum persistenten Speichern von Verbindungsinformationen. Als wir die Android App planten, wären wir sehr froh gewesen, wenn es ein openHAB SDK für Android gäbe, das all diese Aufgaben schon für uns übernehmen würde. Dann müssten wir nur noch Activities mit entsprechenden Layouts entwickeln und uns wäre ein Grossteil des Aufwands erspart geblieben. Die offizielle Android App von openHAB ist zwar Open Source, jedoch derart schlecht aufgebaut, dass nichts davon wiederzuverwenden war. Deshalb möchten wir während der Entwicklung unserer App gleich selbst solch ein SDK aufbauen. Aus Zeitgründen werden wir uns aber auf diejenigen Funktionen beschränken, die wir tatsächlich benötigen. Die Architektur der App teilt sich deshalb auf in einen Teil SDK und einen Teil App (siehe Abbildung \ref{fig:androidArchSdk}). 
+In unserer Android App verwenden wir das REST-API von openHAB. Dazu braucht es eigene Service-Klassen zum Ausführen der REST Calls und zum Mappen der JSON Responses in Domain-Objekte (Sitemaps, Pages, Widgets, Items). Ebenso braucht es eine Schnittstelle zum persistenten Speichern von Verbindungsinformationen. Als wir die Android App planten, wären wir sehr froh gewesen, wenn es ein openHAB SDK für Android gäbe, das all diese Aufgaben schon für uns übernehmen würde. Dann müssten wir nur noch Activities mit entsprechenden Layouts entwickeln und uns wäre ein Grossteil des Aufwands erspart geblieben. Die offizielle Android App von openHAB ist zwar Open Source, jedoch derart schlecht aufgebaut, dass nichts davon wiederzuverwenden war. Deshalb möchten wir während der Entwicklung unserer App gleich selbst solch ein SDK aufbauen. Aus Zeitgründen werden wir uns aber auf diejenigen Funktionen beschränken, die wir tatsächlich benötigen. Die Architektur der App teilt sich deshalb auf in einen Teil SDK und einen Teil App (siehe Abbildung \ref{fig:androidArchSdk}). 
 
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=\textwidth]{report/img/android_arch_sdk.png}
-	\caption{Aufteilung SDK und APP}
+	\caption{Aufteilung SDK und App}
 	\label{fig:androidArchSdk}
 \end{figure}
 
-Im SDK befinden sich Klassen für die Verwendung der REST API und Model-Klassen, um die Daten der API intern zu repräsentieren. Zudem werden im SDK auch diverse Hilfsklassen zu finden sein. \\
-Das App Package besteht aus allen Klassen, die speziell für diese App so genötigt werden und nicht zwingenderweise für andere Apps wiederverwendbar sein müssen. Das betriffet hauptsächlich alle Activities und diverse UI Elemente.
+Im SDK befinden sich Klassen für die Verwendung des REST-API und Model-Klassen, um die Daten des API intern zu repräsentieren. Zudem werden im SDK auch diverse Hilfsklassen zu finden sein. \\
+Das App Package besteht aus allen Klassen, die speziell für diese App so benötigt werden und nicht zwingenderweise für andere Apps wiederverwendbar sein müssen. Das betriffet hauptsächlich alle Activities und diverse UI Elemente.
 
 \textbf{Klassendiagramm}\\
 Die nachfolgende Abbildung zeigt einen vereinfachten Auszug aus dem geplanten Klassendiagramm der App. Auch hier wird wieder die Trennung zwischen SDK und App sichtbar. Eine Erklärung zu ausgewählten Klassen befindet sich im Umsetzungsteil der Dokumentation im Abschnitt \ref{sec:importantClasses} auf Seite \pageref{sec:importantClasses}. Hinweis: Die dargestellten Klassen können in der tatsächlichen Implementierung in Methoden und Instanzvariablen abweichen.
@@ -287,7 +285,7 @@ Die nachfolgende Abbildung zeigt einen vereinfachten Auszug aus dem geplanten Kl
 
 \subsection{Anbindung Cloud}
 
-In den funktionalen Anforderungen zum Basisszenario wurde festgelegt, dass Geschehnisse auf dem lokalen Bus (openHAB) an die Cloud gesendet werden müssen. Als Cloud-Plattform wurde Microsoft Azure bereits zu Beginn der Arbeit definiert. Damit die Daten von openHAB in die Cloud gelangen gibt es im Wesentlichen zwei Möglichkeiten: Entweder man entwickelt selbst ein Plugin für openHAB oder man verwendet das openHAB MQTT Persistence Plugin. MQTT ist ein Publish/Subscribe Protokoll und besonders gut für IOT Systeme mit langsamer oder instabiler Internetverbindung geeignet. Wir haben uns für die Variante mit MQTT entschieden. OpenHAB fungiert als MQTT-Client und kann so konfiguriert werden, dass Events auf dem Bus automatisch an einen MQTT-Broker gesendet werden, der von uns auf Microsoft Azure installiert wurde. Um die Daten zu verarbeiten muss ein MQTT-Client auf Microsoft Azure laufen und die Nachrichten vom Broker entgegennehmen. Danach steht uns frei, wie die Daten verarbeitet werden. Details zur Implementierung und technische Beschreibungen sind im Kapitel «Umsetzung» dieser Dokumentation zu finden. 
+In den funktionalen Anforderungen zum Basisszenario wurde festgelegt, dass Geschehnisse auf dem lokalen Bus (openHAB) an die Cloud gesendet werden müssen. Als Cloud-Plattform wurde Microsoft Azure bereits zu Beginn der Arbeit definiert. Damit die Daten von openHAB in die Cloud gelangen gibt es im Wesentlichen zwei Möglichkeiten: Entweder man entwickelt selbst ein Plugin für openHAB oder man verwendet das openHAB MQTT Persistence Plugin. MQTT ist ein Publish/Subscribe-Protokoll und besonders gut für IOT Systeme mit langsamer oder instabiler Internetverbindung geeignet. Wir haben uns für die Variante mit MQTT entschieden. OpenHAB fungiert als MQTT-Client und kann so konfiguriert werden, dass Events auf dem Bus automatisch an einen MQTT-Broker gesendet werden, der von uns auf Microsoft Azure installiert wurde. Um die Daten zu verarbeiten muss ein MQTT-Client auf Microsoft Azure laufen und die Nachrichten vom Broker entgegennehmen. Danach steht uns frei, wie die Daten verarbeitet werden. Details zur Implementierung und technische Beschreibungen sind im Kapitel «Umsetzung» dieser Dokumentation zu finden. 
 
 \subsubsection{MQTT Broker Evaluation}
 Für die Evaluation des Brokers haben wir eine List mit unseren Anforderungen erstellt: 
@@ -344,11 +342,11 @@ Zugriff auf diese Ressourcen haben nur authorisierte Personen die ein entspreche
 Auf den Storage kann ausser der Management-Oberfläche auch über ein Connection-String zugegriffen werden. Dieser String kann nur über die Management-Oberfläche eingesehen werden und ist daher sicher versteckt. Weiter könnte der Connection String aus dem Source-Code der Worker Role gelesen werden, da er dort für den Verbindungsaufbau zum Storage verwendet wird. Diese Worker Role und deren Source-Code befindet sich innerhalb der Cloud und ist somit auch gegen ein Eindringen gesichert. \\
 
 \subsubsection{Android App}
-Über das Android App kann das ganze System manipuliert werden. Daher stellt dies ein grosses Sicherheits-Risiko dar. Gesichtert wird das App durch Eingabe von Benutzerdaten, um auf die RESTful-API des openHAB zuzugreifen. \\
+Über die Android App kann das ganze System manipuliert werden. Daher stellt dies ein grosses Sicherheits-Risiko dar. Gesichtert wird die App durch Eingabe von Benutzerdaten, um auf das REST-API von openHAB zuzugreifen. \\
 Auch hier wird die Person, die das App verwendet zur Verantwortung gezogen, um das Smartphone durch ein sicheres Passwort zu schützen.
 
 \subsubsection{Systemaufbau mit Sensoren/Aktoren}
-Wenn sich die angreifende Person bereits im Haus befindet,hat sie die entsprechenden Alarme bereits ausgelöst und wurde durch die Webcam aufgenommen. \\
+Wenn sich die angreifende Person bereits im Haus befindet,hat sie die entsprechenden Alarm bereits ausgelöst und wurde durch die Webcam aufgenommen. \\
 Für dieses Szenario ist das grösste Risiko, dass die Person die Videoüberwachung bemerkt und aus diesem Grund das Raspberry Pi zerstört bzw. mitnimmt. Um die aufgezeichneten Daten zu sichern, werden die von der Kamera erzeugten Bilder über MQTT im Cloud-Storage abgelegt. Auch wenn das Raspberry Pi zerstört wird, sind die Bilder nun gesichert und können im Nachhinein vom Storage heruntergeladen werden.
 
 \subsubsection{HomeMatic Kommunikation}

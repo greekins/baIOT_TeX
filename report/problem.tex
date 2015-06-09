@@ -1,7 +1,7 @@
 \section{Problembeschreibung}
 
 \subsection{Motivation}
-Als SmartHome Beispielszenario soll ein System aufgesetzt werden, das einen grossen Bezug zur Realität hat. Es soll für aussenstehende Personen attraktiv und nachvollziehbar sein und einen Mehrwert mit sich bringen. In diesem Kapitel werden die funktionalen Anforderungen definiert und einige Fachbegriffe, sowie die Martksituation im Bereich SmartHome erklärt. Der Abschnitt mit den funktionalen Anforderungen gliedert sich in ein Basisszenario und einen Lösungsteil. Das Basisszenario befasst sich mit den grundlegenden Konzepten und Anforderungen, im Lösungsteil gehen wir auf die konkreten Anforderungen für unser Beispielszenario «Einbruchschutz» ein.
+Als SmartHome Beispielszenario soll ein System aufgesetzt werden, das einen grossen Bezug zur Realität hat. Es soll für aussenstehende Personen attraktiv und nachvollziehbar sein und einen Mehrwert mit sich bringen. In diesem Kapitel werden die funktionalen Anforderungen definiert und einige Fachbegriffe, sowie die Martksituation im Bereich Smart- Home erklärt. Der Abschnitt mit den funktionalen Anforderungen gliedert sich in ein Basisszenario und einen Lösungsteil. Das Basisszenario befasst sich mit den grundlegenden Konzepten und Anforderungen, im Lösungsteil gehen wir auf die konkreten Anforderungen für unser Beispielszenario «Einbruchschutz» ein.
 
 
 \subsection{Funktionale Anforderungen}
@@ -48,23 +48,21 @@ Alle Events und Commands, die auf dem Bus transportiert werden, können in der C
 Aufgrund von Events sollen je nach Zustand des Gesamtsystems vordefinierte Aktionen ausgelöst werden. Die Aktionen bestehen in der Regel aus Commands, um wiederum Aktoren zu steuern.
 
 \textbf{F05: Auf Zentrale zugreifen} \\
-Ein Client kann auf die Zentrale zugreifen, um den Status des Systems abzufragen und Commands an Aktoren zu schicken. Der Status des Systems kann sowohl Live-Daten von Sensoren, als auch Werte aus der Vergangenheit beinhalten.
+Ein Client kann auf die Zentrale zugreifen, um den Status des Systems abzufragen und Commands an Aktoren zu schicken.
 
 \subsubsection{Lösungsteil (Demo-System)}
 \label{sec:requirementsSolutionPart}
 
 \textbf{L01: Sicherheits-Status abfragen} \\
-Der Client soll den Status des Einbrecherschutzes abfragen können. \\
+Der Client soll den Status des Einbruchschutz abfragen können. \\
 Status «OK»:
 \begin{itemize}
 	\item Fenster ist geschlossen
-	\item Türe ist geschlossen
 	\item keine Bewegung detektiert
 \end{itemize}
 Status «NOK»:
 \begin{itemize}
 	\item Fenster ist offen
-	\item Türe ist offen
 	\item Bewegung detektiert
 \end{itemize}
 
@@ -77,13 +75,10 @@ Der Kontaktsensor hat permanent einen Status. Der Status ist entweder «offen» 
 \textbf{L04: Event Bewegungsmelder} \\
 Sobald der Bewegungsmelder eine Bewegung registriert, sendet dieser einen Event. Dieser wird nach interner Logik verarbeitet.
 
-\textbf{L05: Aktor: Lampe} \\
+\textbf{L05: Aktor Lampe} \\
 Der Aktor wird via Command angesteuert. Das Licht kann durch eine Regel (Zeit-Mechanismus zur Prävention) oder durch eine Aktion des Clients ein- bzw. abgeschaltet werden.
 
-\textbf{L06: Aktor: Funksteckdose} \\
-Die Funksteckdose kann ebenfalls vielseitig eingesetzt werden. Etwas abstrahiert betrachtet, kann jedes Gerät per Remote ein- bzw. ausgeschaltet werden. An dieser Funktsteckdose kann zum Beispiel eine Musikanlage oder ein Fernsehgerät eingeschaltet werden.
-
-\textbf{L07: NFC Sticker} \\
+\textbf{L06: NFC Sticker} \\
 Die NFC Stickers können sehr vielfältig eingesetzt werden und dienen in erster Linie zur Entlastung des User Interface. Generell wird durch Auflegen eines NFC-fähigen Smartphones (also ein Client) eine Aktion ausgeführt. Was diese Aktion genau beinhaltet, ist offen und könnte genauso gut direkt im User Interface benutzt werden. Beispielsweise könnte ein Command zum «Scharfstellen» des Sicherheitssystems auf den Bus gesendet werden.
 
 \subsection{Marktsituation}
@@ -102,4 +97,4 @@ Der Energieversorgungskonzern RWE bietet seit einigen Jahren ein nachrüstbares 
 Qivicon ist eine Allianz verschiedener Industriepartner und wurde von der Deutschen Telekom gegründet. Im Unterschied zum RWE Smarthome können also Komponenten aller beteiligten Hersteller miteinander vernetzt werden. Die Bedienung ist etwas einfacher, dafür sind die Konfigurationsmöglichkeiten weniger umfassend als beim RWE Smarthome.
 
 \textbf{openHAB} \\
-OpenHAB steht für \textit{open Home Automation Bus} und ist ein Open Source Projekt zur lokalen Vernetzung von IoT- und SmartHome Zubehör unterschiedlichster Hersteller. OpenHAB fungiert als Zentrale und kann auf beliebigen Windows, Linux oder Mac OS X Geräten installiert werden. Durch die modulare Architektur können jederzeit neue Technologien integriert werden. Eine eigene Modellierungssprache erlaubt nahezu unbegrenzte Konfigurationsmöglichkeiten anhand von Regeln und Abläufen. Allerdings erfordert dies ein wenig technisches Geschick. Basierend auf openHAB 1.x wurde das Eclipse Smarthome Projekt gegründet, welches ein Framework für SmartHome Software darstellt. OpenHAB 2 wiederum baut auf Eclipse Smarthome auf und soll die Konfiguration, insbesondere für technisch weniger versierte Benutzer, erleichtern.
+OpenHAB steht für \textit{open Home Automation Bus} und ist ein Open Source Projekt zur lokalen Vernetzung von IoT- und Smart-Home Zubehör unterschiedlichster Hersteller. OpenHAB fungiert als Zentrale und kann auf beliebigen Windows, Linux oder Mac OS X Geräten installiert werden. Durch die modulare Architektur können jederzeit neue Technologien integriert werden. Eine eigene Modellierungssprache erlaubt nahezu unbegrenzte Konfigurationsmöglichkeiten anhand von Regeln und Abläufen. Allerdings erfordert dies ein wenig technisches Geschick. Basierend auf openHAB 1.x wurde das Eclipse Smarthome Projekt gegründet, welches ein Framework für Smart-Home Software darstellt. OpenHAB 2 wiederum baut auf Eclipse Smarthome auf und soll die Konfiguration, insbesondere für technisch weniger versierte Benutzer, erleichtern.
