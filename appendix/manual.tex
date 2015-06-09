@@ -24,9 +24,11 @@ Für die Client-Library (M2Mqtt) muss das Zertifikat noch ins DER-Format konvert
 \pagebreak
 \section*{Android App - Hawk Eye}
 \label{sec:manualAndroidApp}
+Diese Android App bietet einen Zugang zum openHAB System. Dadurch können die Status der verschiedenen Sensoren und Aktoren abgefragt werden. Ebenfalls kann über ein Schalter die einzelnen Glühbirnen ein- oder ausgeschaltet werden. Nachfolgend werden alle Screens gezeigt und erklärt.
+
 \begin{figure}[htbp]
 	\begin{minipage}{0.6\textwidth} 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 
+Die Abbildung \ref{fig:screenshot_1} zeigt den Home-Screen. Durch Tippen auf «Einrichten» gelangt man zu den Einstellungen. Durch Tippen auf den Pfeil gelangt man zur Übersicht. Dies ist jedoch nur möglich, wenn die Verbindungseinstellungen korrekt sind und eine Verbindung zum openHAB hergestellt werden kann.
 	\end{minipage}
 	\hfill
 	\begin{minipage}{0.32\textwidth}
@@ -38,7 +40,8 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 
 \begin{figure}[htbp]
 	\begin{minipage}{0.6\textwidth} 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 
+Die Abbildung \ref{fig:screenshot_2} zeigt die Einstellungen. Dazu muss die openHAB-URL (IP-Adresse des Raspberry Pis mit Port 8080) und der Name der Sitemap eingetragen werden. Durch Tippen auf «Verbindung Testen» können die Eingaben geprüft und die Konnektivität getestet werden. \\ \\
+Des weiteren kann die Notification ein- und ausgeschaltet werden. Durch Tippen auf den Haken werden die Einstellungen gespeichert und die View geschlossen.
 	\end{minipage}
 	\hfill
 	\begin{minipage}{0.32\textwidth}
@@ -51,7 +54,10 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 
 \begin{figure}[htbp]
 	\begin{minipage}{0.6\textwidth} 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 
+Wenn die Verbindungseigenschaften korrekt sind, wird das Sitemap dargestellt (Abbildung \ref{fig:screenshot_7}). Da sind die drei Bereiche zu sehen. Durch Tippen auf das Element gelangt man in die Detailansicht des entsprechenden Bereiches. Je nach Status wird dabei ein anderes Icon gezeigt. Falls zum Beispiel die Lichter ausgeschaltet sind, ändert die Farbe des Icons auf grau (inaktiv). \\ \\
+In der Actionbar befindet sich rechts ein Zahnrad. Durch antippen dieses Symbols gelangt man zu den Einstellungen.
+\\ \\
+Um die Seite zu aktualisieren und die Status neu zu laden, kann mit dem Finger von oben nach unten gezogen werden (swipe).
 	\end{minipage}
 	\hfill
 	\begin{minipage}{0.32\textwidth}
@@ -61,9 +67,10 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 	\end{minipage}
 \end{figure}
 
+
 \begin{figure}[htbp]
 	\begin{minipage}{0.6\textwidth} 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 
+Diese Abbildung zeigt die Detailansicht des Bereiches «Fenster». Auch hier ändert sich jeweils das Icon, falls sich der Status des Items ändert (siehe Abbildung \ref{fig:screenshot_6}). Durch Tippen auf den Back-Button von Android, gelangt man zurück zur Übersicht.
 	\end{minipage}
 	\hfill
 	\begin{minipage}{0.32\textwidth}
@@ -75,7 +82,7 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 
 \begin{figure}[htbp]
 	\begin{minipage}{0.6\textwidth} 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 
+Das Icon ändert auf rot, wenn mindestens ein Fenster geöffnet wurde.
 	\end{minipage}
 	\hfill
 	\begin{minipage}{0.32\textwidth}
@@ -87,7 +94,7 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 
 \begin{figure}[htbp]
 	\begin{minipage}{0.6\textwidth} 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 
+In der Abbildung \ref{fig:screenshot_4} wird die Detailansicht des Bereiches «Licht». Die einzelnen Lampen können über den Schalter ein- und ausgeschaltet werden. Je nach dem ändert sich auch hier das Icon.
 	\end{minipage}
 	\hfill
 	\begin{minipage}{0.32\textwidth}
@@ -99,7 +106,9 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 
 \begin{figure}[htbp]
 	\begin{minipage}{0.6\textwidth} 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 
+Der Bereich Überwachung ist das Kernstück der App. Hier kann die Alarmbereitschaft ein- und ausgeschaltet werden. Wenn der Alarm ausgeschaltet ist, wird man weder benachrichtigt, noch ändern sich die Icons, wenn sich ein Status ändert.\\
+Weiter wird hier die Information gegeben, ob eine Bewegung detektiert wurde. \\ \\
+Im unteren Bereich ist die Kamera zu sehen. Durch Scrollen sieht man das ganze Bild. 
 	\end{minipage}
 	\hfill
 	\begin{minipage}{0.32\textwidth}
