@@ -3,19 +3,19 @@
 
 In diesem Hauptkapitel werden Details zur Umsetzung dokumentiert. Hier sind Konfigurationen, Technologiebeschreibungen, Code Listings und sonstige technische Erklärungen über openHAB, MQTT und die Android App zu finden.
 
-Zu Beginn geht es darum, die Hardware zu vernetzen und zu konfigurieren, so dass die einzlnen Komponenten im Zusammenspiel mit openHAB funktionieren. Dazu wird zu erst das Raspberry Pi konfiguriert und das openHAB Framework installiert. Als nächstes werden die beiden Zentralen von HomeMatic und Philips Hue in Betrieb genommen, sowie die Überwachungskamera. Jede Zentrale muss dabei die eigenen Geräte «anlernen», damit sie weiss, welche Sensoren und Aktoren existieren. Dazu bietet das HomeMatic ein Webinterface und von Philips gibt es ein Android bzw. iPhone App. \\
+Zu Beginn geht es darum, die Hardware zu vernetzen und zu konfigurieren, so dass die einzelnen Komponenten im Zusammenspiel mit openHAB funktionieren. Dazu wird zuerst das Raspberry Pi konfiguriert und das openHAB Framework installiert. Als nächstes werden die beiden Zentralen von HomeMatic und Philips Hue in Betrieb genommen, sowie die Überwachungskamera. Jede Zentrale muss dabei die eigenen Geräte «anlernen», damit sie weiss, welche Sensoren und Aktoren existieren. Dazu bietet das HomeMatic ein Webinterface und von Philips gibt es ein Android bzw. iPhone App. \\
 Damit die Zentralen mit openHAB kommunizieren können, werden sie zusammen mit dem Raspberry Pi über LAN-Kabel an den Router angeschlossen. Die Webcam kann über dessen Webinterface über WLAN eingebunden werden.
 
 Damit openHAB mit den Komponenten kommunizieren kann, werden die Zentralen im Config-File eingetragen und die einzelnen Sensoren und Aktoren als Item definiert.\\
-Um intelligente Abläufe zu definieren, bietet openHAB Regeln an. Über dise kann beispielsweise definiert werden, dass das Licht eingeschaltet wird, sobald das Fenster geöffnet wurde.
+Um intelligente Abläufe zu definieren, bietet openHAB Regeln an. Über diese kann beispielsweise definiert werden, dass das Licht eingeschaltet wird, sobald das Fenster geöffnet wird.
 
-Damit alle Events und auch die Bilder der Webcam gesichert werden können, wird MQTT (weiteres dazu im Kapitel \ref{sssec:mqtt} ab Seite \pageref{sssec:mqtt}) eingesetzt. Über dieses Protokoll werden die Daten an die Cloud gesendet und dort im Storage abgelegt. Dazu gibt es in der Azure Cloud ein Clouddienst mit einer Worker Role und einem MQTT-Broker. Der Broker nimmt die Messages entgegen, die Worker Role konsumiert diese und speichert sie ab.
+Damit alle Events und auch die Bilder der Webcam gesichert werden können, wird MQTT (weiteres dazu im Kapitel \ref{sssec:mqtt}, ab Seite \pageref{sssec:mqtt}) eingesetzt. Über dieses Protokoll werden die Daten an die Cloud gesendet und dort im Storage abgelegt. Dazu gibt es in der Azure Cloud ein Clouddienst mit einer Worker Role und einem MQTT-Broker. Der Broker nimmt die Messages entgegen, die Worker Role konsumiert diese und speichert sie ab.
 
 Zugänglich ist das System über ein selbst geschriebenes Android App. Über dieses App können die einzelnen Glühbirnen, der Fensterkontakt und der Bewegungsmelder über openHAB angesprochen werden.
 
 
 \subsection{openHAB Konfiguration}
-Items, Rules, Sitemaps und Persitence Strategies werden in openHAB in einer eigens dafür entwickelten DSL beschrieben. Für alle diese Bereiche werden Konfigurationsdateien im entsprechenden Unterverzeichnis des openHAB Konfigurationsordner abgelegt. Änderungen an den Konfigurationsdateien werden von openHAB zur Laufzeit sofort erkannt und berücksichtigt. Nebst den genannten Bereichen existiert noch eine globale Konfigurationsdatei um beispielsweise IP-Adressen für Bindings einzutragen. Folgende Dateien sind für diese Arbeit relevant:
+Items, Rules, Sitemaps und Persistence Strategies werden in openHAB in einer eigens dafür entwickelten DSL beschrieben. Für alle diese Bereiche werden Konfigurationsdateien im entsprechenden Unterverzeichnis des openHAB Konfigurationsordners abgelegt. Änderungen an den Konfigurationsdateien werden von openHAB zur Laufzeit sofort erkannt und berücksichtigt. Nebst den genannten Bereichen existiert eine globale Konfigurationsdatei, um beispielsweise IP-Adressen für Bindings einzutragen. Folgende Dateien sind für diese Arbeit relevant:
 
 \begin{itemize}
 	\item /configurations/openhab.cfg
@@ -26,7 +26,7 @@ Items, Rules, Sitemaps und Persitence Strategies werden in openHAB in einer eige
 	\item /configurations/transform/*.map
 \end{itemize}
 
-Anhand diesen Konfigurationen werden die User Cases modelliert.
+Anhand dieser Konfigurationen werden die User Cases modelliert.
 
 \subsubsection{Items}
 Die Definition der Items erfolgt in der Datei \lstinline!demo.items! und verwendet die openHAB Item DSL. Details zur Syntax sind auf dem openHAB Wiki (unvollständig) dokumentiert. Siehe \url{https://github.com/openhab/openhab/wiki/Explanation-of-items#syntax}.
@@ -84,12 +84,12 @@ Group:String:OR(true, false) Windows
 
 
 \textbf{Kontaktsensor, Zeile 38 - 42}\\
-Der Kontaktsensor ist ein Use Case der in openHAB sehr oft vorkommt. Deshalb existiert ein Item Type «Contact» mit den beiden möglichen Werten OPEN und CLOSED. Das Homematic Binding liefert aber die Werte \lstinline!true! oder \lstinline!false! und kann deshalb nicht an ein Contact Item gebunden werden. Als Alternative haben wir ein String Item verwendet und mit Hilfe einer Transformation-Map \lstinline!false! mit «geschlossen» und \lstinline!true! mit «offen» übersetzt. Das Icon <contact> kann trotzdem noch verwendet werden. Allerdings wird nun nicht mehr automatisch das Icon für das offene bzw. geschlossene Fenster angezeigt, da openHAB den Basisnamen des Icons mit dem State konkateniert. Wir haben dementsprechend die Icons umbenannt.\\ \\
+Der Kontaktsensor ist ein Use Case, der in openHAB sehr oft vorkommt. Deshalb existiert ein Item Type «Contact» mit den beiden möglichen Werten OPEN und CLOSED. Das Homematic Binding liefert aber die Werte \lstinline!true! oder \lstinline!false! und kann deshalb nicht an ein Contact Item gebunden werden. Als Alternative haben wir ein String Item verwendet und mit Hilfe einer Transformation-Map \lstinline!false! mit «geschlossen» und \lstinline!true! mit «offen» übersetzt. Das Icon <contact> kann trotzdem noch verwendet werden. Allerdings wird nun nicht mehr automatisch das Icon für das offene bzw. geschlossene Fenster angezeigt, da openHAB den Basisnamen des Icons mit dem State konkateniert. Wir haben dementsprechend die Icons umbenannt.\\ \\
 Auf der letzten Zeile werden die Bindingparameter für Homematic angegeben.\\ \lstinline!address=LEQ1469091! bezieht sich auf die Seriennummer des Kontaktsensors und\\ \lstinline!parameter=STATE! gibt an, welche Eigenschaft gebunden werden soll. \lstinline!channel=1! ist ein Defaultwert.
 
 \textbf{Bewegungsmelder, Zeile 11 - 21}\\
 Der Bewegungsmelder ist ebenfalls von Homematic und wird in den Bindingparametern gleich referenziert wie beim Kontaktsensor. Der Bindingparameter \lstinline!MOTION! erhält einen boolschen Wert und muss mit Hilfe der Map \lstinline!motion.map! in einen benutzerfreundlichen String transformiert werden. Der Parameter \lstinline!ERROR! dient dem Sabotageschutz.\\ \\
-Leider muss bei Homematic jeder Parameter einem eigenen Item zugeordnet werden. Deshalb haben wir ein drittes String-Item \lstinline!Motion_Summary! definiert, indem die Werte der beiden anderen Items zusammengefasst werden. 
+Leider muss bei Homematic jeder Parameter einem eigenen Item zugeordnet werden. Deshalb haben wir ein drittes String-Item \lstinline!Motion_Summary! definiert, in dem die Werte der beiden anderen Items zusammengefasst werden. 
 
 \textbf{Lichter, Zeile 24 - 32}\\
 Die Philips Hue Lampen können direkt an ein Switch Item gekoppelt werden. Im Bindingparameter muss lediglich die Nummer der Birne eingetragen werden. Der Status (\lstinline!ON/OFF!) wird mit der Transformation-Map in «Ein» bzw. «Aus» übersetzt.
@@ -102,7 +102,7 @@ Die restlichen Items sind Group Items. Sie werden für die Sitemap als Zusammenf
 
 
 \subsubsection{Sitemap}
-Mit einer Sitemap wird das User Interface beschrieben, um Items für verschiedene Frontends Verfügbar zu machen. In einer baumartigen Struktur können Items an sogenannte Widgets gebunden werden. Ein Widget ist einfach gesagt ein Listenelement im User Interface. Je nach Widget und zugehörigem Icon ist das Element neben Icon und Text auch noch mit Controls ausgestattet. Group-Widgets führen den Benutzer auf eine neue Seite. Die Navigation ist nach dem Drill-Down Prinzip aufgebaut. Unsere Sitemap Definition ist leicht an die Bedürfnisse der Android App angepasst. Weitere Informationen zur Android App befinden sich im Abschnitt \ref{sec:androidRealization} ab Seite \pageref{sec:androidRealization}.	
+Mit einer Sitemap wird das User Interface beschrieben, um Items für verschiedene Frontends verfügbar zu machen. In einer baumartigen Struktur können Items an sogenannte Widgets gebunden werden. Ein Widget ist einfach ausgedrückt ein Listenelement im User Interface. Je nach Widget und zugehörigem Icon ist das Element neben Icon und Text auch noch mit Controls ausgestattet. Group-Widgets führen den Benutzer auf eine neue Seite. Die Navigation ist nach dem Drill-Down Prinzip aufgebaut. Unsere Sitemap Definition ist leicht an die Bedürfnisse der Android App angepasst. Weitere Informationen zur Android App befinden sich im Abschnitt \ref{sec:androidRealization}, ab Seite \pageref{sec:androidRealization}.	
 
 \begin{lstlisting}[style=csharp, caption=demo.sitemap - User Interface Deklaration]
 sitemap demo label="Ihr Haus" {
@@ -206,23 +206,13 @@ end
 
 \pagebreak
 
-
-\subsection{Deploymentübersicht Cloud}
-
-\begin{figure}[H]
-	\centering
-		\includegraphics[scale=0.6]{report/img/deployment}
-	\caption{Deployment Diagramm}
-	\label{fig:deploymentAzure}
-\end{figure}
-
 \subsection{MQTT} \label{sssec:mqtt}
 MQTT steht für «Message Queue Telemetry Transport» und ist ein Nachrichten-Protokoll, das speziell für IoT-Anwendungen konzipiert wurde. Es setzt auf dem TCP/IP Stack auf und wird für den Nachrichtenaustausch zwischen verschiedenen, verteilten Maschinen verwendet. \\
-Das Protokoll wurde speziell für Systeme designt, die über wenig Speicherplatz und kleiner Netzwerk-Bandbreite verfügen, was bei IoT-Anwendungen meist der Fall ist.
+Das Protokoll wurde speziell für Systeme designt, die über wenig Speicherplatz und kleine Netzwerk-Bandbreite verfügen, was bei IoT-Anwendungen meist der Fall ist.
 
 \subsubsection{Funktionsweise}
-MQTT folgt dem Prinzip «Publish/Subscribe», sprich Clients können bestimmte Topics abonnieren. Wenn Messages auf dieses Topic gesendet werden, leitet der Broker diese an alle interessierten Clients weiter. \\
-In Bezug aufs Erstellen von Topics agiert der Broker passiv. Das bedeutet, Clients können sich auf beliebigen, selber defnierte, Topics registrieren. Wenn aber niemand auf dieses Topic publiziert, wird der Client nie eine Message erhalten.
+MQTT folgt dem Prinzip «Publish/Subscribe», das heisst Clients können bestimmte Topics abonnieren. Wenn Messages auf dieses Topic gesendet werden, leitet der Broker diese an alle interessierten Clients weiter. \\
+In Bezug auf das Erstellen von Topics agiert der Broker passiv. Das bedeutet, Clients können sich auf beliebige, selber definierte Topics registrieren. Wenn aber niemand auf dieses Topic publiziert, wird der Client nie eine Message erhalten.
 
 \begin{figure}[H]
 	\centering
@@ -231,18 +221,28 @@ In Bezug aufs Erstellen von Topics agiert der Broker passiv. Das bedeutet, Clien
 	\label{fig:funktionsweiseMQTT}
 \end{figure}
 
+Das Deploymentdiagramm (Abbildung \ref{fig:deploymentDiagram}) zeigt, wie der Cloudservice und das Smart-Home aufgebaut sind. Der Cloudservice umfasst eine virtuelle Maschine, eine Worker Role und den Storage. Auf der virtuellen Maschine läuft der Broker. Eine Worker Role hört auf ein Topic, erhält die Nachrichten vom Broker und speicher sie in den Cloudstorage.\\
+Auf dem Raspberry Pi werden über das MQTT-Binding des openHABs die Item-Updates an den Broker, in die Cloud, gesendet.
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[scale=0.6]{report/img/deployment}
+	\caption{Deployment Diagramm}
+	\label{fig:deploymentDiagram}
+\end{figure}
+
 \subsubsection{Broker}
 
 \textbf{Zertifizierungsstelle/Server-Zertifikat} \\
-Da die MQTT-Verbindung verschlüsselt werden soll, müssen verschiedene Zertifikate erstellt werden. Das erstellte Server-Zertifikat muss von einer CA (Certification Authority) signiert werden. Da ein gültiges Zertifikat nicht entgeltlich erworben werden möchte, wird eine eigene Zertifizierungsstelle erstellt. OpenSSl bringt da alle nötigen Mittel für die Erzeugung eines CAs mit. Dies bringt den Nachteil mit, dass Computersysteme diesem Zertifikat nicht automatisch trauen, daher muss dann das Zertifkat von Hand dem Certificate Store als «Trusted Root Certification Authority» hinzugefügt werden. \\ \\
+Da die MQTT-Verbindung verschlüsselt werden soll, müssen verschiedene Zertifikate erstellt werden. Das erstellte Server-Zertifikat muss von einer CA (Certification Authority) signiert werden. Da ein gültiges Zertifikat nicht entgeltlich erworben werden möchte, wird eine eigene Zertifizierungsstelle erstellt. OpenSSl bringt dafür alle nötigen Mittel für die Erzeugung eines CAs mit. Dies bringt den Nachteil mit, dass Computersysteme diesem Zertifikat nicht automatisch trauen. Daher muss das Zertifkat von Hand dem Certificate Store als «Trusted Root Certification Authority» hinzugefügt werden. \\ \\
 Nachdem die Zertifizierungsstelle erfolgreich generiert wurde, kann das Server Zertifikat erstellt werden. Anschliessend muss dieses Server Zertifikat von der eben erstellten Zertifizierungsstelle signiert werden.
 
 Da sowohl die Zertifizierungsstelle, als auch das Server-Zertifikat auf dem gleichen Computer erstellt werden, muss darauf geachtet werden, dass bei der Erzeugung unterschiedliche Parameter gesetzt werden. Die betroffenen Parameter sind zum Beispiel «Locality Name», «Organizational Name», «Organizational Unit» etc. Falls hier dieselben Werte eingetragen werden, schlägt die Signierung des Serverzertifikates fehl. \\
 Weiter muss beachtet werden, dass im Server-Zertifikat der «Common Name» dem FQDN (Fully Qualified Domain Name) des Servers entspricht, auf dem der MQTT-Broker laufen soll. Wird hier beispielsweise nur der Hostname eingetragen, schlägt die Überprüfung des Zertifikates fehl, da sich der CN vom FQDN des Servers unterscheidet.
 
 \textbf{Installation und Konfiguration des Brokers} \\
-Wie bereits im Lösugnskonzept erarbeitet, wird als MQTT-Broker «Mosquitto» eingesetzt. Der Broker kann als Binary installiert und über die Commandline gestartet werden.
-Nach der Standard-Installation muss der Broker Konfiguriert werden. Dazu wird das File «mosquitto.conf» bearbeitet.
+Wie bereits im Lösungskonzept erarbeitet, wird als MQTT-Broker «Mosquitto» eingesetzt. Der Broker kann als Binary installiert und über die Commandline gestartet werden.
+Nach der Standard-Installation muss der Broker konfiguriert werden. Dazu wird das File «mosquitto.conf» bearbeitet.
 \\Folgende Parameter müssen editiert werden:
 
 \begin{tabularx}{\textwidth}{XX}
@@ -267,19 +267,19 @@ Nach der Standard-Installation muss der Broker Konfiguriert werden. Dazu wird da
 			Diese Option definiert die zu verwendende TLS-Version. Für Openssl (Version 1.0.2) wird tlsv1 verwendet.
 		\\ \hline
 			password\_file \\ \path{C:\Program Files (x86)\mosquitto\passwords} &
-			Das Passwords-File beinhaltet die definierten Benutzernamen und Passwörter, um sich am Broker anzumelden. Durch setzen dieses Pfades wird dies automatisch vom Broker berücksichtigt.
+			Das Passwords-File beinhaltet die definierten Benutzernamen und Passwörter, um sich am Broker anzumelden. Durch Setzen dieses Pfades wird dies automatisch vom Broker berücksichtigt.
 		\\ \hline
 \end{tabularx}
 
-Um den Broker zu starten, muss in der Konsole (cmd.exe) in das Installationsverzeichnis (\path{C:\ProgramFiles(x86)\mosquitto\)} navigiert werden. Dort kann der Broker mit der angepassten Konfiguration gestartet werden. Damit in der Konsole Feedback gezeigt wird, wird der Broker im «Verbose-Modus» gestartet: \\
+Um den Broker zu starten, muss in der Konsole (cmd.exe) in das Installationsverzeichnis (\path{C:\ProgramFiles(x86)\mosquitto\)} navigiert werden. Dort kann der Broker mit der angepassten Konfiguration gestartet werden. Damit in der Konsole Feedback angezeigt wird, wird der Broker im «Verbose-Modus» gestartet: \\
 \lstinline!mosquitto -c mosquitto.conf -v! \\
 
 \subsubsection{openHAB MQTT Persistence (Publishing Client)}
 \label{sec:mqttPersistenceRealization}
-Im Lösungskonzept haben wir bereits erklärt, dass wir die Events auf dem openHAB Event Bus via MQTT an die Cloud übertragen wollen und dass es ein MQTT Plugin für openHAB gibt. Nachdem der Broker installiert wurde wollen wir nun unsere openHAB Items an den Broker senden. Dazu installieren wir das openHAB MQTT Persistence Plugin auf unserem Raspberry Pi: \\
+Im Lösungskonzept haben wir bereits erklärt, dass wir die Events auf dem openHAB Event Bus via MQTT an die Cloud übertragen wollen, und dass es ein MQTT Plugin für openHAB gibt. Nachdem der Broker installiert worden ist, wollen wir nun unsere openHAB Items an den Broker senden. Dazu installieren wir das openHAB MQTT Persistence Plugin auf unserem Raspberry Pi: \\
 \lstinline!apt-get install openhab-addon-persistence-mqtt!
 \\ \\
-Danach müssen wir in der openHAB Konfiguration (openhab.cfg) angeben, wie wir uns auf den Broker verbinden wollen:
+Danach müssen wir in der openHAB Konfiguration (openhab.cfg) angeben, wie wir uns mit dem Broker verbinden wollen:
 \begin{lstlisting}[style=csharp, caption=Auszug /configuration/openhab.cfg - MQTT Config]
 mqtt:mosquitto.url =  ssl://mqttbrokerba.cloudapp.net:8883
 mqtt:mosquitto.user=mosquitto
@@ -314,9 +314,9 @@ Damit erreichen wir, dass ein Item immer dann an den Broker gesendet wird, wenn 
 \subsubsection{Azure Worker Role (Subscribing Client)} \label{sssec:m2mqttClient}
 Wie die Abbildung \ref{fig:systemView} auf Seite \pageref{fig:systemView} (Systemübersicht) zeigt, befindet sich nebst dem Broker auch ein Client, in Form einer Worker Role in der Cloud. Die Worker Role abonniert alle Topics und persistiert die Messages im Table bzw. Blob-Storage.
 
-In der \lstinline!OnStart()!-Methode der Worke Role werden zu erst die Referenzen zum Table- und Blob-Storage erzeugt. \\
+In der \lstinline!OnStart()!-Methode der Worke Role werden zuerst die Referenzen zum Table- und Blob-Storage erzeugt. \\
 Danach wird die Verbindung zum MQTT-Broker hergestellt, die Topics definiert, die er abonnieren möchte und der QoS-Level gesetzt. \\
-Damit der Client benachrichtigt wird, wenn eine Message eintrifft, wird der Eventhandler \lstinline!client_MqttMsgPublishReceived()! definiert. Die Methode muss die gleichen Parameter entgegennehmen, wie die Delegate-Methode. Das ist einerseits der Sender (Object) und die Event-Argumente. Damit der Eventhandler beim Eintreffen einer Message aufgerufen wird, muss dieser auf dem Event registriert werden: \\ \lstinline!client.MqttMsgPublishReceived += client_MqttMsgPublishReceived;! 
+Damit der Client benachrichtigt wird, wenn eine Message eintrifft, wird der Eventhandler \lstinline!client_MqttMsgPublishReceived()! definiert. Die Methode muss die gleichen Parameter entgegennehmen, wie die Delegate-Methode. Das ist einerseits der Sender (Object) und andererseits die Event-Argumente. Damit der Eventhandler beim Eintreffen einer Message aufgerufen wird, muss dieser auf dem Event registriert werden: \\ \lstinline!client.MqttMsgPublishReceived += client_MqttMsgPublishReceived;! 
 
 \begin{lstlisting}[style=csharp, caption=WorkerRole.cs - MQTT Topic Subscribe]
 public override bool OnStart()
@@ -339,7 +339,7 @@ public override bool OnStart()
 }
 \end{lstlisting}
 
-Im Eventhandler wird dann schlussendlich die Logik zur Persistierung eingefügt. Wenn eine Message über das Topic «openhab/blob» empfangen wird, handelt es sich um eine Fotografie der Webcam. Dieses JPG-File wird als Byte-Array übermittelt und wird so auch im Blob-Storage abgelegt. \\
+Im Eventhandler wird dann die Logik zur Persistierung eingefügt. Wenn eine Message über das Topic «openhab/blob» empfangen wird, handelt es sich um eine Fotografie der Webcam. Dieses JPG-File wird als Byte-Array übermittelt und wird so auch im Blob-Storage abgelegt. \\
 Bei allen anderen Messages muss es sich um Text handeln, daher werden sie im Table-Storage abgelegt.
 
 \begin{lstlisting}[style=csharp, caption=WorkerRole.cs - EventHandler]
@@ -368,7 +368,7 @@ void client_MqttMsgPublishReceived(object sender,
 
 \textbf{Zertifikat} \\
 Da die Verbindung durch SSL/TLS mit einem Self-signed Zertifikat verschlüsselt wird, muss dieses Zertifikat dem Certificate Store des virtuellen Hosts als «Trusted Root Certification Authority» hinzugefügt werden. Dies muss vorgenommen werden, bevor die Worker Role versucht eine Verbindung zum Broker herzustellen. Ansonsten terminiert die Worker Role mit einer Exception, da sie das Zertifikat nicht akzeptiert. \\
-Da man zwischen Erzeugung des virtuellen Hosts und dem Start der Worker Role nicht auf die Maschine zugreifen kann, muss das Zertifikat programmatisch als Startup-Skript dem Store hinzugefügt werden. Für solche Aufgaben bietet Microsoft Azure die Möglichkeit Startup Tasks zu definieren. Dies wird in der ServiceDefinition vorgenommen, durch einfügen folgender Anweisung:
+Da man zwischen Erzeugung des virtuellen Hosts und dem Start der Worker Role nicht auf die Maschine zugreifen kann, muss das Zertifikat programmatisch als Startup-Skript dem Store hinzugefügt werden. Für solche Aufgaben bietet Microsoft Azure die Möglichkeit, Startup Tasks zu definieren. Dies wird in der ServiceDefinition vorgenommen, durch Einfügen folgender Anweisung:
 \begin{lstlisting}[style=csharp, caption=ServiceDefinition.csdef - Startup Task]
 <Startup>
 	<
@@ -383,7 +383,7 @@ Dieser Startup Task führt das Batchfile «startup.cmd» aus, welches das Zertif
 certutil -addstore root m2mqtt_ca.cer
 \end{lstlisting}
 
-Im Sequenzdiagram der Abbildung \ref{fig:sequenzMQTT} wird aufgezeigt, wie die MQTT-Nachrichten nachdem QoS 2 versendet werden.
+Im Sequenzdiagramm der Abbildung \ref{fig:sequenzMQTT} wird aufgezeigt, wie die MQTT-Nachrichten nach dem QoS 2 versendet werden.
 
 \begin{figure}[H]
 	\centering
@@ -394,14 +394,14 @@ Im Sequenzdiagram der Abbildung \ref{fig:sequenzMQTT} wird aufgezeigt, wie die M
 
 
 \subsubsection{openHAB MQTT Action}
-Normalerweise wird aufgrund unserer Konfiguration ein openHAB Item direkt via MQTT an die Cloud gesendet, sobald sich der Status des Items ändert (beschrieben in Abschnitt \ref{sec:mqttPersistenceRealization} auf Seite . Da unsere Überwachungskamera aber nicht durch ein openHAB Item repräsentiert wird, kann openHAB auch nichts davon an die Cloud schicken. Trotzdem möchten wir gerne einen Snapshot der Kamera an die Cloud senden, sobald der Alarm ausgelöst wurde (siehe Abbildung \ref{fig:sequenceAlarm} - Sequenzdiagramm Alarm auf Seite \pageref{fig:sequenceAlarm} im Lösungskonzept). \\
-Deshalb benutzen wir eine sogenannte openHAB Action zum Senden des Snapshots an den MQTT Broker. Die Action kann in der DSL zum beschreiben der Rules ähnlich wie ein statischer Methodenaufruf verwendet werden. Natürlich gibt es diese spezielle Action noch nicht im Standardumfang von openHAB, sondern wir mussten diese in Form eines Action-Plugins selbst programmieren.
+Normalerweise wird aufgrund unserer Konfiguration ein openHAB Item direkt via MQTT an die Cloud gesendet, sobald sich der Status des Items ändert (beschrieben in Abschnitt \ref{sec:mqttPersistenceRealization} auf Seite . Da unsere Überwachungskamera aber nicht durch ein openHAB Item repräsentiert wird, kann openHAB auch nichts davon an die Cloud schicken. Trotzdem möchten wir gerne einen Snapshot der Kamera an die Cloud senden, sobald der Alarm ausgelöst wird (siehe Abbildung \ref{fig:sequenceAlarm} - Sequenzdiagramm Alarm auf Seite \pageref{fig:sequenceAlarm} im Lösungskonzept). \\
+Deshalb benutzen wir eine sogenannte openHAB Action zum Senden des Snapshots an den MQTT Broker. Die Action kann in der DSL zum Beschreiben der Rules, ähnlich wie ein statischer Methodenaufruf, verwendet werden. Natürlich gibt es diese spezielle Action noch nicht im Standardumfang von openHAB, sondern wir mussten diese in Form eines Action-Plugins selbst programmieren.
 
 \textbf{Programmierung der MQTT Action}\\
 Zum Entwickeln von openHAB Plugins muss eine entsprechende Eclipse Umgebung eingerichtet werden. Dies sollte sich noch als der schwierigste Teil davon herausstellen. Eine Anleitung dazu findet man unter \url{https://github.com/openhab/openhab/wiki/IDE-Setup}. Bei uns hat nur die Variante mit «yoxos» funktioniert. Und auch bei dieser Anleitung mussten wir einige Tricks anwenden. Bei Schritt 8) musste die JDK Version in den Projekteinstellungen zunächst auf 1.6 zurückgestuft werden und vor Schritt 9) wieder auf Version 1.7. Beim Kompilieren werden alle openHAB Artifakte erstellt: OpenHAB selbst, alle Bindings, Actions und sonstige Plugins, sowie auch die Eclipse RCP's des openHAB Designers für alle Zielsysteme. 
 \\ \\
-Sobald Eclipse vollständig eingericht wurde kann ein Action Skeleton anhand eines Maven Archetypes generiert werden. Eine Anleitung dazu befindet sich im openHAB GitHub Wiki: \url{https://github.com/openhab/openhab/wiki/How-To-Implement-An-Action}. \\
-Die openHAB Runtime wird die Action-Aufrufe in den Rules später zur Laufzeit an die statischen Java-Methoden im Action-Plugin binden. Damit das später alles sauber funktioniert und auch die Dependency Injection von gewissen Service-Objekten gemacht werden kann müssen die Dateien OSGI-INF/action.xml und META-INF/MANIFEST.MF angepasst werden:
+Sobald Eclipse vollständig eingericht war, kann ein Action Skeleton anhand eines Maven Archetypes generiert werden. Eine Anleitung dazu befindet sich im openHAB GitHub Wiki: \url{https://github.com/openhab/openhab/wiki/How-To-Implement-An-Action}. \\
+Die openHAB Runtime wird die Action-Aufrufe in den Rules später zur Laufzeit an die statischen Java-Methoden im Action-Plugin binden. Damit das später alles sauber funktioniert und auch die Dependency Injection von gewissen Service-Objekten gemacht werden kann, müssen die Dateien OSGI-INF/action.xml und META-INF/MANIFEST.MF angepasst werden:
 
 \begin{lstlisting}[style=csharp, caption=OSGI-INF/action.xml]
 <?xml version="1.0" encoding="UTF-8"?>
@@ -454,10 +454,10 @@ Bundle-ActivationPolicy: lazy
 
 \end{lstlisting}
 
-Dank diesen Konfigurationen wird der gleiche MQTT-Service Injected, der auch im MQTT-Persistence Plugin eingesetzt wird und die statischen Java Methoden aus der Klasse org.openhab.action.mqtt.internal.Mqtt werden für die DSL sichtbar. Zudem stellt die openHAB Runtime der MQTT Action die zugehörigen Konfigurationen zur Verfügung, die in der globalen Konfigurationsdatei hinterlegt wurden (openhab.cfg).
+Dank diesen Konfigurationen wird der gleiche MQTT-Service Injected, der auch im MQTT-Persistence Plugin eingesetzt wird, und die statischen Java Methoden aus der Klasse org.openhab.action.mqtt.internal.Mqtt werden für die DSL sichtbar. Zudem stellt die openHAB Runtime der MQTT Action die zugehörigen Konfigurationen zur Verfügung, die in der globalen Konfigurationsdatei hinterlegt wurden (openhab.cfg).
 
 \textbf{Installation MQTT Action}\\
-Nachdem wir die MQTT Action programmiert hatten, mussten wir sie mit Hilfe von Eclipse als .jar Datei exportieren. Danach haben wir in der Konfigurationsdatei von openHAB (openhab.cfg) den Eintrag für die MQTT Action gemacht. Diese verweist auf den selben Broker, den wir auch für das Persitence Plugin benötigen.
+Nachdem wir die MQTT Action programmiert hatten, mussten wir sie mit Hilfe von Eclipse als .jar Datei exportieren. Danach haben wir in der Konfigurationsdatei von openHAB (openhab.cfg) den Eintrag für die MQTT Action gemacht. Diese verweist auf den selben Broker, den wir auch für das Persistence Plugin benötigen.
 
 
 \begin{lstlisting}[style=csharp, caption=openhab.cfg]
@@ -471,7 +471,7 @@ Die MQTT Action implementiert zwei Methoden: sendMQTTString(topic, message) und 
 
 \subsection{Android App}
 \label{sec:androidRealization}
-Im Lösungskonzept in Abschnitt \ref{sec:androidArchSolution} ab Seite \pageref{sec:androidArchSolution} haben wir bereits erklärt, wie die Architektur der App aussieht. In diesem Abschnitt gehen wir auf die eingesetzten Frameworks, wichtige Klassen und das User Interface Design ein.
+Im Lösungskonzept im Abschnitt \ref{sec:androidArchSolution}, ab Seite \pageref{sec:androidArchSolution}, haben wir bereits erklärt, wie die Architektur der App aussieht. In diesem Abschnitt gehen wir auf die eingesetzten Frameworks, wichtige Klassen und das User Interface Design ein.
 
 \subsubsection{Frameworks und Libraries}
 Für Android gibt es mittlerweile eine grosse Vielzahl an äusserst hilfreichen und robusten Frameworks und Libraries, die den Entwickleralltag enorm erleichtern. Manche der Frameworks haben einen starken Einfluss darauf, wie der Code strukturiert wird. Für das Verständnis des Codes ist es deshalb wichtig, sich mit ReactiveX, Retrofit und Butterknife vertraut zu machen. Folgende Liste beinhaltet alle Gradle Build Dependencies:
@@ -493,9 +493,9 @@ Für Android gibt es mittlerweile eine grosse Vielzahl an äusserst hilfreichen 
 
 
 \textbf{ReactiveX} \\
-Die Reactive Extension wurde usprünglich für .NET entwickelt und ist mittlerweile fester Bestandteil davon. Heute gibt es die Library auch für diverse andere Plattformen, darunter Java bzw. auch eine spezielle Version für Android. ReactiveX verwendet das Paradigma der reaktiven Programmierung und unterstützt den Programmierer beim Ausdrücken von komplizierten Datenflüssen. In der konventionellen, imperativen Programmierung herrscht das Pull-prinzip, sodass Änderungen an Daten aktiv geholt werden müssen. ReactiveX hingegen «pusht» neue Daten in die Konsumenten hinein. Dabei berücksichtigt ReactiveX auch viele Concurrency-aspekte automatisch.\\
+Die Reactive Extension wurde usprünglich für .NET entwickelt und ist mittlerweile fester Bestandteil davon. Heute gibt es die Library auch für diverse andere Plattformen, darunter Java bzw. auch eine spezielle Version für Android. ReactiveX verwendet das Paradigma der reaktiven Programmierung und unterstützt den Programmierer beim Ausdrücken von komplizierten Datenflüssen. In der konventionellen, imperativen Programmierung herrscht das Pull-Prinzip, sodass Änderungen an Daten aktiv geholt werden müssen. ReactiveX hingegen «pusht» neue Daten in die Konsumenten hinein. Dabei berücksichtigt ReactiveX auch viele Concurrency-Aspekte automatisch.\\
 
-Das Folgende (leicht vereinfachte) Beispiel stammt aus unserer App und demonstriert sehr gut die Vorteile von ReactiveX. Vom openHAB REST-API soll ein Item geladen werden, danach soll der boolsche Wert invertiert und wieder an das API zurückgesendet werden. Bevor der neue Status im User Interface angezeigt wird, wird der Status aus Konsistenzgründen noch einmal geladen:
+Das folgende (leicht vereinfachte) Beispiel stammt aus unserer App und demonstriert sehr gut die Vorteile von ReactiveX. Vom openHAB REST-API soll ein Item geladen werden, danach soll der boolsche Wert invertiert und wieder an das API zurückgesendet werden. Bevor der neue Status im User Interface angezeigt wird, wird der Status aus Konsistenzgründen noch einmal geladen:
 \pagebreak
 \begin{lstlisting}[style=csharp, label={lst:reactiveXSample}, caption=ReactiveX Beispiel]
 api.getItem("Alarm_active")
@@ -526,9 +526,9 @@ RestAdapter adapter = new RestAdapter.Builder()
 OpenHabApi api = adapter.create(OpenHabApi.class);
 \end{lstlisting}
 
-In Listing \ref{lst:retrofitCreation} auf Zeile 3 wird ein \lstinline!GsonConverter! übergeben. Dieser sorgt dafür, dass die JSON Response korrekt deserialisiert und auf den gewünschten POJO Typ gemappt wird. Dem \lstinline!gson!-Objekt selbst können noch sogenannte TypeAdapter hinzugefügt werden, um mehr Kontrolle beim Mapping zu haben.\\
+In Listing \ref{lst:retrofitCreation}, auf Zeile 3, wird ein \lstinline!GsonConverter! übergeben. Dieser sorgt dafür, dass die JSON Response korrekt deserialisiert und auf den gewünschten POJO Typ gemappt wird. Dem \lstinline!gson!-Objekt selbst können noch sogenannte TypeAdapter hinzugefügt werden, um mehr Kontrolle beim Mapping zu haben.\\
 \\ 
-Noch besser als das automatische Generieren der Service-Klassen ist an Retrofit der Support für ReactiveX. Wenn man asynchrone REST Calls machen möchte, würde man normalerweise einen Callback Handler übergeben, wie bereits beschrieben. Es gibt allerdings eine elegantere Variante. Sofern ReactiveX als Dependency im Projekt aufgelöst werden kann, ist es möglich, den Rückgabetyp der Methoden im Service-Interface mit \lstinline!Observable<T>! zu deklarieren. Anschliessend weiss Retrofit, dass die Methode asynchron und mit Hilfe von ReactiveX ausgeführt werden soll. Beim Aufruf der Methode erhält man also nicht direkt das POJO, sondern ein Observable, welches man subscriben kann. Sobald sich ein Subscriber anmeldet wird der Request ausgeführt und das Resultat an den Subscriber geschickt. Folgendes Service-Interface deklariert die Methoden, welche bereits aus dem ReactiveX Code-Beispiel in Listing \ref{lst:reactiveXSample} bekannt sind:
+Noch besser als das automatische Generieren der Service-Klassen ist an Retrofit der Support für ReactiveX. Wenn man asynchrone REST Calls machen möchte, würde man normalerweise einen Callback Handler übergeben, wie bereits beschrieben. Es gibt allerdings eine elegantere Variante. Sofern ReactiveX als Dependency im Projekt aufgelöst werden kann, ist es möglich, den Rückgabetyp der Methoden im Service-Interface mit \lstinline!Observable<T>! zu deklarieren. Anschliessend weiss Retrofit, dass die Methode asynchron und mit Hilfe von ReactiveX ausgeführt werden soll. Beim Aufruf der Methode erhält man also nicht direkt das POJO, sondern ein Observable, welches man subscriben kann. Sobald sich ein Subscriber anmeldet, wird der Request ausgeführt und das Resultat an den Subscriber geschickt. Folgendes Service-Interface deklariert die Methoden, welche bereits aus dem ReactiveX Code-Beispiel in Listing \ref{lst:reactiveXSample} bekannt sind:
 
 \begin{lstlisting}[style=csharp, label=lst:retrofitInterface, caption=OpenHabApi Service-Interface]
 public interface OpenHabApi {
@@ -543,13 +543,13 @@ public interface OpenHabApi {
 }
 \end{lstlisting}
 
-Dank dem Zusammenspiel von ReactiveX und Retrofit wird dem Programmierer ein gewaltiger Teil an Fleissarbeit abgenommen. Es kann schneller entwickelt werden, die möglichen Fehlerquellen werden reduziert und die Lesbarkeit bzw. Nachvollziehbarkeit verbessert sich.
+Dank dem Zusammenspiel von ReactiveX und Retrofit wird dem Programmierer ein gewaltiger Teil an Fleissarbeit abgenommen. Es kann schneller entwickelt werden, die möglichen Fehlerquellen werden reduziert, und die Lesbarkeit bzw. Nachvollziehbarkeit verbessert sich.
 
 
 \textbf{Butterknife} \\
-Butterknife ist eine nützliche kleine Library zur Dependency Injection von View Komponenten in Activities. Jede Activity besitzt in der Regel eine Root-View, die in einem Layout Resource File mit XML definiert wird. In diesen Layout Files befinden sich typischerweise weitere User Interface Elemente, wie Buttons, Input-Felder oder Bilder. Die Activity ist dazu gedacht, jene Elemente mit Code zu beleben, also Events zu behandeln, Texte zu aktualisieren und so weiter. Die Referenzen auf diese Elemente muss sich die Activity selbst beschaffen, indem sie die \lstinline!findViewById(int id)! Methode aufruft und das Element anschliessend einer lokalen- oder Instanzvariablen zuweist. Die Methode \lstinline!findViewById(int id)! hat den Rückgabetyp \lstinline!View!, deshalb müssen alle Element explizit gecastet werden.
+Butterknife ist eine nützliche kleine Library zur Dependency Injection von View Komponenten in Activities. Jede Activity besitzt in der Regel eine Root-View, die in einem Layout Resource File mit XML definiert wird. In diesen Layout Files befinden sich typischerweise weitere User Interface Elemente, wie Buttons, Input-Felder oder Bilder. Die Activity ist dazu gedacht, jene Elemente mit Code zu beleben, also Events zu behandeln, Texte zu aktualisieren und so weiter. Die Referenzen auf diese Elemente muss sich die Activity selbst beschaffen, indem sie die \lstinline!findViewById(int id)! Methode aufruft und das Element anschliessend einer lokalen Variable oder Instanzvariable zuweist. Die Methode \lstinline!findViewById(int id)! hat den Rückgabetyp \lstinline!View!, deshalb müssen alle Element explizit gecastet werden.
 
-Butterknife macht diese Tipparbeit überflüssig, indem die Elemente als Instanzvariablen deklariert und mit einer Annotation versehen werden:
+Butterknife macht diese Tipparbeit überflüssig, indem die Elemente als Instanzvariable deklariert und mit einer Annotation versehen werden:
 
 \begin{lstlisting}[style=csharp, label=lst:butterknifeSample1, caption=Butterknife Beispiel 1]
 public class SampleActivity extends Activity {
@@ -567,7 +567,7 @@ public class SampleActivity extends Activity {
 }
 \end{lstlisting}
 
-Ein Vorteil ergibt sich vorallem bei Activities mit vielen referenzierten User Interface Elementen. Butterknife erleichtert zudem das Behandeln von Events, indem Methoden ebenfalls mit einer Annotation versehen werden, anstatt dass die Activity ein Callback Interface implementieren muss bzw. anonyme Klassen verwendet werden:
+Ein Vorteil ergibt sich vor allem bei Activities mit vielen referenzierten User Interface Elementen. Butterknife erleichtert zudem das Behandeln von Events, indem Methoden ebenfalls mit einer Annotation versehen werden, anstatt dass die Activity ein Callback Interface implementieren muss bzw. anonyme Klassen verwendet werden:
 
 \begin{lstlisting}[style=csharp, label=lst:butterknifeSample2, caption=Butterknife Beispiel 2]
 @OnClick(R.id.button)
@@ -674,7 +674,7 @@ public class WidgetListModel {
 \end{lstlisting}
 
 \textbf{ch.hsr.baiot.openhab.app.adapter.WidgetListAdapter}\\
-Diese Klasse erbt vom Typ \lstinline!RecyclerView.Adapter! und verbindet eine Collection von Widgets mit einer \lstinline!RecyclerView!. Die RecyclerView fragt den Adapter nach der Anzahl von Elementen, lässt die Elemente erzeugen und sagt dem Adapter, dass er ein Element an das jeweilige Pendent in der Liste binden soll. Wenn sich die Liste im Adapter ändert, kann dar Adapter der RecyclerView mitteilen, inwiefern sich die Liste verändert hat. Die RecylcerView fragt den Adapter danach wieder entsprechend ab. Dieses Pattern wird in vielen User Interface Frameworks zum Anzeigen von Listen verwendet, so auch in Android. Die Klasse \lstinline!WidgetListAdapter! ist ein Subscriber des \lstinline!WidgetListModel!, wie bereits im Abschnitt zuvor beschrieben. Jedoch kennt der Adapter das ListModel nicht direkt, sondern betrachtet dieses nur als ReactiveX Observable. Abbildung \ref{fig:recylerViewClasses} zeigt die Abhängigkeiten zwischen den beteiligten Klassen:
+Diese Klasse erbt vom Typ \lstinline!RecyclerView.Adapter! und verbindet eine Collection von Widgets mit einer \lstinline!RecyclerView!. Die RecyclerView fragt den Adapter nach der Anzahl von Elementen, lässt die Elemente erzeugen und sagt dem Adapter, dass er ein Element an das jeweilige Pendent in der Liste binden soll. Wenn sich die Liste im Adapter ändert, kann der Adapter der RecyclerView mitteilen, inwiefern sich die Liste verändert hat. Die RecylcerView fragt den Adapter danach wieder entsprechend ab. Dieses Pattern wird in vielen User Interface Frameworks zum Anzeigen von Listen verwendet, so auch in Android. Die Klasse \lstinline!WidgetListAdapter! ist ein Subscriber des \lstinline!WidgetListModel!, wie bereits im Abschnitt zuvor beschrieben. Jedoch kennt der Adapter das ListModel nicht direkt, sondern betrachtet dieses nur als ReactiveX Observable. Abbildung \ref{fig:recylerViewClasses} zeigt die Abhängigkeiten zwischen den beteiligten Klassen:
 
 \begin{figure}[H]
 	\centering
@@ -684,7 +684,7 @@ Diese Klasse erbt vom Typ \lstinline!RecyclerView.Adapter! und verbindet eine Co
 \end{figure}
 
 \textbf{ch.hsr.baiot.openhab.app.widget.*}\\
-Die User Interface Elemente, die in der RecyclerView als Listeneinträge dargestellt werden, haben pro «Typ» jeweils ein eigenes XML Layout Resource File. Das Layout wird danach vom Android OS instanziiert und einem sogenannten \lstinline!ViewHolder! zugewiesen. ViewHolder sind jene Objekte, die zwischen RecyclerView und Adapter ausgetauscht werden (siehe Abbildung \ref{fig:recylerViewClasses}). ViewHolder Objekte referenzieren die Layoutinstanz und werden im Adapter erzeugt. Das Einsetzen der Daten geschieht auf Anfrage der RecyclerView im Adapter und nennt man «Binding». Im Package \lstinline!ch.hsr.baiot.openhab.app.widget! befinden sich Subklassen von ViewHolder (\lstinline!Widget*.java!). Die Subklassen werden benötigt, damit unterschiedliche Arten von Listeneinträgen in der RecyclerView dargestellt werden können. Beispielsweise solche mit Icon und Text, Detailtext oder solche mit einem Schalter und so weiter. 
+Die User Interface Elemente, die in der RecyclerView als Listeneinträge dargestellt werden, haben pro «Typ» jeweils ein eigenes XML Layout Resource File. Das Layout wird danach vom Android OS instanziiert und einem sogenannten \lstinline!ViewHolder! zugewiesen. ViewHolder sind jene Objekte, die zwischen RecyclerView und Adapter ausgetauscht werden (siehe Abbildung \ref{fig:recylerViewClasses}). ViewHolder Objekte referenzieren die Layoutinstanz und werden im Adapter erzeugt. Das Einsetzen der Daten geschieht auf Anfrage der RecyclerView im Adapter und nennt sich «Binding». Im Package \lstinline!ch.hsr.baiot.openhab.app.widget! befinden sich Subklassen von ViewHolder (\lstinline!Widget*.java!). Die Subklassen werden benötigt, damit unterschiedliche Arten von Listeneinträgen in der RecyclerView dargestellt werden können. Beispielsweise solche mit Icon und Text, Detailtext oder solche mit einem Schalter und so weiter. 
 
 \begin{lstlisting}[style=csharp, label=lst:widgetLayoutSample, caption={Layout mit Icon, Text und Detailtext}]
 <?xml version="1.0" encoding="utf-8"?>
@@ -729,8 +729,8 @@ Die User Interface Elemente, die in der RecyclerView als Listeneinträge dargest
 \end{lstlisting}
 
 \textbf{ch.hsr.baiot.openhab.app.activity.PageActivity}\\
-Die wichtigste Activity in unserer App ist die \lstinline!PageActivity!. Sie stellt jeweils eine Page einer Sitemap dar. Für jede Hierarchiestufe in der Sitemap kommt eine neue PageActivity auf den Android Activity Stack. Die PageActivity besitzt unter anderem eine \lstinline!RecyclerView!, einen \lstinline!WidgetListAdapter! und ein \lstinline!WidgetListModel!. Mit Hilfe der Klassen aus dem SDK wird die Page via REST-API geladen und die Widgets der Page an das WidgetListModel übergeben. Das WidgetListModel erkennt die Veränderung an der Liste von Widgets (zu Beginn war diese leer) und benachrichtigt die Subscriber über die Veränderungen. Der WidgetListAdapter ist solch ein Subscriber, wodurch die Widgets letztlich in die RecyclerView gelangen. Die PageActivity koordiniert also das Zusammenspiel dieser Komponenten. Das mag etwas komplex erscheinen, jedoch ist somit eine hohe Kohäsion und eine geringe Kopplung erreicht und der Code in den einzelnen Klassen ist leicht nachzuvollziehen. In der offiziellen openHAB App für Android sieht man was passiert, wenn versucht wird die gleiche Aufgabe mit nur einer Klasse zu lösen. Das Ergebnis ist eine gigantische Klasse mit Methoden, die zweihundert Zeilen gerne überschreiten.\\ \\
-Wie schon erwähnt lädt die PageActivity initial die gewünschte Page. Anschliessend soll der openHAB Server die App informieren, sobald sich etwas auf dieser Page verändert hat. Dazu verwendet die PageActivity den \lstinline!LongPollingSocketClient! aus unserem SDK. Durch einen Bug von openHAB ist die Response des Long-Polling Requests oftmals leer, sodass die Page konventionell aktualisiert werden muss. Wenn der Long-Polling Request ein Timeout überschreitet, ohne eine Response erhalten zu haben, passiert dasselbe.
+Die wichtigste Activity in unserer App ist die \lstinline!PageActivity!. Sie stellt jeweils eine Page einer Sitemap dar. Für jede Hierarchiestufe in der Sitemap kommt eine neue PageActivity auf den Android Activity Stack. Die PageActivity besitzt unter anderem eine \lstinline!RecyclerView!, einen \lstinline!WidgetListAdapter! und ein \lstinline!WidgetListModel!. Mit Hilfe der Klassen aus dem SDK wird die Page via REST-API geladen und die Widgets der Page an das WidgetListModel übergeben. Das WidgetListModel erkennt die Veränderung an der Liste von Widgets (zu Beginn war diese leer) und benachrichtigt die Subscriber über die Veränderungen. Der WidgetListAdapter ist ein solcher Subscriber, wodurch die Widgets letztlich in die RecyclerView gelangen. Die PageActivity koordiniert also das Zusammenspiel dieser Komponenten. Das mag etwas komplex erscheinen, jedoch ist somit eine hohe Kohäsion und eine geringe Kopplung erreicht, und der Code in den einzelnen Klassen ist leicht nachzuvollziehen. In der offiziellen openHAB App für Android sieht man was passiert, wenn versucht wird, die gleiche Aufgabe mit nur einer Klasse zu lösen. Das Ergebnis ist eine gigantische Klasse mit Methoden, die zweihundert Zeilen gerne überschreiten.\\ \\
+Wie schon erwähnt, lädt die PageActivity initial die gewünschte Page. Anschliessend soll der openHAB Server die App informieren, sobald sich etwas auf dieser Page verändert hat. Dazu verwendet die PageActivity den \lstinline!LongPollingSocketClient! aus unserem SDK. Durch einen Bug von openHAB ist die Response des Long-Polling Requests oftmals leer, sodass die Page konventionell aktualisiert werden muss. Wenn der Long-Polling Request ein Timeout überschreitet, ohne eine Response erhalten zu haben, passiert dasselbe.
 
 \begin{figure}[H]
 	\centering
@@ -742,7 +742,7 @@ Wie schon erwähnt lädt die PageActivity initial die gewünschte Page. Anschlie
 In Abbildung \ref{fig:pageActivityWorkflow} wird der Ablauf beim Laden anhand eines Flussdiagramms vereinfacht aufgezeigt. In dieser Darstellung ist nicht ersichtlich, wie die PageActivity den Ablauf bei Fehlern oder beim Pausieren (im Sinne des Android Activity Lifecycle) unterbricht.
 
 \subsubsection{Material Design}
-Das App wurde nach den Prinzipien des Material Designs gestaltet. Google bietet dazu Guidelines an: \url{https://www.google.com/design/spec/material-design/introduction.html}. Insbesondere haben wir versucht die strengen Rastervorgaben mithilfe von Margins und Paddings einzuhalten, damit für das Auge ein harmonischer Eindruck entsteht. Alle verwendeten Farben stammen aus den offiziellen Material Design Farbpaletten.
+Das App wurde nach den Prinzipien des Material Designs gestaltet. Google bietet dazu Guidelines an: \url{https://www.google.com/design/spec/material-design/introduction.html}. Insbesondere haben wir versucht, die strengen Rastervorgaben mit Hilfe von Margins und Paddings einzuhalten, damit für das Auge ein harmonischer Eindruck entsteht. Alle verwendeten Farben stammen aus den offiziellen Material Design Farbpaletten.
 
 \begin{itemize}
 	\item Primary Color: Indigo 500 (\lstinline!#3F51B5!)
@@ -750,18 +750,18 @@ Das App wurde nach den Prinzipien des Material Designs gestaltet. Google bietet 
 	\item Accent Color: Cyan 500 (\lstinline!#00BCD4!)
 \end{itemize}
 
-Für die Darstellung unserer verschiedenen Komponenten wurden Card-Views eingesetzt. Cards werden verwendet, um einzelne Bereiche abzugrenzen. Sie dienen als Eintrittspunkt für weitere Informationen. In unserem Fall gibt es folgende Bereiche: Fenster, Lichter und Überwachung. Jede dieser Bereiche enthalten detaillierte Informationen und speziefische Aktionen, die ausgeführt werden können. Zum Beispiel beinhaltet der Bereich Überwachung die Information, ob der Bewegungsmelder ausschlägt oder das Bild der Überwachungskamera kann betrachtet werden. Weiter kann der Alarm ein- bzw. ausgeschaltet werden.
+Für die Darstellung unserer verschiedenen Komponenten wurden Card-Views eingesetzt. Cards werden verwendet, um einzelne Bereiche abzugrenzen. Sie dienen als Eintrittspunkt für weitere Informationen. In unserem Fall gibt es folgende Bereiche: Fenster, Lichter und Überwachung. Jeder dieser Bereiche enthält detaillierte Informationen und spezifische Aktionen, die ausgeführt werden können. Zum Beispiel beinhaltet der Bereich Überwachung die Information, ob der Bewegungsmelder ausschlägt, oder das Bild der Überwachungskamera kann betrachtet werden. Weiter kann der Alarm ein- bzw. ausgeschaltet werden.
 
-Innerhalb dieser Cards wird eine List-View eingesetzt. Sie dient dazu, Elemente in Listen form übersichtlich darzustellen. In unserem Fall werden die einzelnen Elemente durch Trennstriche abgegrenzt.
+Innerhalb dieser Cards wird eine List-View eingesetzt. Sie dient dazu, Elemente in Listenform übersichtlich darzustellen. In unserem Fall werden die einzelnen Elemente durch Trennstriche abgegrenzt.
 
 Die einzelnen Screens sind im Anhang \ref{sec:manualAndroidApp}, in der Benutzeranleitung der App zu finden.
 
 \subsection{Push-Notifications}
 \label{sec:notificationRealization}
-Der Mobile-Client wird durch Push-Notifications benachrichtig, sobald der Alarm ausgelöst wird. Umgesetzt wird dies mithilfe des Google Cloud Messaging Dienstes.
+Der Mobile-Client wird durch Push-Notifications benachrichtigt, sobald der Alarm ausgelöst wird. Umgesetzt wird dies mit Hilfe des Google Cloud Messaging Dienstes.
 
 \subsubsection{Cloud}
-Um den GCM-Dienst nutzen zu können, muss zu erst in der Google Developer Console (\url{https://console.developers.google.com}) ein Projekt erstellt werden mit einer Cloud-Messaging-API. Für dieses API kann ein Schlüssel erzeugt werden, der für das Versenden der Notification über das neu erstellte API benötigt wird.
+Um den GCM-Dienst nutzen zu können, muss zuerst in der Google Developer Console (\url{https://console.developers.google.com}) ein Projekt erstellt werden mit einer Cloud-Messaging-API. Für dieses API kann ein Schlüssel erzeugt werden, der für das Versenden der Notification über das neu erstellte API benötigt wird.
 
 Ausgelöst wird der ganze Vorgang durch die MQTT-Nachricht «alarm\_activated». Die Worker Role nimmt diese Nachricht entgegen und erzeugt eine Notification-Message:
 
@@ -774,7 +774,7 @@ Ausgelöst wird der ganze Vorgang durch die MQTT-Nachricht «alarm\_activated».
 }
 \end{lstlisting}
 
-Die Registration-Id bezeichnet den Client, der die Message erhalten soll. Dazu müssen sich die Clients zuvor bei GCM registrieren und erhalten dann die Id. Diese Message muss also für jeden Client einzeln über einen HTTP-Post gesendet werden. GCM weiss anhand des Id-Strings an welche Android-Clients er die Message weiterleiten soll.
+Die Registration-Id bezeichnet den Client, der die Message erhalten soll. Dazu müssen sich die Clients zuvor bei GCM registrieren und erhalten dann die Id. Diese Message muss also für jeden Client einzeln über einen HTTP-Post gesendet werden. GCM weiss anhand des Id-Strings, an welche Android-Clients er die Message weiterleiten soll.
 
 Folgende Grafik stellt den Registrations-Vorgang dar:
 \begin{figure}[H]
@@ -784,7 +784,7 @@ Folgende Grafik stellt den Registrations-Vorgang dar:
 	\label{fig:notification}
 \end{figure}
 
-Die nachfolgende Grafik (Abbildung \ref{fig:sequenzNotification}) zeigt auf, wie anhand der MQTT-Message die Notification ausgelöst wird. OpenHAB bemerkt eine Statusänderung eines Items und weiss anhand der Persistency Konfiguration, dass das Item via MQTT an den Broker geschickt werden soll (näheres dazu im Abschnitt \ref{sec:mqttPersistenceRealization} auf Seite \pageref{sec:mqttPersistenceRealization}). Die Worker Role empfängt die Message und entscheidet aufgrund deren Inhalt, ob eine Notification gesendet werden muss. Sollte dies der Fall sein, wird eine Push-Notification beim GCM-Dienst ausgelöst.
+Die nachfolgende Grafik (Abbildung \ref{fig:sequenzNotification}) zeigt auf, wie anhand der MQTT-Message die Notification ausgelöst wird. OpenHAB bemerkt eine Statusänderung eines Items und weiss anhand der Persistency Konfiguration, dass das Item via MQTT an den Broker geschickt werden soll (Näheres dazu im Abschnitt \ref{sec:mqttPersistenceRealization} auf Seite \pageref{sec:mqttPersistenceRealization}). Die Worker Role empfängt die Message und entscheidet aufgrund deren Inhalt, ob eine Notification gesendet werden muss. Sollte dies der Fall sein, wird eine Push-Notification beim GCM-Dienst ausgelöst.
 
 \begin{figure}[H]
 	\centering
@@ -794,7 +794,7 @@ Die nachfolgende Grafik (Abbildung \ref{fig:sequenzNotification}) zeigt auf, wie
 \end{figure}
 
 \subsubsection{Android-Client}
-Wie bereits erklärt benötigt die Worker Role eine Registration-Id um das Android Phone referenzieren zu können. Die Registration-Id ist an ein GCM Projekt gekoppelt und wird in der Android App mit Hilfe des Google PlayServices SDK beim GCM-Dienst angefordert. Die Registration-Id muss dann in eigener Verantwortung an die Worker Role übertragen und geheim gehalten werden. Um eine Nachricht zu erhalten muss ein Android BroadcastReceiver im App-Projekt vorhanden sein, der die Nachricht entgegennimmt und zur Verarbeitung an einen IntentService weitergibt. Dort wird das Notification UI-Element (Dialog am oberen Bildschirmrand) erzeugt und angezeigt.
+Wie bereits erklärt, benötigt die Worker Role eine Registration-Id, um das Android Phone referenzieren zu können. Die Registration-Id ist an ein GCM Projekt gekoppelt und wird in der Android App mit Hilfe des Google PlayServices SDK beim GCM-Dienst angefordert. Die Registration-Id muss dann in eigener Verantwortung an die Worker Role übertragen und geheim gehalten werden. Um eine Nachricht zu erhalten muss ein Android BroadcastReceiver im App-Projekt vorhanden sein, der die Nachricht entgegennimmt und zur Verarbeitung an einen IntentService weitergibt. Dort wird das Notification UI-Element (Dialog am oberen Bildschirmrand) erzeugt und angezeigt.
 
 \subsection{Sicherheit}
 Aus technischer Sicht können folgende Massnahmen getroffen werden, um die im Lösungskonzept beschriebenen Schwachstellen zu sichern:
@@ -805,27 +805,27 @@ Aus technischer Sicht können folgende Massnahmen getroffen werden, um die im L�
 \end{itemize}
 
 \subsubsection{Verschlüsselung MQTT-Verbindung}
-Die Verbindung zum MQTT-Broker wird durch SSL/TLS Verschlüsselt. Dazu wird ein Self-signed Zertifikat eingesetzt. Wie dieses Zertifikat erzeugt wird, ist aus dem Anhang \ref{ch:manual} zu entnehmen. \\
+Die Verbindung zum MQTT-Broker wird durch SSL/TLS verschlüsselt. Dazu wird ein Self-signed Zertifikat eingesetzt. Wie dieses Zertifikat erzeugt wird, ist aus dem Anhang \ref{ch:manual} zu entnehmen. \\
 Die jeweilige Implementierung der TLS-Verbindung wird im Kapitel \ref{sssec:mqtt} auf Seite \pageref{sssec:mqtt} erläutert.
 
 \subsubsection{Konfiguration MQTT-Broker}
-Am Broker sollen sich nur authentifizierte und autorisierte Clients anmelden können. Dazu bietet der MQTT-Standard die Möglichkeit ein Password-File zu erzeugen. In dieses File wird der Benutzername und das zugehörige Passwort eingetragen, mit dem sich die Clients anmelden können. Nur wenn diese Angaben übereinstimmen, kann eine Verbindung aufgebaut werden. \\
-Mosquitto bringt ein Tool mit, zur Erzeugung und Verschlüsselung dieses Files. Über die Konsole wird das Skript aufgerufen und die Benutzerangaben können als Parameter übergeben werden:
+Am Broker sollen sich nur authentifizierte und autorisierte Clients anmelden können. Dazu bietet der MQTT-Standard die Möglichkeit, ein Password-File zu erzeugen. In dieses File wird der Benutzername und das zugehörige Passwort eingetragen, mit dem sich die Clients anmelden können. Nur wenn diese Angaben übereinstimmen, kann eine Verbindung aufgebaut werden. \\
+Mosquitto bringt ein Tool mit zur Erzeugung und Verschlüsselung dieses Files. Über die Konsole wird das Skript aufgerufen, und die Benutzerangaben können als Parameter übergeben werden:
 \begin{lstlisting}[style=csharp, caption=mosquitto\_passwd.exe - generate password-file]
 > mosquitto_passwd -c passwordFile
 > mosquitto_passwd -b passwordFile username password
 \end{lstlisting}
-Wie sich die Clients gegenüber dem Broker authentifizieren, ist im Abschnitt \ref{sec:mqttPersistenceRealization} auf Seite \pageref{sec:mqttPersistenceRealization} (openHAB Client) und im Abschnitt \ref{sssec:m2mqttClient} auf Seite \pageref{sssec:m2mqttClient} (Worker Role Client) ersichtlich.
+Wie sich die Clients gegenüber dem Broker authentifizieren, ist im Abschnitt \ref{sec:mqttPersistenceRealization}, auf Seite \pageref{sec:mqttPersistenceRealization} (openHAB Client), und im Abschnitt \ref{sssec:m2mqttClient}, auf Seite \pageref{sssec:m2mqttClient} (Worker Role Client), ersichtlich.
 
 \subsubsection{Verschlüsselung WLAN}
 Über das WLAN kann man ohne Authentifizierung auf das openHAB zugreifen. Um unautorisierten Zugriff zu verhindern, wird das WLAN mit dem Sicherheitsstandard WPA2 verschlüsselt. Die Kommunikation wird also über den symmetrischen AES (Advanced Encryption Standard) Algorithmus verschlüsselt. Da es sich um eine symmetrische Verschlüsselung handelt, muss jeder Client ein PSK (Pre Shared Key) besitzen, der jeweils beim Verbindungsaufbau eingegeben werden muss.
 
 \subsection{Problematik Systemaufbau}
 In diesem Systemaufbau gibt es aufgrund der Infrastruktur der HSR einige Probleme, die es in einem richtigen Szenario nicht geben würde. \\
-Da die Komponenten nicht in die Infrastruktur der Schule integriert werden durften, musste auf ein eigenes, lokales Netzwerk zurückgegriffen werden. Dabei handelt es sich um ein unabhängiges Netzwerk, auf das von extern nicht zugegriffen werden kann. \\
-Dies stellt einige Herausforderungen an die Erreichbarkeit unseres System. Einerseits die Konnektivität mit der Cloud und andererseits das Erreichen von openHAB durch unseren Android Client. \\
+Da die Komponenten nicht in die Infrastruktur der Schule integriert werden durften, musste auf ein eigenes, lokales Netzwerk zurückgegriffen werden. Dabei handelt es sich um ein unabhängiges Netzwerk, auf das von externer Seite nicht zugegriffen werden kann. \\
+Dies stellt einige Herausforderungen an die Erreichbarkeit unseres Systems. Einerseits die Konnektivität mit der Cloud und andererseits das Erreichen von openHAB durch unseren Android Client. \\
 Durch das Anbinden des Raspberry Pi an das lokale und das HSR-Netzwerk wird die Erreichbarkeit der Cloud gewährleistet. Es sind also zwei Network-Interfaces konfiguriert. Eines für das lokale und eines für das HSR Netzwerk. Damit die MQTT-Nachrichten an das richtige Interface gesendet wird, muss die Default Route auf das HSR-Interface (eth0) gesetzt werden: \lstinline!ip route add default dev eth0!. \\\\
-Da sich das Raspberry Pi jedoch nicht in der DMZ befindet, besteht keine Möglichkeit die REST-Schnittstelle von openHAB von extern zu erreichen. Aus diesem Grundmuss sich der Android Client zwingend im lokalen Netz befinden. \\
+Da sich das Raspberry Pi jedoch nicht in der DMZ befindet, besteht keine Möglichkeit, die REST-Schnittstelle von openHAB von extern zu erreichen. Aus diesem Grund muss sich der Android Client zwingend im lokalen Netz befinden. \\
 Aufgrund dieser Tatsache ist der Client nicht für Notifications erreichbar. Für Demonstrations-Zwecke muss zwischen dem HSR und dem lokalen Netzwerk gewechselt werden, um die Notifications zu erhalten.
 
 
