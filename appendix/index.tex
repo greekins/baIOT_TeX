@@ -6,7 +6,9 @@
 
 \input{appendix/abbreviations}
 
-\includepdf[pages=-, pagecommand={},
+\addtocounter{chapter}{1}
+\addcontentsline{toc}{chapter}{\protect\numberline{\thechapter} Aufgabenstellung}
+\includepdf[pages=-, pagecommand={}, addtotoc={82, section, 1, Aufgabenstellung, aufgabenstellung},
 clip,scale=0.8, trim=1.7cm 2cm 1.7cm 3cm]{appendix/aufgabenstellung}
 
 \input{appendix/manual}
