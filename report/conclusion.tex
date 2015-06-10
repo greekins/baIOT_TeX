@@ -1,12 +1,17 @@
-\section{Schlusswort und Ergebnisse}
+\section{Zusammenfassung und Ergebnisse}
 
-Diese Bachelorarbeit über das Thema «Internet of Things mit openHAB und Microsoft Azure» basiert auf unserer Studienarbeit, in der wir uns intensiv mit der Thematik auseinandergesetzt haben. Der Fokus lag in der Vorarbeit jedoch viel stärker auf der Cloud. Die Integration von echten Things in Form von Hardware wurde dabei vernachlässigt und durch virtuelle Aktoren ersetzt. Diese Lücke motivierte uns, das Thema für die Bachelorarbeit zu vertiefen.\\ \\
-Schon in der Studienarbeit wurde uns klar, wie schwierig es ist, eine Architektur zu entwerfen und vorherzusehen wohin sich ein Internet of Things entwickeln kann. Das Internet of Things ist nichts, was von Technologie-Riesen minutiös geplant und danach der Masse aufgezwängt werden kann. Uns wurde zunehmend bewusst, dass sich dieses Gebiet selbst entfalten muss und dass es dort am besten gelingen würde, wo die Nähe zu den zukünftigen Nutzern vorhanden ist, nämlich in den privaten Haushalten.\\ \\
-Mit dieser Erkenntnis im Gepäck gestalteten wir unser Szenario Einbruchschutz, das uns als Leitfaden diente. Wir wollten etwas entwickeln, das die richtige Balance zwischen Spielerei und Praxisnutzen besitzt. Es sollte erschwinglich, erweiterbar und möglichst realitätsnah werden. Die Analyse des Marktes und von bestehenden Systemen wie das RWE Smarthome war in den ersten Wochen ein essentieller Teil der Arbeit. OpenHAB als Basistechnologie einzusetzen erschien uns die geeignetste Wahl, denn es bietet genügend Flexibilät um das Szenario nach unseren Vorstellungen zu realisieren. Dank der Flexibilität konnten wir die Android App und die Cloud-Integration perfekt an das Szenario Einbruchschutz anpassen. Zusammengefasst entstanden während der Arbeit folgende Ergebnisse:
+Die Aufgabenstellung forderte eine Lösung zur lokalen Vernetzung von Sensoren und Aktoren. Bestehende Systeme auf dem Markt sollten miteinander verglichen und als Lösungsansatz in Betracht gezogen werden. OpenHAB besitzt schon die Fähigkeit zum Vernetzen und intelligenten Steuern von Sensoren und Aktoren. Dadurch konnten wir uns auf den Aufbau eines Demo-Systems mit dem Fokus auf das Szenario Einbruchschutz konzentrieren.
+
+OpenHAB als Basistechnologie einzusetzen erschien uns die geeignetste Wahl, denn es bietet genügend Flexibilät um das Szenario nach unseren Vorstellungen zu realisieren. Dank der Flexibilität konnten wir die Android App und die Cloud-Integration perfekt an das Szenario Einbruchschutz anpassen. Zusammengefasst entstanden während der Arbeit folgende Ergebnisse:
 \begin{itemize}
 	\item Marktanalyse und Evaluation einer Plattform
 	\item Versuchsaufbau mit echter Hardware
+	\item OpenHAB Add-On für MQTT in Rules
 	\item Cloud-Anwendung zum Sichern von Items
 	\item Android App als  openHAB Client
 \end{itemize}
-Ursprünglich war vorgesehen, den Versuchsaufbau an das IoT-System der Studienarbeit anzuschliessen. Schnell merkten wir, dass die Lösung aus der Studienarbeit zu spezifisch war und sich nicht gut für das Zusammenspiel mit openHAB eignen würde. Das bestätigte unsere Meinung, dass sich das Internet of Things Bottom-Up entwickeln muss. 
+
+Mit openHAB liess sich die Hardware sehr gut in den Versuchsaufbau integrieren. Auch das Zusammenspiel der Hardware funktionierte meist einwandfrei. Man muss kein Software Ingenieur sein, um einen derartigen Versuchsaufbau nachzubilden. Etwas technisches Verständnis und Geduld wird aber vorausgesetzt.
+
+Wir konnten mit dieser Arbeit zeigen, wie openHAB eingesetzt wird und wie ein eigenes Szenario darauf aufgebaut werden kann. Es wurde gezeigt, dass sich openHAB über das MQTT Protokoll mit der Azure Cloud verwenden lässt. 
+

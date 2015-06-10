@@ -26,7 +26,7 @@ Mit openHAB haben wir eine Plattform gefunden, die allen wichtigen Kriterien ent
 
 \textit{F03:} OpenHAB kann den Verkehr auf dem EventBus über verschiedene Wege auf externen Systemen protokollieren. Zu unserem Zweck eignet sich das MQTT Persistence Modul.
 
-\textit{F04:} Über die Rule Engine von openHAB können Regeln mit Hilfe einer Java-ähnlichen DSL beschrieben werden. Regeln werden bei gewissen Events auf dem EventBus ausgeführt. Die DSL erlaubt den Zugriff auf den Zustand von Items und kann auch Commands an Items und somit an Aktoren senden.
+\textit{F04:} Über die Rule Engine von openHAB können Regeln mit Hilfe einer Java-ähnlichen DSL beschrieben werden. Regeln werden bei gewissen Events auf dem EventBus ausgeführt. Die DLS erlaubt den Zugriff auf den Zustand von Items und kann auch Commands an Items und somit an Aktoren senden.
 
 \textit{F05:} Eine REST-API bietet umfassenden Zugriff auf die openHAB Runtime. Über sogenannte Sitemaps können deskriptive User Interfaces automatisch generiert werden.
 
@@ -87,7 +87,7 @@ Alle momentan verfügbaren Bindings sind unter folgendem Link zu finden: \url{ht
 \begin{figure}[H]
 	\centering
 		\includegraphics[scale=0.4]{report/img/communicationOH}
-	\caption{Event Bus als Schnittstelle für Bindings, Quelle: \url{http://www.openhab.org}}
+	\caption{Event Bus als Schnittstelle für Bindings, Quelle: \url{http://www.openhab.org}	}
 	\label{fig:ohComm}
 \end{figure}
 
@@ -105,24 +105,24 @@ Wenn so viele unterschiedliche Technologien unterstützt und integriert werden s
 	\item Bindingparameter
 \end{itemize}
 
-Die Eigenschaften Typ und Name sind zwingend, die anderen sind optional. Der Typ ist auf eine vorgegebene Auswahl beschränkt, der Name dient als Identifier und muss eindeutig sein.\\
+Die Eigenschaften Typ und Name sind zwingend, die Anderen sind optional. Der Typ ist auf eine vorgegebene Auswahl beschränkt, der Name dient als Identifier und muss eindeutig sein.\\
 \\
-Je nach gewähltem Typ können Items die unterschiedlichsten Dinge repräsentieren. Ein sehr häufig verwendeter Typ ist das SwitchItem mit den beiden möglichen Werten ON und OFF. Dieses Item eignet sich aufgrund seines Wertebereichs hervorragend als Boolean. Ein SwitchItem kann stellvertretend für etwas Reales, wie eine Lampe, oder für etwas Abstraktes wie die Anwesenheit eines Bewohners stehen. Es ist wichtig zu verstehen, dass ein Item rein virtuell ist. Die Brücke zur echten Hardware wird erst über Bindingparameter geschlagen, denn dann verknüpft openHAB das Item mit dem entsprechenden Binding. Da die Bindingparameter eines Items aber optional sind, macht openHAB keinen Unterschied zwischen virtuellen und realen Items.
+Je nach gewähltem Typ können Items die unterschiedlichsten Dinge repräsentieren. Ein sehr häufig verwendeter Typ ist das SwitchItem mit den beiden möglichen Werten ON und OFF. Dieses Item eignet sich aufgrund seines Wertebereichs hervorragend als Boolean. Ein SwitchItem kann stellvertretend für etwas reales, wie eine Lampe, oder für etwas abstraktes wie die Anwesenheit eines Bewohners stehen. Es ist wichtig zu verstehen, dass ein Item rein virtuell ist. Die Brücke zur echten Hardware wird erst über Bindingparameter geschlagen, denn dann verknüpft openHAB das Item mit dem entsprechenden Binding. Da die Bindingparameter eines Items aber optional sind macht openHAB keinen Unterschied zwischen virtuellen und realen Items.
 
 
 \subsubsection{Item Repository}
-Der Zustand eines Items muss die Ausführungsdauer einer openHAB Instanz überleben können, beispielsweise nach einem Neustart. Der Zustand muss ausserdem jederzeit abfragbar sein, egal ob sich der Zustand des Items gerade erst durch einen Event geändert hat oder schon über mehrere Startvorgänge hinweg genau so existiert. Diese Verantwortung übernimmt das Item Repository, welches permanent den Event Bus auf Status-Updates abhört und die Änderungen persistiert.
+Der Zustand eines Items muss die Ausführungsdauer einer openHAB Instanz überleben können, beispielsweise nach einem Neustart. Der Zustand muss ausserdem jederzeit abfragbar sein, egal ob sich der Zustand des Items gerade erst durch ein Event geändert hat oder schon über mehrere Startvorgänge hinweg genau so exisitiert. Diese Verantwortung übernimmt das Item Repository, welches permanent den Event Bus auf Status-Updates abhört und die Änderungen persistiert.
 
 \subsubsection{Rules}
-Rules sind die Werkzeuge zur Automatisierung. Dank einer Java-ähnlichen DSL können Aktionen ausgelöst werden, wenn gewisse Bedingungen erfüllt sind. Das können einerseits Zustandsänderungen von Items, aber auch Systemevents oder Events von selbst angelegten Timern sein. 
+Rules sind die Werkzeuge zur Automatisierung. Dank einer Java-ähnlichen DSL können Aktionen ausgelöst werden, wenn gewisse Bedingungen erfüllt wurden. Das können einerseits Zustandsänderungen von Items, aber auch Systemevents oder Events von selbst angelegten Timern sein. 
 
 \subsubsection{Sitemaps}
 Sitemaps sind Konfigurationsfiles zur deklarativen Definition von User Interfaces. Sitemaps werden ebenfalls in einer Xtext basierten DSL geschrieben und haben eine baumartige Struktur. OpenHAB liest das Konfigurationsfile und stellt die Sitemap über ein REST-API zur Verfügung. Eine mitgelieferte Webapplikation stellt das User Interface anschliessend im Browser dar. Layouttechnisch orientiert sich die Webapplikation am iOS 6 Design mit Listendarstellung und Drill-Down Prinzip. Die nativen iOS und Android Apps von openHAB verfolgen das selbe Bedienkonzept.\\
-Die verschiedenen Elemente, die in Sitemaps verfügbar sind, können Items direkt über deren Namen referenzieren. Einige Elemente sind dynamisch und erlauben eine wertabhängige Darstellung.
+Die verschiedenen Elemente, die in Sitemaps verfügbar sind, können Items direkt über deren Name referenzieren. Einige Elemente sind dynamisch und erlauben eine werteabhängige Darstellung.
 
 \subsection{Allgemeine Systemsicht}
 Anhand der Problembeschreibung wurde ein Plan erarbeitet, der das ganze System verständlich beschreibt. Die Abbildung \ref{fig:systemView} stellt die wichtigsten Komponenten und Entitäten aus der Problemdomäne in gegenseitiger Beziehung dar. An zentraler Stelle steht das openHAB-Framework, es verbindet alle Komponenten. Die Cloud wird über MQTT (ein Message-Protokoll) angebunden, um Events zu persistieren.\\
-Die Sensoren/Aktoren kommunizieren durch Bindings über das Netzwerk mit openHAB, um deren Status zu übertragen. Der Client kann diesen Status über ein REST-API abfragen und Commands senden.
+Die Sensoren/Aktoren kommunizieren durch Bindings über das Netzwerk mit openHAB um deren Status zu übertragen. Der Client kann diesen Status über ein REST-API abfragen und Commands senden.
 
 \begin{figure}[H]
 	\centering
@@ -132,7 +132,7 @@ Die Sensoren/Aktoren kommunizieren durch Bindings über das Netzwerk mit openHAB
 \end{figure}
 
 Für das Szenario wurde eine fiktive Wohnung (Abbildung \ref{fig:housePlan}) gezeichnet, um den Einsatz in einer Zwei-Zimmer-Wohnung zu demonstrieren. Dabei befindet sich das openHAB auf dem Rasperry Pi in zentraler Stelle, damit die anderen Zentralen über kurze Strecken mit LAN-Kabeln vernetzt werden können.\\
-Die Webcam ist so platziert, dass der grosse Wohnbereich mitsamt Küche überwacht werden kann und somit ein potentieller Einbrecher aufgenommen werden kann. Der Fensterkontaktsensor wird im Zimmer angebracht und der Bewegungsmelder zwischen Küche und Wohnzimmer, um eine möglichst grosse Fläche abzudecken. Die Philips Hue Lampen befinden sich im Schlaf- und Wohnzimmer, um die ganze Wohnung zu beleuchten.
+Die Webcam ist so platziert, damit der grosse Wohnbereich mitsamt Küche überwacht werden kann und somit ein potentieller Einbrecher aufgenommen werden kann. Der Fenster Kontaktsensor wird im Zimmer angebracht und der Bewegungsmelder zwischen Küche und Wohnzimmer, um einen möglichst grosse Fläche abzudecken.Die Philips Hue Lampen befinden sich im Schlaf- und Wohnzimmer, um die ganze Wohnung zu beleuchten.
 
 Die Türen und das Fenster im Wohnzimmer werden nicht mit Kontaktsensoren ausgestattet, da dieser Bereich durch den Bewegungsmelder erfasst wird.
 
@@ -143,7 +143,7 @@ Die Türen und das Fenster im Wohnzimmer werden nicht mit Kontaktsensoren ausges
 	\label{fig:housePlan}
 \end{figure}
 
-Philips Hue und HomeMatic besitzen beide eine Zentrale. Über die kommunizieren sie mit ihren Gadgets über Funk. Die Zentralen werden über LAN (RJ45) an das Raspberry Pi angeschlossen. Die Abbildung \ref{fig:componentsIntegration} zeigt die Vernetzung der Komponenten. An zentraler Stelle steht das Raspberry Pi, welches via Router mit den beiden Zentralen der Philips Hue und HomeMatic verbunden ist.
+Philips Hue und HomeMatic besitzen beide eine Zentrale, über die kommunizieren sie mit Ihren Gadgets. Die Zentralen werden über LAN (RJ45) an das Raspberry Pi angeschlossen.
 
 \begin{figure}[H]
 	\centering
@@ -153,7 +153,7 @@ Philips Hue und HomeMatic besitzen beide eine Zentrale. Über die kommunizieren 
 \end{figure}
 
 \subsubsection{Beispiel Use Case}
-Das System verfügt über zwei Alarm-Modi: Aktiv und Inaktiv. Wenn der Alarm scharf ist und der HomeMatic Bewegungsmelder oder der Fensterkontakt eine Veränderung registriert, dann sollen die Philips Hue Lampen eingeschaltet werden. Zeitgleich werden Aufnahmen der Webcam an die Cloud gesendet. Die Cloud schickt eine Push-Notification an das Android App, um den Benutzer über den ausgelösten Alarm zu informieren. Das folgende Sequenzdiagramm veranschaulicht den Use Case:
+Das System verfügt über zwei Alarm-Modi: Scharf und Inaktiv. Wenn der Alarm scharf ist und der HomeMatic Bewegungsmelder oder der Fensterkontakt eine Veränderung registriert, dann sollen die Philips Hue Lampen eingeschaltet werden. Zeitgleich werden Aufnahmen der Webcam an die Cloud gesendet. Die Cloud schickt eine Push-Notification an das Android App um den Benutzer über den ausgelösten Alarm zu informieren. Das folgende Sequenzdiagramm veranschaulicht den Use Case:
 
 \begin{figure}[H]
 	\centering
@@ -164,9 +164,9 @@ Das System verfügt über zwei Alarm-Modi: Aktiv und Inaktiv. Wenn der Alarm sch
 
 
 \subsection{Android App}
-Als User Interface für unser System dient eine Android App. Zwar existieren bereits verschiedene openHAB Clients, sowohl als Web-App als auch als Android App, jedoch sind diese zu generisch. Man könnte argumentieren, dass es doch gut ist, wenn die App universell einsetzbar ist, und oft hätte man damit recht. In unserem speziellen Szenario «Einbruchschutz» müssten wir aber zu viele Kompromisse eingehen. Deshalb haben wir uns dafür entschieden, die Android App selbst zu programmieren. 
+Als User Interface für unser System dient eine Android App. Zwar existieren bereits verschiedene openHAB Clients, sowohl als Web-App als auch als Android App, jedoch sind diese zu generisch. Man könnte argumentieren, dass es doch gut ist, wenn die App universell einsetzbar ist und oft hätte man damit recht. In unserem speziellen Szenario «Einbruchschutz» müssten wir aber zu viele Kompromisse eingehen. Deshalb haben wir uns dazu entschieden, die Android App selbst zu programmieren. 
 \\ \\
-Jede openHAB Installation bietet eine offene REST-Schnittstelle an, damit auch Clients von Drittanbietern auf Items und Sitemaps zugreifen können. Der openHAB Server ermöglicht sowohl das explizite Abfragen der Daten, als auch den umgekehrten Weg, um Clients proaktiv über Änderungen zu informieren. 
+Jede openHAB Installation bietet eine offene REST-Schnittstelle an, damit auch Clients von Drittanbietern auf Items und Sitemaps zugreifen können. Der openHAB Server ermöglicht sowohl das explizite Abfragen der Daten, als auch den umgekehrten Weg um Clients proaktiv über Änderungen zu informieren. 
 
 \subsubsection{Features}
 Die Features unserer App orientieren sich an den funktionalen Anforderungen zum Lösungsteil. Insbesondere sind dies:
@@ -196,7 +196,7 @@ In dieser Ansicht soll der Benutzer möglichst auf einen Blick alle relevanten I
 
 \begin{figure}[htbp]
 	\begin{minipage}{0.6\textwidth} 
-Auf der Detailseite «Fenster» können die entsprechend ausgerüsteten Fenster überwacht werden. In unserem Versuchsaufbau ist nur ein Kontaktsensor vorgesehen, sollten es aber mehrere sein, würden die Fenster untereinander aufgelistet.
+Auf der Detailseite «Fenster» können die entsprechend ausgerüsteten Fenster überwacht werden. In unserem Versuchsaufbau ist nur ein Konaktsensor vorgesehen, sollten es aber mehrere sein, würden Fenster untereinander aufgelistet.
 	\end{minipage}
 	\hfill
 	\begin{minipage}{0.32\textwidth}
@@ -232,7 +232,7 @@ Diese Ansicht enthält einen Schalter zum Scharfstellen oder Deaktivieren des Al
 
 \begin{figure}[H]
 	\begin{minipage}{0.6\textwidth} 
-Wenn das Smartphone auf einen vorkonfigurierten NFC-Tag gelegt wird, erscheint diese Ansicht, auch wenn die App zuvor nicht geöffnet war. Da der Alarm-Modus nur die beiden Zustände «aktiv» oder «Iinaktiv» kennt, wird der Modus bei jedem Auflegen jeweils umgekehrt.
+Wenn das Smartphone auf einen vorkonfigurierten NFC-Tag gelegt wird erscheint diese Ansicht, auch wenn die App zuvor nicht geöffnet war. Da der Alarm-Modus nur die beiden Zustände «Scharf» oder «Inaktiv» kennt, wird der Modus bei jedem Auflegen jeweils umgekehrt.
 	\end{minipage}
 	\hfill
 	\begin{minipage}{0.32\textwidth}
@@ -246,22 +246,26 @@ Wenn das Smartphone auf einen vorkonfigurierten NFC-Tag gelegt wird, erscheint d
 
 \subsubsection{Architektur}
 \label{sec:androidArchSolution}
-Die Architektur von Android Apps sieht meistens relativ ähnlich aus. Sie besteht aus einem Manifest-File, Activities, BroadcastReceiver, ContentProvider und Services. In unserer App benötigen wir alle diese Komponenten, mit Ausnahme eines ContentProviders.
+Die Architektur von Android Apps sieht meistens relativ ähnlich aus. Sie bestehen aus einem Manifest-File, Activities, BroadcastReceiver, ContentProvider und Services. Alle diese Komponenten sind als abstrakte Klassen im Android Framework enthalten. Wir verwenden in unserer App Subklassen von Activity, BroadcastReceiver und Service.
 
 \textbf{Manifest-File}\\
 In diesem XML-File werden die Rahmenbedingungen der App festgehalten. Beispielsweise welche Berechtigungen die App benötigt, welche Activities und Services sie anbietet oder verwendet.
 
 \textbf{Activities}\\
-Alle Ansichtsseiten einer Android App werden mit Hilfe von Activities umgesetzt und erben von der Klasse Activity. Eine Activity besitzt ein zugehöriges Layout (in Form eines XML-Files) und ermöglicht die Manipulation der Layoutelemente. Dazu gehört auch das Verarbeiten von Events, die von Layoutelementen gesendet wurden. Jede Ansichtsseite hat also in der Regel seine eigene Activity, die an einen Lebenszyklus gebunden ist. Das Android OS ruft bei jeder Phase des Lebenszyklus (onCreate, onResume, onPause, onDestroy etc.) die jeweilige Methode der Activity auf. Diese Methoden müssen in den eigenen Activity Subklassen überschrieben und korrekt implementiert werden. Gestartet werden Activities nicht durch Instanziierung mit dem new-Keyword, sondern über einen Intent. Für Activities der selben App kann einfach die Klassenreferenz (Activity.class) beim Intent übergeben werden und Android übernimmt die Instanziierung. Im Manifest-File kann eine App seine Activities einzeln nach aussen anbieten, z.B. eine Activity zum Aufnehmen eines Fotos. Andere Apps können mit einem allgemein formulierten Intent diese Activity starten. Sollte es mehrere Apps geben, die Activities zur Fotoaufnahme anbieten, kann der Benutzer eine App aus der Liste auswählen und als Standard speichern. Aus diesem Grund können einer Activity keine Konstruktorargumente und dadurch auch keine Referenzen auf Model-Objekte oder ähnliches übergeben werden. Alle Parameter sind serialisierte Objekte (meist Strings), die in einer Key/Value Datenstruktur über den Intent zugreifbar sind. Oft möchte man aber in mehreren Activities auf die gleichen Domainmodell-Objekte zugreifen können. Zur Lösung des Problems kann man Dependency Injection Frameworks einsetzen, die so konfiguriert werden, dass die entsprechenden Objekte automatisch den annotierten Instanzvariablen zugewiesen werden. Das lohnt sich aber nur für grössere Apps, da ein gewisser Initialaufwand damit verbunden ist. Ansonsten bleibt nur die Verwendung von Singletons bzw. statischen Methoden übrig. Streng genommen benutzen auch Dependency Injection Frameworks diese Variante.
+Alle Ansichtsseiten einer Android App werden mit Hilfe von Activities umgesetzt und erben von der Framework-Klasse Activity. Eine Activity besitzt ein zugehöriges Layout (in Form eines XML-Files) und ermöglicht die Manipulation der Layoutelemente. Dazu gehört auch das Verarbeiten von Events, die von Layoutelementen gesendet wurden. Jede Ansichtsseite hat also in der Regel seine eigene Activity, die an einen Lebenszyklus gebunden ist. Das Android OS ruft bei jeder Phase des Lebenszyklus (onCreate, onResume, onPause, onDestroy etc.) die jeweilige Methode der Activity auf. Diese Methoden müssen in den eigenen Activity Subklassen überschrieben und korrekt implementiert werden. Gestartet werden Activities nicht durch Instanziierung mit dem new-Keyword, sondern über einen Intent (englisches Wort für «Absicht»). 
+
+Im Android Framework wird die Klasse Intent verwendet, um seine Absicht zum Starten einer Activity zu erklären. Dazu wird ein Intent-Objekt instanziiert und mit Key/Value Wertepaaren als Parameter für die Activity befüllt. Der Value eines Parameter kann kein beliebier Typ sein, sondern muss gewisse Kriterien erfüllen. Die primitiven Typen gehören dazu. Für Activities der selben App kann einfach die Klassenreferenz (Activity.class) beim Intent übergeben werden und Android übernimmt die Instanziierung. Im Manifest-File kann eine App seine Activities einzeln nach aussen anbieten, z.B. eine Activity zum Aufnehmen eines Fotos. Andere Apps können mit einem allgemein formulierten Intent diese Activity starten. Sollte es mehrere Apps geben, die Activities zur Fotoaufnahme anbieten, kann der Benutzer eine App aus der Liste auswählen und als Standard speichern.
+
+Activties können ausschliesslich durch einen Intent erzeugt werden, deshalb können einer Activity keine Konstruktorargumente und dadurch auch keine Referenzen auf komplexe Domainmodel-Objekte (View-Models, Service-Klassen) oder ähnliches übergeben werden. Alle Parameter sind serialisierte Objekte (meist Strings), die in einer Key/Value Datenstruktur über den Intent zugreifbar sind. Oft möchte man aber in mehreren Activities auf die gleichen Domainmodell-Objekte zugreifen können. Zur Lösung des Problems kann man Dependency Injection Frameworks einsetzen, die so konfiguriert werden, dass die entsprechenden Objekte automatisch den annotierten Instanzvariablen zugewiesen werden. Das lohnt sich aber nur für grössere Apps, da ein gewisser Initialaufwand damit verbunden ist. Ansonsten bleibt nur die Verwendung von Singletons bzw. statischen Methoden übrig. Streng genommen benutzen auch Dependency Injection Frameworks diese Variante.
 
 \textbf{BroadcastReceiver}\\
-Werden benötigt, um auf Ereignisse von Android oder von anderen Apps zu reagieren. Sie sind Teil der App und werden im Manifest-File deklariert. Die Implementierung erfolgt durch Erben der Klasse BroadcastReceiver. Wir verwenden in unserer App einen BroadcastReceiver, um Push-Notifications empfangen zu können.
+Werden benötigt um auf Ereignisse von Android oder von anderen Apps zu reagieren. Sie sind Teil der App und werden im Manifest-File deklariert. Die Implementierung erfolgt durch Erben der Klasse BroadcastReceiver. Wir verwenden in unserer App einen BroadcastReceiver um Push-Notifications empfangen zu können.
 
 \textbf{Services}\\
-Sind Android-Klassen zum Ausführen von Code im Hintergrund, ohne dass eine Activity für den Benutzer sichtbar ist. Wir verwenden einen Service, um die Push-Notification, die vom BroadcastReceiver empfangen wurde, zu verarbeiten. Nicht zu verwechseln sind diese (Android-)Services mit den Service-Klassen im Schichtenmodell auf dem Business-Logic-Layer als allgemeines Programmierkonzept. Es können auch eigene Service-Klassen zum Kapseln von Businesslogik verwendet werden, die nichts mit den Android-Services zu tun haben.
+Sind Android-Klassen zum Ausführen von Code im Hintergrund, ohne dass eine Activity für den Benutzer sichtbar ist. Wir verwenden einen Service, um die Push-Notification, die vom BroadcastReceiver empfangen wurde, zu verarbeiten. Nicht zu verwechseln sind diese (Android-)Services mit den Service-Klassen im Schichtenmodell auf dem Business-Logic-Layer als allgemeines Programmierkonzept. Es können auch eigene Service-Klassen zum kapseln von Businesslogik verwendet werden, die nichts mit den Android-Services zu tun haben.
 
 \textbf{openHAB SDK}\\
-In unserer Android App verwenden wir das REST-API von openHAB. Dazu braucht es eigene Service-Klassen zum Ausführen der REST Calls und zum Mappen der JSON Responses in Domain-Objekte (Sitemaps, Pages, Widgets, Items). Ebenso braucht es eine Schnittstelle zum persistenten Speichern von Verbindungsinformationen. Als wir die Android App planten, wären wir sehr froh gewesen, wenn es ein openHAB SDK für Android gegeben hätte, das all diese Aufgaben schon für uns übernehmen würde. Dann müssten wir nur noch Activities mit entsprechenden Layouts entwickeln, und uns wäre ein Grossteil des Aufwands erspart geblieben. Die offizielle Android App von openHAB ist zwar Open Source, jedoch derart schlecht aufgebaut, dass nichts davon wiederzuverwenden war. Deshalb möchten wir während der Entwicklung unserer App gleich selbst ein solches SDK aufbauen. Aus Zeitgründen werden wir uns aber auf diejenigen Funktionen beschränken, die wir tatsächlich benötigen. Die Architektur der App teilt sich deshalb auf in einen Teil SDK und einen Teil App (siehe Abbildung \ref{fig:androidArchSdk}). 
+In unserer Android App verwenden wir das REST-API von openHAB. Dazu braucht es eigene Service-Klassen zum Ausführen der REST Calls und zum Mappen der JSON Responses in Domain-Objekte (Sitemaps, Pages, Widgets, Items). Ebenso braucht es eine Schnittstelle zum persistenten Speichern von Verbindungsinformationen. Als wir die Android App planten, wären wir sehr froh gewesen, wenn es ein openHAB SDK für Android gäbe, das all diese Aufgaben schon für uns übernehmen würde. Dann müssten wir nur noch Activities mit entsprechenden Layouts entwickeln und uns wäre ein Grossteil des Aufwands erspart geblieben. Die offizielle Android App von openHAB ist zwar Open Source, jedoch derart schlecht aufgebaut, dass nichts davon wiederzuverwenden war. Deshalb möchten wir während der Entwicklung unserer App gleich selbst solch ein SDK aufbauen. Aus Zeitgründen werden wir uns aber auf diejenigen Funktionen beschränken, die wir tatsächlich benötigen. Die Architektur der App teilt sich deshalb auf in einen Teil SDK und einen Teil App (siehe Abbildung \ref{fig:androidArchSdk}). 
 
 \begin{figure}[H]
 	\centering
@@ -270,11 +274,11 @@ In unserer Android App verwenden wir das REST-API von openHAB. Dazu braucht es e
 	\label{fig:androidArchSdk}
 \end{figure}
 
-Im SDK befinden sich Klassen für die Verwendung des REST-API und Model-Klassen, um die Daten des API intern zu repräsentieren. Zudem werden im SDK auch diverse Hilfsklassen zu finden sein. \\
-Das App Package besteht aus allen Klassen, die speziell für diese App so benötigt werden und nicht zwingenderweise für andere Apps wiederverwendbar sein müssen. Das betrifft hauptsächlich alle Activities und diverse UI Elemente.
+Im SDK-Package befinden sich Klassen für die Verwendung des REST-API und Model-Klassen, um die Daten des API intern zu repräsentieren. Wir haben auf den Einsatz eines Dependency Injection Container verzichtet und verwenden ein Singleton als Einstiegspunkt ins SDK, um unnötige Komplexität zu verhindern. Das Singleton dient nur dazu, Referenzen auf die Bestandteile im SDK zur Verfügung zu stellen. Zudem werden im SDK auch diverse Hilfsklassen zu finden sein. \\
+Das App Package besteht aus allen Klassen, die speziell für diese App so benötigt werden und nicht zwingenderweise für andere Apps wiederverwendbar sein müssen. Das betriffet hauptsächlich alle Activities und diverse UI Elemente.
 
 \textbf{Klassendiagramm}\\
-Die nachfolgende Abbildung zeigt einen vereinfachten Auszug aus dem geplanten Klassendiagramm der App. Auch hier wird wieder die Trennung zwischen SDK und App sichtbar. Eine Erklärung zu den ausgewählten Klassen befindet sich im Umsetzungsteil der Dokumentation, im Abschnitt \ref{sec:importantClasses}, auf Seite \pageref{sec:importantClasses}. Hinweis: Die dargestellten Klassen können in der tatsächlichen Implementierung in Methoden und Instanzvariablen abweichen.
+Die nachfolgende Abbildung zeigt einen vereinfachten Auszug aus dem geplanten Klassendiagramm der App. Auch hier wird wieder die Trennung zwischen SDK und App sichtbar. Eine Erklärung zu ausgewählten Klassen befindet sich im Umsetzungsteil der Dokumentation im Abschnitt \ref{sec:importantClasses} auf Seite \pageref{sec:importantClasses}. Hinweis: Die dargestellten Klassen können in der tatsächlichen Implementierung in Methoden und Instanzvariablen abweichen.
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=\textwidth]{report/img/android_uml.png}
@@ -285,10 +289,10 @@ Die nachfolgende Abbildung zeigt einen vereinfachten Auszug aus dem geplanten Kl
 
 \subsection{Anbindung Cloud}
 
-In den funktionalen Anforderungen zum Basisszenario wurde festgelegt, dass Geschehnisse auf dem lokalen Bus (openHAB) an die Cloud gesendet werden müssen. Als Cloud-Plattform wurde Microsoft Azure bereits zu Beginn der Arbeit definiert. Damit die Daten von openHAB in die Cloud gelangen, gibt es im Wesentlichen zwei Möglichkeiten: Entweder man entwickelt selbst ein Plugin für openHAB oder man verwendet das openHAB MQTT Persistence Plugin. MQTT ist ein Publish/Subscribe-Protokoll und besonders gut für IOT Systeme mit langsamer oder instabiler Internetverbindung geeignet. Wir haben uns für die Variante mit MQTT entschieden. OpenHAB fungiert als MQTT-Client und kann so konfiguriert werden, dass Events auf dem Bus automatisch an einen MQTT-Broker gesendet werden, der von uns auf Microsoft Azure installiert wurde. Um die Daten zu verarbeiten, muss ein MQTT-Client auf Microsoft Azure laufen, und die Nachrichten vom Broker entgegennehmen. Danach steht uns frei, wie die Daten verarbeitet werden. Details zur Implementierung und technische Beschreibungen sind im Kapitel «Umsetzung» dieser Dokumentation zu finden. 
+In den funktionalen Anforderungen zum Basisszenario wurde festgelegt, dass Geschehnisse auf dem lokalen Bus (openHAB) an die Cloud gesendet werden müssen. Als Cloud-Plattform wurde Microsoft Azure bereits zu Beginn der Arbeit definiert. Damit die Daten von openHAB in die Cloud gelangen gibt es im Wesentlichen zwei Möglichkeiten: Entweder man entwickelt selbst ein Plugin für openHAB oder man verwendet das openHAB MQTT Persistence Plugin. MQTT ist ein Publish/Subscribe-Protokoll und besonders gut für IOT Systeme mit langsamer oder instabiler Internetverbindung geeignet. Wir haben uns für die Variante mit MQTT entschieden. OpenHAB fungiert als MQTT-Client und kann so konfiguriert werden, dass Events auf dem Bus automatisch an einen MQTT-Broker gesendet werden, der von uns auf Microsoft Azure installiert wurde. Um die Daten zu verarbeiten muss ein MQTT-Client auf Microsoft Azure laufen und die Nachrichten vom Broker entgegennehmen. Danach steht uns frei, wie die Daten verarbeitet werden. Details zur Implementierung und technische Beschreibungen sind im Kapitel «Umsetzung» dieser Dokumentation zu finden. 
 
 \subsubsection{MQTT Broker Evaluation}
-Für die Evaluation des Brokers haben wir eine Liste mit unseren Anforderungen erstellt: 
+Für die Evaluation des Brokers haben wir eine List mit unseren Anforderungen erstellt: 
 
 \begin{enumerate}
 	\item Open Source/Freeware
@@ -297,8 +301,8 @@ Für die Evaluation des Brokers haben wir eine Liste mit unseren Anforderungen e
 	\item High throughput, Low latency
 	\item Cloud Ready
 	\item Einfache Installation
-	\item Quality of Service Level: Exactly once
-	\item Last Will Unterstützung (Message, die gesendet wird, wenn der Client die Verbindung schliesst)
+	\item Qualit of Service Level: Exactly once
+	\item Last Will unterstützung (Message, die gesendet wird, wenn der Client die Verbindung schliesst)
 \end{enumerate}
 
 \textbf{HiveMQ (\url{http://www.hivemq.com})} \\
@@ -310,23 +314,23 @@ Die aktuelle Implementation benötigt lediglich 120kB Speicherplatz und 3MB RAM 
 Alle anderen Kriterien werden ebenfalls erfüllt.
 
 \textbf{CloudMQTT} \\
-CloudMQTT unterscheidet sich von den anderen Brokern, da dieser nicht selbst betrieben werden kann. Das bedeutet, man erstellt bei CloudMQTT eine Instanz und kann denn neu erstellten Broker über verschiedene APIs ansteuern. \\
+CloudMQTT unterscheidet sich von den anderen Brokern, da dieser nicht selbst betrieben werden kann. Das bedeutet, man erstellt bei CloudMQTT eine Instanz und kann denn neu erstellten Broke über verschiedene APIs ansteuern. \\
 Der Anbieter stellt verschiedene Preispläne zur Verfügung (\url{http://www.cloudmqtt.com/plans.html}). Ab 10 Verbindungen bzw. 10Kbit/s Bandbreite muss für die Leistung bezahlt werden. \\
-Ob TLS SSL Verschlüsselung unterstützt wird, ist aus der spärlichen Dokumentation nicht ersichtlich.
+Ob TLS SSL Verschlüsselung unterstützt wird, ist in der spärlichen Dokumentation nicht ersichtlich.
 
 \textbf{Fazit} \\
 Aufgrund der gesammelten Daten der drei Produkte wurde entschieden, Mosquitto einzusetzen. Es ist das einzige Produkt, welches alle unsere Kriterien erfüllt. Da dieses Projekt durch die Eclipse Foundation unterstützt wird, besteht die Hoffung, dass die Zusammenarbeit mit openHAB unterstützt bzw. miteinbezogen wurde.
 
 \subsubsection{Client-Library}
 In unserem Systemaufbau wird es zwei MQTT-Clients geben. Einerseits durch das openHAB-Binding, da die Events auf dem EventBus über MQTT in die Azure Cloud gesendet werden soll. Andererseits wird in der Cloud eine Worker Role diese Events konsumieren und persistieren. \\
-Das Binding von openHAB besteht bereits, daher muss nur noch eine Client-Implementation für C\# gesucht werden. Nach kurzer Rechereche scheint die «M2Mqtt» Library sehr verbreitet zu sein. \\
-Durch Aufsetzen eines Prototyps konnte die benötigte Funktionalität erfasst werden. Sie erfüllt alle Kriterien, die auch an den Broker gestellt wurden.
+Das Binding von openHAB besteht bereits, daher muss nur noch eine Client-Implementation für C\# gesuchtwerden. Nach kurzer Rechereche scheint die «M2Mqtt» Library sehr verbreitet zu sein. \\
+Durch aufsetzen eines Prototyps konnte die benötigte Funktionalität erfasst werden. Sie erfüllt alle Kriterien, die auch an den Broker gestellt wurden.
 
 \subsection{Push-Notifications}
-Damit ein Sicherheitssystem Sinn macht, muss der Besitzer benachrichtigt werden, sobald sich ein Zustand der Sensoren ändert. Genauer gesagt, soll der Benutzer informiert werden, wenn der Bewegungsmelder oder der Fensterkontakt im Alarm-Modus eine Veränderung registriert. Ansonsten müsste der Benutzer permanent die Status im Android-App überwachen. Für die Umsetzung bietet sich der Google Cloud Message Dienst (GCM) an, der auch von Microsoft empfohlen wird. Da nur die Android-Plattform unterstützt werden muss, wird auf den Einsatz des Azure Notification Hubs verzichtet und die direkte Verbindung zum GCM-Dienst gesucht. Im entsprechenden Kapitel des Umsetzungsteils auf Seite \pageref{sec:notificationRealization} erfahren Sie, wie die Notification Funktion cloud- und androidseitig umgesetzt wurde.
+Damit ein Sicherheitssystem Sinn macht, muss der Besitzer benachrichtigt werden, sobald sich ein Zustand der Sensoren ändert. Genauer gesagt soll der Benutzer informiert werden, wenn der Bewegungsmelder oder der Fensterkontakt im Alarm-Modus eine Veränderung registriert. Ansonsten müsste der Benutzer permanent die Status im Android-App überwachen. Für die Umsetzung bietet sich der Google Cloud Message Dienst (GCM) an, der auch von Microsoft empfohlen wird. Da nur die Android-Platform unterstützt werden muss, wird auf den Einsatz des Azure Notification Hubs verzichtet und die direkte Verbindung zum GCM-Dienst gesucht. Erfahren Sie im entsprechenden Kapitel des Umsetzungsteil auf Seite \pageref{sec:notificationRealization}, wie die Notification Funktion cloud- und androidseitig umgesetzt wurde.
 
 \subsection{Sicherheit}
-In unserem Szenario Einbruchschutz, ist das Thema Sicherheit sehr wichtig. Daher lohnt es sich dazu  Gedanken zu machen. Man kann das System in vier Bereiche einteilen, in denen ein Angriff angesetzt werden kann:
+In unserem Szenario, Einbruchschutz, ist das Thema Sicherheit sehr wichtig. Daher lohnt es sich dazu  Gedanken zu machen. Man kann das System grob in drei Bereiche einteilen, an denen ein Angriff angesetzt werden kann:
 \begin{itemize}
 	\item Cloud
 	\item Android App
@@ -335,24 +339,24 @@ In unserem Szenario Einbruchschutz, ist das Thema Sicherheit sehr wichtig. Daher
 \end{itemize}
 
 \subsubsection{Cloud}
-Die Angriffsfläche in der Cloud ist ziemlich eingeschränkt. Sicherheitsrelevante Aspekte sind der Broker und die persistierten Daten im Storage. Zugriff auf diese Ressourcen erhält man über verschiedene Wege. Einerseits über das Management Web-Interface von Microsoft Azure oder über einen Connection-String. Durch die Verwendung eines Connection Strings für den Verbindungsaufbau zum Storage muss kein Benutzername bzw. Passwort mitgegeben werden.
+Die Angriffsfläche in der Cloud ist ziemlich eingeschränkt. Sicherheitsrelevante Aspekte sind der Broker und die persistierten Daten im Storage. Zugriff auf diese Ressourcen erhält man über verschiedene Wege. Einerseits über das Management Web-Interface von Microsoft Azure oder über ein Connection-String. Durch die Verwendung eines Connection Strings für den Verbindungsaufbau zum Storage kein Benutzername bzw. Passwort mitgegeben werden.
 
-Zugriff auf diese Ressourcen haben nur authorisierte Personen, die ein entsprechendes Microsoft Konto besitzen und auf die Subscription zugelassen werden. Eine vernünftige Attacke kann daher nur durch das Hijacken eines Accounts gefahren werden. Als Gegenmassnahme müssen ausreichend sichere Passwörter auf den persönlichen Konten gesetzt werden. Das liegt in der Verantwortung der einzelnen Personen, die auf diese Subscription Zugriff besitzen.
+Zugriff auf diese Ressourcen haben nur authorisierte Personen die ein entsprechendes Microsoft Konto besitzen und auf die Subscription zugelassen werden. Eine vernünftige Attack kann daher nur durch das Hijacken eines Accounts gefahren werden. Als Gegenmassnahme müssen ausreichend sichere Passwörter auf den persönlichen Konten gesetzt werden. Das liegt in der Verantwortung der einzelnen Personen, die auf diese Subscription Zugriff besitzen.
 
-Auf den Storage kann nebst der Management-Oberfläche auch über einen Connection-String zugegriffen werden. Dieser String kann nur über die Management-Oberfläche eingesehen werden und ist daher sicher versteckt. Weiter könnte der Connection String aus dem Source-Code der Worker Role gelesen werden, da er dort für den Verbindungsaufbau zum Storage verwendet wird. Diese Worker Role und deren Source-Code befindet sich innerhalb der Cloud und ist somit auch gegen ein Eindringen gesichert. \\
+Auf den Storage kann ausser der Management-Oberfläche auch über ein Connection-String zugegriffen werden. Dieser String kann nur über die Management-Oberfläche eingesehen werden und ist daher sicher versteckt. Weiter könnte der Connection String aus dem Source-Code der Worker Role gelesen werden, da er dort für den Verbindungsaufbau zum Storage verwendet wird. Diese Worker Role und deren Source-Code befindet sich innerhalb der Cloud und ist somit auch gegen ein Eindringen gesichert. \\
 
 \subsubsection{Android App}
-Über die Android App kann das ganze System manipuliert werden. Daher stellt dies ein grosses Sicherheits-Risiko dar. Gesichert wird die App durch Eingabe von Benutzerdaten, um auf das REST-API von openHAB zuzugreifen. \\
+Über die Android App kann das ganze System manipuliert werden. Daher stellt dies ein grosses Sicherheits-Risiko dar. Gesichtert wird die App durch Eingabe von Benutzerdaten, um auf das REST-API von openHAB zuzugreifen. \\
 Auch hier wird die Person, die das App verwendet zur Verantwortung gezogen, um das Smartphone durch ein sicheres Passwort zu schützen.
 
 \subsubsection{Systemaufbau mit Sensoren/Aktoren}
-Wenn sich die angreifende Person bereits im Haus befindet, hat sie die entsprechenden Alarm bereits ausgelöst und wurde durch die Webcam aufgenommen. \\
-Das grösste Risiko für dieses Szenario ist, dass die Person die Videoüberwachung bemerkt und aus diesem Grund das Raspberry Pi zerstört bzw. mitnimmt. Um die aufgezeichneten Daten zu sichern, werden die von der Kamera erzeugten Bilder über MQTT im Cloud-Storage abgelegt. Auch wenn das Raspberry Pi zerstört wird, sind die Bilder nun gesichert und können im Nachhinein vom Storage heruntergeladen werden.
+Wenn sich die angreifende Person bereits im Haus befindet,hat sie die entsprechenden Alarm bereits ausgelöst und wurde durch die Webcam aufgenommen. \\
+Für dieses Szenario ist das grösste Risiko, dass die Person die Videoüberwachung bemerkt und aus diesem Grund das Raspberry Pi zerstört bzw. mitnimmt. Um die aufgezeichneten Daten zu sichern, werden die von der Kamera erzeugten Bilder über MQTT im Cloud-Storage abgelegt. Auch wenn das Raspberry Pi zerstört wird, sind die Bilder nun gesichert und können im Nachhinein vom Storage heruntergeladen werden.
 
 \subsubsection{HomeMatic Kommunikation}
-Da die HomeMatic Komponenten untereinander drahtlos kommunizieren, besteht hier ebenfalls die Gefahr einer Attacke. HomeMatic setzt für die Übertragung auf den Funkstandard BidCos. Dieser Standard sieht vor, dass das 868 MHz Band verwendet wird. Im Vergleich zu 2.4 GHz besitzt man so eine grössere Reichweite, und die Gefahr von Interferenz durch andere Funkgeräte ist sehr minim.\\
-Bezüglich Sicherheit sieht der Standard lediglich vor, die übertragenen Daten durch XOR-Operationen unleserlich zu machen. HomeMatic hat daher bei der Implentierung dieses Standards die Verschlüsselung durch AES-128 verstärkt. Der zur Verschlüsselung verwendete Key ist in der Zentrale hinterlegt und kann bei Bedarf geändert werden.
+Da die HomeMatic Komponenten untereinander drahtlos kommunizieren besteht hier ebenfalls die Gefahr einer Attacke. HomeMatic setzt für die Übertragung auf den Funkstandard BidCos. Diese Standard sieht vor, dass das 868 MHz Band verwendet wird. Im Vergleich zu 2.4 GHz besitzt man so eine grösse Reichweite und die Gefahr von Interferenz durch andere Funkgeräte ist sehr minim.\\
+Bezüglich Sicherheit sieht der Standard lediglich vor, die übertragenen Daten durch XOR-Operationen unleserlich zu machen. HomeMatic hat daher bei der Implentierung dieses Stanards die Verschlüsselung durch AES-128 verstärkt. Der zur Verschlüsselung verwendete Key ist in der Zentrale hinterlegt und kann bei Bedarf geändert werden.
 
 
 \subsubsection{Fazit}
-Wie aus den Ausführungen zur Sicherheit ersichtlich ist, können alle technischen Sicherheits-Risiken abgedeckt werden. Die grösste Schwachstelle ist jeweils der Mensch, der durch Social-Engineering-Techniken manipuliert werden kann und so Zugriff auf das Android App gewährt.
+Wie aus den Ausführungen zur Sicherheit ersichtlich ist, können alle technischen Sicherheits-Risiken abgedeckt werden. Die grösste Schwachstellt ist jeweils der Mensch, der durch Social-Engineering-Techniken manipuliert werden kann und so Zugriff auf das Android App gewährt.
